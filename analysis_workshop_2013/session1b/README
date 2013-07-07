@@ -1,0 +1,63 @@
+
+The goal of this session is to generate two sets of simulated data for the reaction
+gamma p -> pi+ pi- pi+ n
+
+A) The first set will have resonance in pi+ pi- pi+ invariant mass and this set, after it has
+been passed through the detector simulation, will serve as the mock signal data sample for
+further simulation.
+
+B) The second set will not have any resonances in it and will be used in the amplitude analysis
+procedure to account for the detector acceptance.
+
+This example uses the generator gen_3pi, which is based on the AmpTools package and has
+been checked into the GlueX repository at programs/Simulation/gen_3pi.  The configuration
+files in this directory are copied from those in that directory.
+
+
+Steps:
+
+1) First examine the configuration file gen_3pi.cfg.  You can see how each of the amplitudes 
+are constructed as a product of amplitudes.  The amplitude definitions themselves are coded as 
+classes in the GlueX repository:  libraries/AMPTOOLS_AMPS
+
+2) Generate 50K events of sample A (with resonances) by executing the following command:
+
+gen_3pi -c gen_3pi.cfg -o threepi_data_gen.root -hddm threepi_data_gen.hddm -l 0.7 -u 2.0 -n 50000
+
+The arguments specify the configuration file, the output file, the (optional) HDDM formatted copy
+of the output, the lower limit in 3 pi invariant mass (GeV), the upper limit in 3 pi invariant
+mass (GeV) and the number of events.
+
+[In addition a file called gen_3pi_diagnostic.root is created.  This is created everytime that 
+gen_3pi is run and contains some diagnostic histograms.  This behavior can be altered by editing
+the gen_3pi.cc source code.]
+
+3) A ROOT script is provided to make some simple plots of the output:  plotInvariantMasses.C
+Start ROOT, run the script, and interpret the plots.
+
+4) To complete this exercise you will also need the sample B that does not have resonances.
+Generate 200K events of this type -- adding the -f flag to the generation generates the
+events flat in 3 pi invaraint mass:
+
+gen_3pi -c gen_3pi.cfg -o threepi_gen.root -hddm threepi_gen.hddm -f -l 0.7 -u 2.0 -n 200000
+
+
+Additional Exercises 
+(be sure you maintain the original files for the remainder of the workshop)
+
+* modify plotInvariantMasses.C to read and plot sample B
+* comment out/edit some amplitudes in the configuration file, regenerate sample A, and plot
+* comment out 'permute' commands in the coniguration file, regenerate sample A, and plot
+* modify plotInvariantMasses to plot missing mass, momentum transfer, or other variables
+
+* modify polarization:
+
+  The generation is done with pure x polarization.  A component of y polarization can be added
+  by removing the comment in front of the line in gen_3pi.cfg
+
+   include gen_3pi_ypol.cfg
+
+  The fraction of x polarization can be adjusted by modifying the line
+
+   define polFrac 0.0
+
