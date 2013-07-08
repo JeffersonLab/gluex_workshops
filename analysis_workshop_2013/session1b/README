@@ -22,7 +22,7 @@ classes in the GlueX repository:  libraries/AMPTOOLS_AMPS
 
 2) Generate 50K events of sample A (with resonances) by executing the following command:
 
-gen_3pi -c gen_3pi.cfg -o threepi_data_gen.root -hddm threepi_data_gen.hddm -l 0.7 -u 2.0 -n 50000
+gen_3pi -c gen_3pi.cfg -o threepi_data_gen.root -hd threepi_data_gen.hddm -l 0.7 -u 2.0 -n 50000
 
 The arguments specify the configuration file, the output file, the (optional) HDDM formatted copy
 of the output, the lower limit in 3 pi invariant mass (GeV), the upper limit in 3 pi invariant
@@ -39,7 +39,7 @@ Start ROOT, run the script, and interpret the plots.
 Generate 200K events of this type -- adding the -f flag to the generation generates the
 events flat in 3 pi invaraint mass:
 
-gen_3pi -c gen_3pi.cfg -o threepi_gen.root -hddm threepi_gen.hddm -f -l 0.7 -u 2.0 -n 200000
+gen_3pi -c gen_3pi.cfg -o threepi_gen.root -hd threepi_gen.hddm -f -l 0.7 -u 2.0 -n 200000
 
 
 Additional Exercises 
