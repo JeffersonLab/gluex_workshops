@@ -1,0 +1,11 @@
+
+This exercise is to simply convert the analysis TTree's to a format which is compatable with with AmpTools.  Paul wrote a generic converter programs/Utilities/tree_to_amptools which uses the analysis TTree to write the required kinematic information in a new TTree compatible with AmpTools.  
+
+Analysis TTrees containing only combos surviving the BDT cut have been produced for larger evaluation sample of signal and background events and are stored at $GLUEX_DATA/session7a/.  From these samples we produce the input files to AmpTools for our "data" using tree_to_amptools.
+
+Steps:
+
+1) Execute the following script to produce the AmpTools imput 
+
+ln -s $SESSIONS/session7a/exercise2/prepAmpToolsInput.sh
+./prepAmpToolsInput.sh
