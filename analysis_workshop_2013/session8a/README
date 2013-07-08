@@ -1,0 +1,78 @@
+
+Requirements:
+
+A sample of events of the type gamma p -> pi+ pi- pi+ n that has been generated
+and reconstructed in the earlier stages of the analysis workshop.  Three
+files are needed.
+
+threepi_data.root : the mock data after reconstruction and analysis
+threepi_gen.root : an MC sample generated flat in invariant mass with no physics
+threepi_acc.root : the MC sample above subjected to the same reconstruction and analysis as data
+
+These files (or symbolic links to them) must be in the directory containing this README file
+before proceeding.
+
+The goals of this example are:
+
+A. Perform a fit to extract the production amplitudes for several resonances starting
+   with output data files.
+B. Use the AmpPlotter library to view projections of the fit
+
+<><><><><><><> Quick recipe for doing example <><><><><><><><>
+fit -c fit_3pi.cfg
+threepi_plotter threepi.fit
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+-------------------------------------------------
+A. Perform fit
+-------------------------------------------------
+
+1.  In this fit we are simply going to try to fit for what was input to the
+    the generator.  We will perform a "mass dependent fit" under the assumption
+    that the resonances in 3 pi are described by the simple Breit-Wigner 
+    shapes that we generated.  The file fit_3pi.cfg is provided to configure
+    the fit.  Note the only difference between it and the gen_3pi.cfg file
+    used to generate the sample is that the locations of the input and
+    MC files are specified and one of the fit parameters is fixed to be real.
+    (There is always an arbitrary overall phase when performing a fit that
+    needs to be removed by fixing a parameter to be real.)
+    
+    Perform the fit by executing the command:
+    
+    fit -c fit_3pi.cfg
+    
+    You can examine the output on the screen.  The results of the fit will
+    be written to the file threepi.fit.  This file contains information
+    about the configuration of the fit as well as the parameter values,
+    covariances, and information about the convergence of MINUIT.
+
+
+-------------------------------------------------
+C. View fit results using AmpPlotter GUI package
+-------------------------------------------------
+
+1.  To view the results of the fit we will use the threepi_plotter
+    application.  The application generates plots of data and
+    the Monte Carlo that has been weighted by the intensity
+    determined by the fit.  First examine the source code of
+    threepi_plotter.  The only relevant items are the definition
+    of the PlotGenerator (in the example ThreePiPlotGenerator) and
+    the registration of the amplitudes and data readers used in
+    the fit.
+    
+2.  The definition of ThreePiPlotGenerator can be found in the library
+    AMPTOOLS_DATAIO.  The source for this class specifies which 1D
+    histograms to create and how to fill these histograms for a single
+    event.  It is useful to look at distributions that can be used to
+    distinguish the various physics amplitudes like invariant masses
+    and angles.
+    
+3.  Start up the plotter GUI, passing in the fit results on the command
+    line:
+
+    threepi_plotter  threepi.fit
+
+    The GUI allows you to turn off and on amplitudes, select a projection
+    and generate plots of data and/or MC.  Access to both the accepted
+    and generated MC is provided so the acceptance can be studied in
+    the variables of interest.
