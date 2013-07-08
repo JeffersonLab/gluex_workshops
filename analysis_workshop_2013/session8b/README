@@ -1,0 +1,121 @@
+Requirements:
+
+A sample of events of the type gamma p -> pi+ pi- pi+ n that has been generated
+and reconstructed in the earlier stages of the analysis workshop.  Three
+files are needed.
+
+threepi_data.root : the mock data after reconstruction and analysis
+threepi_gen.root : an MC sample generated flat in invariant mass with no physics
+threepi_acc.root : the MC sample above subjected to the same reconstruction and analysis as data
+
+These files (or symbolic links to them) must be in the directory containing this README file
+before proceeding.
+
+The goals of this example are:
+
+A. Perform a fit to extract the production amplitudes as a function of M(pi+ pi- pi+)
+B. Collect results of multiple fits in a table and display the output
+
+<><><><><><><> Quick recipe for doing example <><><><><><><><>
+./divideData.pl
+cd threepi_fit/bin_10
+fit -c bin_10.cfg -s ../param_init.cfg
+cd ../..
+./driveFit.pl
+plot_3pi -o threepi_fit.txt
+root -l drawWaves.C
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+-------------------------------------------------
+A. Perform fit
+-------------------------------------------------
+
+1. We are intersted in extracting the production amplitudes as a function
+   of M(pi+pi-pi+).  For each of the produced resonances, we expect the
+   production amplitudes to trace out Breit-Wigners as a function of M(pi+pi-pi+).
+   (This is precisely the behavior we have generated with the configuration
+   file gen_3pi.cfg.)  In order to extract the production amplitudes as
+   a function of resonance mass, we divide the data into bins of M(pi+pi-pi+)
+   and then perform a fit in each bin.  The parameters of this fit are related
+   to the production amplitudes for the various resonances.
+
+   A PERL script, which invokes the command line tool split_mass, is provided
+   to do this division and organize the fits.  Examine the variables 
+   at the top of divideData.pl to ensure they are correct.  Then run
+
+   ./divideData.pl
+
+   This should create a directory called threepi_fit and inside of this
+   directory are (by default) 65 subdirectories spanning M(pi+pi-pi+) from
+   0.7 to 2.0 GeV/c^2.
+
+   Note:  The behavior of the fit, e.g., amplitudes in the fit, free parameters, 
+   input polarization, etc., is controlled by the template file.  For fits
+   with full polarization, the relevant file is threepi_pol_TEMPLATE.cfg.
+   This file will be utilized by the script to generate configuration files
+   in each of the bin directories.  The default template is a good match
+   to the generated gen_3pi.cfg file used above.  It is instructive to
+   examine and understand the differences in the amplitude structure in
+   these two files.
+
+2.  A common practice is to seed the fit of one bin with the best fit values of
+    the previous bin.  Since parameters tend to be continusously varying
+    this starts the fit off close to minimum.  In order to do this
+    we need a seed to start the process.  One can simply go into any
+    directory and do a fit and copy the fit output to seed file.
+    The example below uses bin 10 for this:
+
+    cd threepi_fit/bin_10
+    fit -c bin_10.cfg -s ../param_init.cfg
+    cd ..
+
+    The -s flag passed to fit tells the fit application to write out a
+    "seed file" which is the parameter initialization of the configuration
+    file.  The seed file is only written if the fit was successful. This seed 
+    file can be included using the include command in the config file for 
+    the next fit. Now it is time to sequentially fit all bins.  Check the 
+    variables at the top of the driveFit.pl script.  Then run:
+
+    ./driveFit
+
+    This will fit all bins and log the fit output to files in each directory.
+
+-------------------------------------------------
+B. View fit results
+-------------------------------------------------
+
+1. The raw fit parameters are not particularly meaningful.  One
+   needs both the fit parameters and the integrals of the amplitudes
+   over phase space to construct a quantity like the fit-predicted
+   number of events for a particular amplitude.  Because of this
+   a simple C++ command line tool (plot_3pi.cc), which utilizes 
+   the fitting framework, has been provided to generate a text
+   file of meaningful numbers that can be passed into ROOT.
+
+   Examine the source code of plot_3pi.cc in the directory
+   $HALLD_HOME/src/programs/AmplitudeAnalysis/Examples/threepi_binned
+   Some important numbers
+   and paths are hard-coded at the begining of main{}.  In the body
+   of the program note the correspondence between the amplitude 
+   names used in the function calls and those in the fit configuration file.  
+   (Again, this is hard-coded.  It could for example be derived from a
+   configuration file, or a GUI -- this is a simple specialized tool
+   for quickly generating some numbers.)  To generate a table of numbers 
+   run:
+
+   plot_3pi -o threepi_fit.txt
+
+   You can examine the file threepi_fit.txt -- for each bin of mass
+   (left column) is listed the predicted number of generated events
+   for each of the amplitudes along with the error on this number.
+   The numbers of events listed have been corrected for acceptance
+   based on the Monte-Carlo samples.
+
+2.  A ROOT script has been provided to read in this file and
+    and make a plot.  Execute the script by running:
+
+    root -l drawWaves.C
+
+    The plot that contains all waves is particularly interesting.
+    It could, in principle, be compared to the M(pi+pi-pi+) mass
+    distribution in the file threepi_data_gen.root
