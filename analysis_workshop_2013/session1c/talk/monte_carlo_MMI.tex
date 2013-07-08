@@ -1,0 +1,124 @@
+\section{Preliminaries}
+
+\ft{Defining terms}
+
+event generation: specifying initial particles produced
+  initial usually means point of interaction of beam and target particle
+detector simulation: conveying particles through the detector
+  tranport
+  interaction with material
+    production of secondaries
+  decay
+    production of decay products
+smearing: introduction of detector resolution at the hit level
+  separate step 
+
+\section{Event Generation}
+
+\ft{Programs}
+
+particle gun: generate one-particle events
+genr8: produce X particles in $\gamma p \rightarrow (p {\rm or} n) X$
+bggen: produce events reflecting the total hadronic cross section for photoproduction in Hall D
+
+\ft{particle gun overview}
+
+\I useful for developing/testing event reconstruction in a simple context
+\I option to HDGEANT, not a stand-alone program
+\I can specify particle type, range of directions, range of momenta
+\I see description of HDGEANT below
+
+\subsection{genr8}
+
+\ft{genr8 overview}
+
+\I useful for calculating acceptance and resolution for signal events
+\I generates the reaction $AB \to CD$ via exchange of virtual particle
+  \I in our context: $\gamma p \rightarrow (p {\rm or} n) X$
+  \I cross section assumed $\propto e^{-bt}$ where $t$ is momentum transfer squared, $b$ user-specified slope
+  \I final-state particles can decay, one decay mode per particle???
+  \I decay model???
+\I configuration via text file and command line arguments
+\I output in specialized format
+\I output converted with genr8\_2\_hddm to HDDM format, z-spread added???
+
+\ft{genr8 configuration}
+
+\begin{verbatim}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%    genr8 input file usage: 
+%
+%            genr8 -M100 -Aoutput.ascii -n < reaction.input
+%
+% Example: gamma p -> omega Delta+          (All decays are isotropic)
+%                      omega -> pi0 gamma
+%                      Delta+ -> p pi0
+%
+%  hint: use "-n" flag to actually print the particle names in the
+%        the output for viewing/debuging, but remember not to use "-n" 
+%        for data that is used as input to HDFast.
+%
+%  modified June 21, 2001: ejb
+%       include decays of pi0-->gamma gamma
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+% Any number of blank spaces ( NO TABS!!!) 
+% can be used between input values in an input line.
+%
+%%%%%%%%%%%%%%%%% Start Input Values %%%%%%%%%%%%%%%%%%%%
+% beamp.x beamp.y beamp.z beamMass  
+0 0 beamZ 0
+% targetp.x targetp.y targetp.z targetMass
+0 0 0 0.938
+% t-channelSlope
+      5.0
+% number of particles needed to describe the isobar decay of X
+10
+%   
+% particle# 0&1 are always the X&Y 
+%part#  chld1#  chld2#  parent# Id     nchild   mass    width   charge  flag
+ 0       4      5       *       0       2       Xmass    Xwidth  +1     00  
+ 1       2      3       *       0       2       0.783    0.0084   0     00
+ 2       6      7       1       7       2       0.139    0        0     01
+ 3       *      *       1       1       0       0.000    0        0     11
+ 4       *      *       0      14       0       0.938    0       +1     11
+ 5       8      9       0       7       2       0.139    0        0     01
+ 6       *      *       2       1       0       0.000    0        0     11
+ 7       *      *       2       1       0       0.000    0        0     11
+ 8       *      *       5       1       0       0.000    0        0     11
+ 9       *      *       5       1       0       0.000    0        0     11
+!EOI
+%%%%%%%%%%%%%%%%%%%%% End Input Values %%%%%%%%%%%%%%%%%%%%%%%
+\end{verbatim}
+
+\ft{genr8 execution}
+
+\I usage message
+
+\ft{bggen}
+
+\I useful for calculating contribution/effect of background events
+\I assumes??? collimated coherent bremsstrahlung beam
+\I all hadronic interactions generated in two energy regimes:
+  \I ???~GeV to 3~GeV: use measured differential cross sections for 10 dominant processes
+  \I 3~GeV to ???~GeV use PYTHIA event generator tuned for Hall D conditions
+\I configuration via text file
+\I output in HDDM format
+
+detector simulation
+  hdgeant
+    configuration
+    input
+    output
+addition of detector resolution
+  mcsmear
+    input
+    output
+reconstruction
+  jana/sim-recon
+    input
+    output 
+analysis
+  root tree
+hddm
