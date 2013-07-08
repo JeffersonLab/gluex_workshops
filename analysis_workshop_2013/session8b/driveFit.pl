@@ -26,7 +26,7 @@ for( $i = 0; $i < $nBins; ++$i ){
   
   print "Fitting in bin $i...\n";
   
-  system( "fit -c bin_$i.cfg -s $seedFile >& bin_$i.log" );
+  system( "fit -c bin_$i.cfg -s $seedFile > bin_$i.log" );
   
   if( -e "$seedFile" ){ system( "cp -f $seedFile .." ); }
   
