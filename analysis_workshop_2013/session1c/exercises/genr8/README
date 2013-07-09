@@ -1,25 +1,29 @@
-# 1. take a look at the input file
+# 1. look at the usage message
+
+genr8 -h | less
+
+# 2. take a look at the input file
 
 less b1_pi.input
 
-# 2. generate 10 events with genr8
+# 3. generate 10 events with genr8
 
 genr8 -Agenr8_output.txt -M10 < b1_pi.input
 
-# 3. take a look at the output file
+# 4. take a look at the output file
 
 less genr8_output.txt
 
-# 4. convert the text file to hddm format
+# 5. convert the text file to hddm format
 
 genr8_2_hddm -V"0 0 50 80" genr8_output.txt
 
-# 5. take a look at the header in the hddm file, note the binary event data at
+# 6. take a look at the header in the hddm file, note the binary event data at
 #    the end
 
 less output.hddm
 
-# 6. take a look at the event data in the hddm file
+# 7. take a look at the event data in the hddm file
 
 hddm-xml output.hddm | less
 

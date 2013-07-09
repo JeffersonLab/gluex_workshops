@@ -1,15 +1,19 @@
-# 1. create the fort.15 file as a link to run.ffr
+# 1. Look at the README for bggen (not the one for this exercise)
+
+less $HALLD_HOME/src/programs/Simulation/bggen/README
+
+# 2. create the fort.15 file as a link to run.ffr
 
 ln -s run.ffr fort.15
 
-# 2. take a look at run.ffr
+# 3. take a look at run.ffr
 
 less run.ffr
 
-# 3. run bggen
+# 4. run bggen
 
 bggen
 
-# 4. look the generated events in the hddm file
+# 5. look the generated events in the hddm file
 
 hddm-xml bggen.hddm | less

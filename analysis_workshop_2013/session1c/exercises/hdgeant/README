@@ -8,7 +8,7 @@ less configure.in
 
 # 3. copy the generated events from the bggen exercise to the local directory
 
-cp -v ../bggen.hddm .
+cp -v ../bggen/bggen.hddm .
 
 # 4. run hdgeant
 
