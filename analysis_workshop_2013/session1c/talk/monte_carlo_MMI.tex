@@ -46,48 +46,52 @@ bggen: produce events reflecting the total hadronic cross section for photoprodu
 
 \begin{verbatim}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%    genr8 input file usage: 
 %
-%            genr8 -M100 -Aoutput.ascii -n < reaction.input
+% This file generates event for the following reaction
 %
-% Example: gamma p -> omega Delta+          (All decays are isotropic)
-%                      omega -> pi0 gamma
-%                      Delta+ -> p pi0
-%
-%  hint: use "-n" flag to actually print the particle names in the
-%        the output for viewing/debuging, but remember not to use "-n" 
-%        for data that is used as input to HDFast.
-%
-%  modified June 21, 2001: ejb
-%       include decays of pi0-->gamma gamma
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% gamma p -> p X(2000)
+%               |
+%               |-> b1(1235) pi-
+%                    |
+%                    |-> omega pi+
+%                          |
+%                          |-> rho pi0
+%                               |   |-> gamma gamma
+%                               |
+%                               |-> pi+ pi-
 %
 %
-% Any number of blank spaces ( NO TABS!!!) 
-% can be used between input values in an input line.
+% Note that in the real world, omegas don't decay into rhos
+% but it is implemeted that way here due to the limitations
+% of the isobar model.
 %
+% Feb. 13, 2008  David Lawrence
 %%%%%%%%%%%%%%%%% Start Input Values %%%%%%%%%%%%%%%%%%%%
 % beamp.x beamp.y beamp.z beamMass  
-0 0 beamZ 0
+0 0 9 0
 % targetp.x targetp.y targetp.z targetMass
 0 0 0 0.938
 % t-channelSlope
       5.0
 % number of particles needed to describe the isobar decay of X
-10
+12
 %   
 % particle# 0&1 are always the X&Y 
 %part#  chld1#  chld2#  parent# Id     nchild   mass    width   charge  flag
- 0       4      5       *       0       2       Xmass    Xwidth  +1     00  
- 1       2      3       *       0       2       0.783    0.0084   0     00
- 2       6      7       1       7       2       0.139    0        0     01
- 3       *      *       1       1       0       0.000    0        0     11
- 4       *      *       0      14       0       0.938    0       +1     11
- 5       8      9       0       7       2       0.139    0        0     01
- 6       *      *       2       1       0       0.000    0        0     11
- 7       *      *       2       1       0       0.000    0        0     11
- 8       *      *       5       1       0       0.000    0        0     11
- 9       *      *       5       1       0       0.000    0        0     11
+% baryon (Y) decay
+ 0       *      *       *       14       0      0.938   0.0      +1      11  
+% meson (X) decay
+ 1       2      3       *       0        2      2.000   0.100    +1      00
+ 2       4      5       1       0        2      1.235   0.142    +1      00
+ 3       *      *       1       9        0      0.140   0.0      -1      11
+ 4       6      7       2       0        2      0.783   0.009     0      00
+ 5       *      *       2       8        0      0.140   0.0      +1      11
+ 6       8      9       4       0        2      0.776   0.150     0      00
+ 7      10     11       4       7        2      0.135   0.0       0      00
+ 8       *      *       6       8        0      0.140   0.0      +1      11
+ 9       *      *       6       9        0      0.140   0.0      -1      11
+10       *      *       7       1        0      0.0     0.0       0      11
+11       *      *       7       1        0      0.0     0.0       0      11
 !EOI
 %%%%%%%%%%%%%%%%%%%%% End Input Values %%%%%%%%%%%%%%%%%%%%%%%
 \end{verbatim}
