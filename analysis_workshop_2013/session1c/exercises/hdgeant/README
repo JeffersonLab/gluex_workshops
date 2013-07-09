@@ -4,7 +4,7 @@ less $HALLD_HOME/src/programs/Simulation/HDGeant/control.in
 
 # 2. take a look at the local control.in
 
-less configure.in
+less control.in
 
 # 3. copy the generated events from the bggen exercise to the local directory
 
