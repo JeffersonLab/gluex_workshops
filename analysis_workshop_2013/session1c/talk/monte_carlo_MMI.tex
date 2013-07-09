@@ -135,7 +135,7 @@
 \end{frame}
 
 \begin{frame}[fragile]
-
+\ft{genr8 configuration continued}
 {\scriptsize
 \begin{verbatim}
 % beamp.x beamp.y beamp.z beamMass  
@@ -191,10 +191,12 @@ genr8 usage: [-A<name>]   < infile
 \f{\ft{bggen overview}
 \bi
 \I useful for calculating contribution/effect of background events
-\I assumes??? collimated coherent bremsstrahlung beam
+\I assumes collimated coherent bremsstrahlung beam
 \I all hadronic interactions generated in two energy regimes:
-  \I ???~GeV to 3~GeV: use measured differential cross sections for 10 dominant processes
-  \I 3~GeV to ???~GeV use PYTHIA event generator tuned for Hall D conditions
+  \bi
+  \I 0.15 to 3.00~GeV: use measured differential cross sections for 10 dominant processes
+  \I above 3.00~GeV use PYTHIA event generator tuned for Hall D conditions
+  \ei
 \I configuration via text file
 \I output in HDDM format
 \ei
@@ -205,54 +207,44 @@ genr8 usage: [-A<name>]   < infile
 
 Text configuration file: {\tt run.ffr}
 
+{\footnotesize
 \begin{verbatim}
--------------------------------------------------------------------
 LIST
-C
-C ===    INPUT file for BGGEN
-C
 TRIG     395000         number of events to simulate
-C                       We expect 395kHz of hadronic rate at high luminosity
-C
 RUNNO    9000           run number of generated events, default is two
-C
 C -- writing out events
 C        HDDM  simple  ntuple
 WROUT      1      1     1   
-
 NPRIEV   100            number of events to print
 EPHLIM   0.15 12.       energy range in GeV
-
 RNDMSEQ    0            random number sequence     integer values
-
 EELEC     12.           electron beam energy
 EPEAK      9.           coherent peak energy
 ZCOLLIM   7600.         distance to the collimator in cm
-
 EPYTHMIN     3.         minimal energy for PYTHIA simulation
-
 STOP
--------------------------------------------------------------------
 \end{verbatim}
+}
 \end{frame}
 
 \f{\ft {bggen execution}
 
-   Several files are used for the input. Three files are stable:
-   - pythia.dat        - contains PYTHIA definitions adjusted for photoproduction (HERMES)
-   - pythia-geant.map  - mapping of GEANT <--> PYTHIA particle codes
-   - particle.dat      - a list of particle properties used for the low energy mode (2)
-
-   One file is used to control the job and to set the number of events to simulate,
-   the energy range etc.
-   - fort.15 linked to run.ffr - list of commands and definitions in the FFREAD format
-
-Just say bggen
+\bi
+\I input files:
+  \bd
+  \I[\bf pythia.dat:]contains PYTHIA definitions adjusted for photoproduction (HERMES)
+  \I[\bf pythia-geant.map:] mapping of GEANT $\leftrightarrow$ PYTHIA particle codes
+  \I[\bf particle.dat:] a list of particle properties used for the low energy mode
+  \I[\bf fort.15:] linked to run.ffr--list of commands and definitions in the FFREAD format
+  \ed
+\I to run, just say {\tt bggen}
+\ei
 }
 
-\section{detector simulation: hdgeant}
+\section{detector simulation}
+\subsection{hdgeant}
 
-\ft{hdgeant overview}
+\f{\ft{hdgeant overview}
 \bi
 \I GEANT 3 implementation
 \I hit generation in C
@@ -261,12 +253,14 @@ Just say bggen
 \I input from HDDM event file or particle gun
 \I output in HDDM format
 \ei
+}
 
 \begin{frame}[fragile]
 \ft{hdgeant configuration}
 
 FFREAD file: control.in
 
+{\scriptsize
 \begin{verbatim}
 cINFILE 'rhop.hddm'
 TRIG 30
@@ -288,6 +282,14 @@ HALO  5e-5
 BGRATE 1.10
 BGGATE -200. 200.
 RNDM 121
+\end{verbatim}
+}
+\end{frame}
+
+\begin{frame}[fragile]
+\ft{hdgeant configuration continued}
+{\scriptsize
+\begin{verbatim}
 CUTS 1e-4 1e-4 1e-3 1e-3 1e-4
 SWIT 0 0 0 0 0 0 0 0 0 0
 GELH  1     0.2     1.0     4     0.160
@@ -309,6 +311,14 @@ c BFIELDTYPE 'Const'
   SAVEHITS  0
   SHOWERSINCOL 0
   DRIFTCLUSTERS 0
+\end{verbatim}
+}
+\end{frame}
+
+\begin{frame}[fragile]
+\ft{hdgeant configuration continued further}
+{\scriptsize
+\begin{verbatim}
 c MULS 0 no multiple scattering
 c      1 Moliere or Coulomb scattering (default)  
 c BREM 0 no bremsstrahlung 
@@ -328,23 +338,24 @@ c      1 delta ray production with generation of secondaries (default)
 c      2 delta ray production without generation of secondaries
 END
 \end{verbatim}
+}
 Plus additional standard GEANT cards
 \end{frame}
 
 \f{\ft{hdgeant execution}
 \bi
 \I reads control.in from current working directory
-\I just say {\tt hdgeant}
+\I to run, just say {\tt hdgeant}
 \ei
 }
 
-\section{addition of detector resolution: mcsmear}
-
+\section{addition of detector resolution}
+\subsection{mcsmear}
 \f{\ft{mcsmear overview}
 \bi
-\I hit from hdgeant are perfect, e. g., exact deposited energy
+\I hits from hdgeant are perfect, e. g., exact deposited energy
 \I new information generated and added to the event with appropriate detector resolution introduced
-\I original perfect energy saved
+\I original perfect energy saved or not
 \ei
 }
 
@@ -353,10 +364,10 @@ Plus additional standard GEANT cards
 
 Configuration done with command line options
 
+{\scriptsize
 \begin{verbatim}
 Usage:
      mcsmear [options] file.hddm
-
   options:
     -ofname  Write output to a file named "fname" (default auto-generate name)
     -N       Add random background hits to CDC and FDC (default is not to add)
@@ -364,7 +375,6 @@ Usage:
     -i       Ignore random number seeds found in input HDDM file
     -r"s1 s2 s3" Set initial random number seeds
     -u#      Sigma CDC anode drift time in ns (def:0ns)
-             (NOTE: this is only used if -y is also specified!)
     -y       Do NOT apply drift distance dependence error to
              CDC (default is to apply)
     -Y       Apply constant sigma smearing for FDC drift time. 
@@ -376,6 +386,14 @@ Usage:
     -e       hdgeant was run with LOSS=0 so scale the FDC cathode
              pedestal noise (def:false)
     -d       Drop truth hits (default: keep truth hits)
+\end{verbatim}
+}
+\end{frame}
+
+\begin{frame}[fragile]
+\ft{mcsmear configuration continued}
+{\scriptsize
+\begin{verbatim}
     -p#      FCAL photo-statistics smearing factor in GeV^3/2 (def:0)
     -b#      FCAL single block threshold in MeV (def:0)
     -B       Don't process BCAL hits at all (def. process)
@@ -395,16 +413,18 @@ Usage:
     -f#      TOF sigma in psec (def: 100)
     -h       Print this usage statement.
 \end{verbatim}
+}
 \end{frame}
 
-\section{Exercises}
+\section{Exercises/Summary}
 
-\ft{Exercises}
+\f{\ft{Exercises}
 \bi
-\I Generate events with genr8
-\I Generate events with bggen
+\I Generate events with genr8 (simple isobar model, specific channel)
+\I Generate events with bggen (hadronic background)
 \I Simulate events with hdgeant
 \I Smear events with mcsmear
 \ei
+}
 
 \end{document}
