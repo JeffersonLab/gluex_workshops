@@ -1,0 +1,22 @@
+LIST
+C
+C ===    INPUT file for BGGEN
+C
+TRIG     10         number of events to simulate
+C                       We expect 395kHz of hadronic rate at high luminosity
+C -- writing out events
+C        HDDM  simple  ntuple
+WROUT      1      0     1   
+
+NPRIEV   3            number of events to print
+EPHLIM   0.15 12.       energy range in GeV
+
+RNDMSEQ    0            random number sequence     integer values
+
+EELEC     12.           electron beam energy
+EPEAK      9.           coherent peak energy
+ZCOLLIM   7600.         distance to the collimator in cm
+
+EPYTHMIN     3.         minimal energy for PYTHIA simulation
+
+STOP

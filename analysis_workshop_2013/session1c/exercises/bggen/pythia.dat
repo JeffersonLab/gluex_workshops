@@ -1,0 +1,52 @@
+! below follows commands sent to PYGIVE
+msel=2
+MSTP(13)=2
+! MSTP(17)=6
+! MSTP(20)=4
+MSTP(20)=0
+! MSTP(38)=4
+! MSTP(51)=11  ! if pdflib is linked than non pythia-pdfs are available, 
+!               like MSTP(51)=4046 
+MSTP(58)=4
+! MSTP(61)=0
+! MSTP(71)=0
+! MSTP(81)=0
+! MSTP(82)=1
+MSTP(92)=4
+MSTP(101)=1
+MSTP(121)=1
+! ----------- Now all the PARPs -----------
+! PARP(2)=3.5  !  ecm, E_gamma =6.06 GeV
+PARP(2)=2.54739  !  ecm, E_gamma =3.00 GeV
+PARP(18)=0.17
+PARP(89)=1000
+PARP(91)=0.40
+PARP(93)=2.
+PARP(99)=0.40
+PARP(102)=0.5
+PARP(103)=0.5
+PARP(104)=0.3
+PARP(111)=0.
+PARP(121)=2.
+PARP(161)=3.00
+PARP(162)=24.6
+PARP(165)=0.47679
+PARP(166)=0.67597
+! ----------- Now come all the switches for Jetset -----------
+PARJ(1)=0.029
+PARJ(2)=0.283
+PARJ(3)=1.20
+PARJ(21)= 0.40
+PARJ(23)=0.03
+PARJ(41)= 1.94
+PARJ(42)= 0.544
+PARJ(45 )= 1.05
+!----------------------------------------------------------------------
+MSTJ(12)=1
+MSTJ(45)=4
+MSTU(112)=4
+MSTU(113)=4
+MSTU(114)=4
+! ----------- Now all the CKINs for pythia -----------
+CKIN(1)=1.
+CKIN(66)=100.0       ! Max for Q^2

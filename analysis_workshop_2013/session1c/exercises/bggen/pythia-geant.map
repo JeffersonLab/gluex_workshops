@@ -1,0 +1,41 @@
+! GEANT --> PYTHIA map
+! GEANT type= id >0 (regular) - PYTHIA decays are forbidden
+!       type=-id  PYTHIA decays are allowed
+! GEANT   PYTHIA  Comment 
+!  type    KF
+  1         22    ! gamma
+  2        -11    ! e+
+  3         11    ! e-
+  4         12    ! neutrino
+  5        -13    ! mu+
+  6         13    ! mu-
+  7        111    ! pi0
+  8        211    ! pi+
+  9       -211    ! pi-
+ 10        130    ! K0L
+ 11        321    ! K+ 
+ 12       -321    ! K-
+ 13       2112    ! neutron
+ 14       2212    ! proton
+ 15      -2212    ! antiproton
+ 16        310    ! K0S
+ 17        221    ! eta
+ 18       3122    ! Lambda0
+ 19       3222    ! Sigma+
+ 20       3212    ! Sigma0
+ 21       3112    ! Sigma-
+ 22       3322    ! Xi0
+ 23       3312    ! Xi-
+ 24       3334    ! Omega-
+ 25      -2112    ! antineutron
+ 26      -3122    ! antiLambda0
+ 27      -3112    ! antiSigma-
+ 28      -3212    ! antiSigma0
+ 29      -3222    ! antiSigma+
+ 30      -3322    ! antiXi0
+ 31      -3312    ! antiXi+
+ 32      -3334    ! antiOmega+
+-80        113    ! rho 0
+-81        223    ! omega0
+-82       2224    ! Delta++
+
