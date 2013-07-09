@@ -17,10 +17,6 @@ jerror_t DReaction_factory_workshop_s4a::init(void)
 	DReactionStep* locReactionStep = NULL;
 	DReaction* locReaction = new DReaction("workshop_s4a"); //unique name, feel free to change
 
-	// DOCUMENTATION:
-	// ANALYSIS library: https://halldweb1.jlab.org/wiki/index.php/GlueX_Analysis_Software
-	// DReaction factory: https://halldweb1.jlab.org/wiki/index.php/Analysis_DReaction
-
 	/**************************************************** workshop_s4a Reaction Steps ****************************************************/
 
 	//Required: DReactionSteps to specify the channel and decay chain you want to study

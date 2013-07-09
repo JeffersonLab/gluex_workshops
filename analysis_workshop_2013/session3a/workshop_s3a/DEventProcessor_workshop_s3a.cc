@@ -66,14 +66,14 @@ jerror_t DEventProcessor_workshop_s3a::evnt(jana::JEventLoop* locEventLoop, int 
 {
 	// This is called for every event. Use of common resources like writing
 	// to a file or filling a histogram should be mutex protected. Using
-	// loop->Get(...) to get reconstructed objects (and thereby activating the
+	// locEventLoop->Get(...) to get reconstructed objects (and thereby activating the
 	// reconstruction algorithm) should be done outside of any mutex lock
 	// since multiple threads may call this method at the same time.
 	//
 	// Here's an example:
 	//
 	// vector<const MyDataClass*> mydataclasses;
-	// loop->Get(mydataclasses);
+	// locEventLoop->Get(mydataclasses);
 	//
 	// japp->RootWriteLock();
 	//  ... fill historgrams or trees ...
