@@ -1,0 +1,15 @@
+# 1. create the fort.15 file as a link to run.ffr
+
+ln -s run.ffr fort.15
+
+# 2. take a look at run.ffr
+
+less run.ffr
+
+# 3. run bggen
+
+bggen
+
+# 4. look the generated events in the hddm file
+
+hddm-xml bggen.hddm | less
