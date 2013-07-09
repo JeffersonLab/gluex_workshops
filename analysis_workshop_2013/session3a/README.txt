@@ -2,10 +2,10 @@ Purpose:
  - The purpose of this exercise is to familiarize users with the creation of DReaction's and the concept and content of DParticleCombo.
 
 Data File:
- - $GLUEX_DATA/session2/hdgeant_smeared.hddm (pythia output)
+ - $GLUEX_DATA/session3_and_4_and_5a/rest_60001.hddm (REST file of g, p -> pi+, pi+, pi-, n generated signal data)
 
 Exercise:
- - Using a JANA plugin ("workshop_3b" in this folder) and hd_root:
+ - Using a JANA plugin ("workshop_3a" in this folder) and hd_root:
    - Create a DReaction for g, p -> (n), pi+, pi-, pi+
    - Using the DParticleCombo objects, histogram:
      - # of Particle Combinations for each event

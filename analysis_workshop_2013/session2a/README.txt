@@ -9,8 +9,8 @@ Exercise 1:
    - Print the results using three different DMCThrown factories: the default factory (all), the tag="FinalState" factory, and the tag="Decaying" factory.
 
 Exercise 2:
- - Using a JANA plugin, print PID, q, p, theta, phi, and vertex-z to screen for all of the "FinalState" DMCThrown objects.
-   - The plugin has already been setup; just modify the contents of the evnt() method.  
+ - Using a JANA plugin and hd_root, print PID, q, p, theta, phi, and vertex-z to screen for all of the "FinalState" DMCThrown objects.
+   - The "workshop_2a" plugin has already been created in this folder; just modify the contents of its evnt() method and compile it. 
    - Note that DMCThrown inherits from DKinematicData
    - Only print the results from the first event in the file.  
  - Compare the results to the hd_dump "FinalState" factory tag output, and confirm that they agree.  

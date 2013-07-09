@@ -17,10 +17,6 @@ jerror_t DReaction_factory_workshop_s4b::init(void)
 	DReactionStep* locReactionStep = NULL;
 	DReaction* locReaction = new DReaction("workshop_s4b"); //unique name, feel free to change
 
-	// DOCUMENTATION:
-	// ANALYSIS library: https://halldweb1.jlab.org/wiki/index.php/GlueX_Analysis_Software
-	// DReaction factory: https://halldweb1.jlab.org/wiki/index.php/Analysis_DReaction
-
 	/**************************************************** workshop_s4b Reaction Steps ****************************************************/
 
 	//Required: DReactionSteps to specify the channel and decay chain you want to study
@@ -61,6 +57,7 @@ jerror_t DReaction_factory_workshop_s4b::init(void)
 
 	// PID
 	locReaction->Add_AnalysisAction(new DHistogramAction_PID(locReaction));
+	locReaction->Add_AnalysisAction(new DCutAction_CombinedPIDFOM(locReaction, 0.01)); //1%
 	locReaction->Add_AnalysisAction(new DHistogramAction_TruePID(locReaction)); //momentum distributions of tracks with true/false PID (if thrown data available)
 
 	// Missing Mass & Kinematics, Pre-KinFit
@@ -68,26 +65,14 @@ jerror_t DReaction_factory_workshop_s4b::init(void)
 	locReaction->Add_AnalysisAction(new DHistogramAction_ParticleComboKinematics(locReaction, false));
 	locReaction->Add_AnalysisAction(new DHistogramAction_MissingMass(locReaction, false, 650, 0.3, 1.6));
 
-	// Custom Actions: Histogram Invariant Mass & Dalitz
-	locReaction->Add_AnalysisAction(new DCustomAction_Dalitz_n3pi(locReaction, false)); //false: measured data
-	locReaction->Add_AnalysisAction(new DCustomAction_InvariantMass_n3pi(locReaction, false)); //false: measured data
-
 	// Kinematic Fit Results and Confidence Level Cut
 	locReaction->Add_AnalysisAction(new DHistogramAction_KinFitResults(locReaction, 0.05)); //5% confidence level cut on pull histograms only
-	locReaction->Add_AnalysisAction(new DCutAction_KinFitFOM(locReaction, 0.0)); //require kinFit converges
+	locReaction->Add_AnalysisAction(new DCutAction_KinFitFOM(locReaction, 0.01)); //1%
 
 	// Missing Mass & Kinematics, Post-KinFit
 		//"PostKinFitConLev"'s: unique name since action type is repeated
 	locReaction->Add_AnalysisAction(new DHistogramAction_ParticleComboKinematics(locReaction, true, "PostKinFit")); //true: kinfit data
 	locReaction->Add_AnalysisAction(new DHistogramAction_MissingMass(locReaction, false, 650, 0.3, 1.6, "PostKinFit")); //false: measured data
-
-	// Custom Actions: Histogram Invariant Mass, Post-KinFit
-	locReaction->Add_AnalysisAction(new DCustomAction_InvariantMass_n3pi(locReaction, true, "PostKinFit_KinFit")); //true: kinfit data
-	locReaction->Add_AnalysisAction(new DCustomAction_InvariantMass_n3pi(locReaction, false, "PostKinFit_Measured")); //false: measured data
-
-	// Custom Actions: Histogram Dalitz, Post-KinFit
-	locReaction->Add_AnalysisAction(new DCustomAction_Dalitz_n3pi(locReaction, true, "PostKinFit_KinFit")); //true: kinfit data
-	locReaction->Add_AnalysisAction(new DCustomAction_Dalitz_n3pi(locReaction, false, "PostKinFit_Measured")); //false: measured data
 
 	_data.push_back(locReaction); //Register the DReaction with the factory
 

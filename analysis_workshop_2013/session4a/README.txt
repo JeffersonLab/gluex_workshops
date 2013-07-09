@@ -2,7 +2,7 @@ Purpose:
  - The purpose of this exercise is to familiarize users with using analysis actions. 
 
 Data File:
- - $GLUEX_DATA/session3_and_4/rest_60001.hddm (REST file of g, p -> pi+, pi+, pi-, n generated signal data)
+ - $GLUEX_DATA/session3_and_4_and_5a/rest_60001.hddm (REST file of g, p -> pi+, pi+, pi-, n generated signal data)
 
 Exercise:
  - Using a JANA plugin ("workshop_4a" in this folder) and hd_root:

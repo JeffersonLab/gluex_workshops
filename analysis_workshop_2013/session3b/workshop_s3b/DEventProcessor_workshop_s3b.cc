@@ -66,9 +66,8 @@ jerror_t DEventProcessor_workshop_s3b::evnt(jana::JEventLoop* locEventLoop, int 
 	//  ... fill historgrams or trees ...
 	// japp->RootUnLock();
 
-	//Optional: Get all particle combinations for all DReactions. 
+	//Get all particle combinations for all DReactions. 
 		//If kinematic fits were requested, these contain both the measured and kinematic-fit track parameters
-		//No cuts from DAnalysisActions are placed on these combos
 	vector<const DParticleCombo*> locParticleCombos;
 	locEventLoop->Get(locParticleCombos);
 	for(size_t loc_i = 0; loc_i < locParticleCombos.size(); ++loc_i)
