@@ -1,6 +1,6 @@
 # 1. look at the usage message
 
-genr8 -h | less
+genr8 -h
 
 # 2. take a look at the input file
 
@@ -21,9 +21,9 @@ genr8_2_hddm -V"0 0 50 80" genr8_output.txt
 # 6. take a look at the header in the hddm file, note the binary event data at
 #    the end
 
-less output.hddm
+less genr8_output.hddm
 
 # 7. take a look at the event data in the hddm file
 
-hddm-xml output.hddm | less
+hddm-xml genr8_output.hddm | less
 
