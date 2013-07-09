@@ -1,49 +1,117 @@
+\documentclass[hyperref={pdfpagelabels=false}]{beamer}
+
+\usetheme{AnnArbor}
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\be}{\begin{enumerate}}
+\newcommand{\ee}{\end{enumerate}}
+\newcommand{\bc}{\begin{center}}
+\newcommand{\ec}{\end{center}}
+\newcommand{\bd}{\begin{description}}
+\newcommand{\ed}{\end{description}}
+\newcommand{\I}{\item}
+\newcommand{\f}{\frame}
+\newcommand{\ft}{\frametitle}
+
+\title{GlueX Simulation Tools}
+\subtitle{GlueX Analysis Workshop}
+\author[Mark Ito]{Mark M.\ Ito}
+\date{July 10, 2013}
+\institute[JLab]{Jefferson Lab}
+
+\begin{document}
+
+\f{\titlepage}
+
 \section{Preliminaries}
 
-\ft{Defining terms}
+\subsection{Terms}
 
-event generation: specifying initial particles produced
-  initial usually means point of interaction of beam and target particle
-detector simulation: conveying particles through the detector
-  tranport
-  interaction with material
-    production of secondaries
-  decay
-    production of decay products
-smearing: introduction of detector resolution at the hit level
-  separate step 
+\f{\ft{Defining terms}
+\bd
+\I[\bf event generation:] specifying initial particles produced
+  \bi
+  \I initial usually means point of interaction of beam and target particle
+  \ei
+\I[\bf detector simulation:] conveying particles through the detector
+  \bi
+  \I tranport
+  \I interaction with material
+  \I production of secondaries
+  \I decay
+  \ei
+\I[\bf smearing:] introduction of detector resolution at the hit level
+  \bi
+  \I separate step in GlueX
+  \ei
+\ed
+}
+
+\subsection{HDDM}
+
+\f{\ft{Hall D Data Model (HDDM)}
+\bi
+\I XML-like
+  \bi
+  \I binary format
+  \I can be rendered as xml: hddm-xml
+  \ei
+\I every file instance starts with a non-binary template
+  \bi
+  \I abbreviated schema for the language
+  \ei
+\I read/write tools can be generated from template
+\ei
+}
 
 \section{Event Generation}
 
-\ft{Programs}
+\f{\ft{Programs}
+\bd
+\I[\bf particle gun:] generate one-particle events
+\I[\bf genr8:] produce X particles in $\gamma p \rightarrow (p\quad {\rm or} n) X$
+\I[\bf bggen:] produce events reflecting the total hadronic cross section for photoproduction in Hall D
+\ed
+}
 
-particle gun: generate one-particle events
-genr8: produce X particles in $\gamma p \rightarrow (p {\rm or} n) X$
-bggen: produce events reflecting the total hadronic cross section for photoproduction in Hall D
+\subsection{Particle gun}
 
-\ft{particle gun overview}
-
+\f{\ft{Particle gun overview}
+\bi
 \I useful for developing/testing event reconstruction in a simple context
 \I option to HDGEANT, not a stand-alone program
 \I can specify particle type, range of directions, range of momenta
-\I see description of HDGEANT below
+\I see description of {\bf\tt hdgeant} below
+\ei
+}
 
 \subsection{genr8}
 
-\ft{genr8 overview}
-
+\f{\ft{genr8 overview}
+\bi
 \I useful for calculating acceptance and resolution for signal events
 \I generates the reaction $AB \to CD$ via exchange of virtual particle
+  \bi
   \I in our context: $\gamma p \rightarrow (p {\rm or} n) X$
   \I cross section assumed $\propto e^{-bt}$ where $t$ is momentum transfer squared, $b$ user-specified slope
-  \I final-state particles can decay, one decay mode per particle???
-  \I decay model???
+  \I final-state particles can decay
+    \bi
+    \I one decay mode per particle
+    \I two-body decay only
+    \ei
+  \ei
 \I configuration via text file and command line arguments
 \I output in specialized format
-\I output converted with genr8\_2\_hddm to HDDM format, z-spread added???
+\I output converted with {\tt genr8\_2\_hddm} to HDDM format
+\ei
+}
 
-\ft{genr8 configuration}
+\begin{frame}[fragile]
 
+\frametitle{genr8 configuration}
+
+{\footnotesize
 \begin{verbatim}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -61,12 +129,15 @@ bggen: produce events reflecting the total hadronic cross section for photoprodu
 %                               |-> pi+ pi-
 %
 %
-% Note that in the real world, omegas don't decay into rhos
-% but it is implemeted that way here due to the limitations
-% of the isobar model.
-%
 % Feb. 13, 2008  David Lawrence
-%%%%%%%%%%%%%%%%% Start Input Values %%%%%%%%%%%%%%%%%%%%
+\end{verbatim}
+}
+\end{frame}
+
+\begin{frame}[fragile]
+
+{\scriptsize
+\begin{verbatim}
 % beamp.x beamp.y beamp.z beamMass  
 0 0 9 0
 % targetp.x targetp.y targetp.z targetMass
@@ -75,12 +146,8 @@ bggen: produce events reflecting the total hadronic cross section for photoprodu
       5.0
 % number of particles needed to describe the isobar decay of X
 12
-%   
-% particle# 0&1 are always the X&Y 
 %part#  chld1#  chld2#  parent# Id     nchild   mass    width   charge  flag
-% baryon (Y) decay
  0       *      *       *       14       0      0.938   0.0      +1      11  
-% meson (X) decay
  1       2      3       *       0        2      2.000   0.100    +1      00
  2       4      5       1       0        2      1.235   0.142    +1      00
  3       *      *       1       9        0      0.140   0.0      -1      11
@@ -93,15 +160,36 @@ bggen: produce events reflecting the total hadronic cross section for photoprodu
 10       *      *       7       1        0      0.0     0.0       0      11
 11       *      *       7       1        0      0.0     0.0       0      11
 !EOI
-%%%%%%%%%%%%%%%%%%%%% End Input Values %%%%%%%%%%%%%%%%%%%%%%%
 \end{verbatim}
+}
+\end{frame}
+
+\begin{frame}[fragile]
 
 \ft{genr8 execution}
 
-\I usage message
+Usage message from {\tt genr8 -h}
+{\small
+\begin{verbatim}
+genr8 usage: [-A<name>]   < infile 
+    -d debug flag
+    -n Use a particle name and not its ID number (ascii only) 
+    -M<max> Process first max events
+    -l<lfevents> Determine the lorentz factor with this many events
+    -r<runNo> default runNo is 9000. 
+    -P save flag= 11 & 01 events(default saves 11 & 10 events) 
+    -A<filename> Save in ascii format. 
+    -s<seed> Set random number seed to <seed>. 
+             (default is to set using current time + pid) 
+    -h Print this help message
+\end{verbatim}
+}
+\end{frame}
 
-\ft{bggen}
+\subsection{bggen}
 
+\f{\ft{bggen overview}
+\bi
 \I useful for calculating contribution/effect of background events
 \I assumes??? collimated coherent bremsstrahlung beam
 \I all hadronic interactions generated in two energy regimes:
@@ -109,20 +197,214 @@ bggen: produce events reflecting the total hadronic cross section for photoprodu
   \I 3~GeV to ???~GeV use PYTHIA event generator tuned for Hall D conditions
 \I configuration via text file
 \I output in HDDM format
+\ei
+}
 
-detector simulation
-  hdgeant
-    configuration
-    input
-    output
-addition of detector resolution
-  mcsmear
-    input
-    output
-reconstruction
-  jana/sim-recon
-    input
-    output 
-analysis
-  root tree
-hddm
+\begin{frame}[fragile]
+\ft{bggen configuration}
+
+Text configuration file: {\tt run.ffr}
+
+\begin{verbatim}
+-------------------------------------------------------------------
+LIST
+C
+C ===    INPUT file for BGGEN
+C
+TRIG     395000         number of events to simulate
+C                       We expect 395kHz of hadronic rate at high luminosity
+C
+RUNNO    9000           run number of generated events, default is two
+C
+C -- writing out events
+C        HDDM  simple  ntuple
+WROUT      1      1     1   
+
+NPRIEV   100            number of events to print
+EPHLIM   0.15 12.       energy range in GeV
+
+RNDMSEQ    0            random number sequence     integer values
+
+EELEC     12.           electron beam energy
+EPEAK      9.           coherent peak energy
+ZCOLLIM   7600.         distance to the collimator in cm
+
+EPYTHMIN     3.         minimal energy for PYTHIA simulation
+
+STOP
+-------------------------------------------------------------------
+\end{verbatim}
+\end{frame}
+
+\f{\ft {bggen execution}
+
+   Several files are used for the input. Three files are stable:
+   - pythia.dat        - contains PYTHIA definitions adjusted for photoproduction (HERMES)
+   - pythia-geant.map  - mapping of GEANT <--> PYTHIA particle codes
+   - particle.dat      - a list of particle properties used for the low energy mode (2)
+
+   One file is used to control the job and to set the number of events to simulate,
+   the energy range etc.
+   - fort.15 linked to run.ffr - list of commands and definitions in the FFREAD format
+
+Just say bggen
+}
+
+\section{detector simulation: hdgeant}
+
+\ft{hdgeant overview}
+\bi
+\I GEANT 3 implementation
+\I hit generation in C
+\I geometry definition via HDDS, an XML mark-up language
+\I optionally includes electromagnetic background of beam, out-of-time 
+\I input from HDDM event file or particle gun
+\I output in HDDM format
+\ei
+
+\begin{frame}[fragile]
+\ft{hdgeant configuration}
+
+FFREAD file: control.in
+
+\begin{verbatim}
+cINFILE 'rhop.hddm'
+TRIG 30
+cBEAM 12. 9.
+OUTFILE 'hdgeant.hddm'
+POSTSMEAR 0
+DELETEUNSMEARED 0
+c MCSMEAROPTS '-t1000 -d0'
+c PLOG 1
+c TLOG 1
+c   particle  momentum  theta  phi  delta_momentum delta_theta delta_phi
+KINE   118      1.0       50.   0.      0.              0.        360.
+c    vertex_x vertex_y vertex_z
+SCAP    0.       0.      65.
+c            vertex_extent_r  vertext_extent_z
+c TGTWIDTH           0.0              30.0
+c    fhalo
+HALO  5e-5
+BGRATE 1.10
+BGGATE -200. 200.
+RNDM 121
+CUTS 1e-4 1e-4 1e-3 1e-3 1e-4
+SWIT 0 0 0 0 0 0 0 0 0 0
+GELH  1     0.2     1.0     4     0.160
+HADR 1
+CKOV 1
+LABS 1
+ABAN 0
+DEBU 1 10 1000
+NOSECONDARIES 0
+TRAJECTORIES 0
+c   TMAXFD (REAL) maximum angular deviation due to the magnetic field
+c                 permitted in one step (degrees)
+c   DEEMAX (REAL) maximum fractional energy loss in one step (0< DEEMAX <=0.1)
+c   STEMAX (REAL) maximum step permitted (cm)
+c   STMIN  (REAL) minimum value for the maximum step imposed by energy loss,
+cAUTO 0
+c BFIELDMAP 'Magnets/Solenoid/solenoid_0750_poisson_20091123_03'
+c BFIELDTYPE 'Const'
+  SAVEHITS  0
+  SHOWERSINCOL 0
+  DRIFTCLUSTERS 0
+c MULS 0 no multiple scattering
+c      1 Moliere or Coulomb scattering (default)  
+c BREM 0 no bremsstrahlung 
+c      1 bremsstrahlung (default)
+c COMP 0 no Compton
+c      1 Compton scattering (default)
+c PAIR 0 no pair production
+c      1 pair production (default)
+c LOSS 0 (controls energy losses) no energy loss
+c      1  delta-rays are produced above the threshold
+c      2  no delta-rays are produced. Complete fluctuations are calculated .
+c DCAY 0 no decay in flight
+c      1 decay in flight with generation of secondaries (default)
+c      2 decay in flight without generation of secondaries
+c DRAY 0 no delta ray production
+c      1 delta ray production with generation of secondaries (default)
+c      2 delta ray production without generation of secondaries
+END
+\end{verbatim}
+Plus additional standard GEANT cards
+\end{frame}
+
+\f{\ft{hdgeant execution}
+\bi
+\I reads control.in from current working directory
+\I just say {\tt hdgeant}
+\ei
+}
+
+\section{addition of detector resolution: mcsmear}
+
+\f{\ft{mcsmear overview}
+\bi
+\I hit from hdgeant are perfect, e. g., exact deposited energy
+\I new information generated and added to the event with appropriate detector resolution introduced
+\I original perfect energy saved
+\ei
+}
+
+\begin{frame}[fragile]
+\ft{mcsmear configuration}
+
+Configuration done with command line options
+
+\begin{verbatim}
+Usage:
+     mcsmear [options] file.hddm
+
+  options:
+    -ofname  Write output to a file named "fname" (default auto-generate name)
+    -N       Add random background hits to CDC and FDC (default is not to add)
+    -s       Don't smear real hits (see -B for BCAL, default is to smear)
+    -i       Ignore random number seeds found in input HDDM file
+    -r"s1 s2 s3" Set initial random number seeds
+    -u#      Sigma CDC anode drift time in ns (def:0ns)
+             (NOTE: this is only used if -y is also specified!)
+    -y       Do NOT apply drift distance dependence error to
+             CDC (default is to apply)
+    -Y       Apply constant sigma smearing for FDC drift time. 
+             Default is to use a drift-distance dependent parameterization.
+    -t#      CDC time window for background hits in ns (def:0ns)
+    -U#      Sigma FDC anode drift time in ns (def:0ns)
+    -C#      Sigma FDC cathode strips in microns (def:0ns)
+    -t#      FDC time window for background hits in ns (def:0ns)
+    -e       hdgeant was run with LOSS=0 so scale the FDC cathode
+             pedestal noise (def:false)
+    -d       Drop truth hits (default: keep truth hits)
+    -p#      FCAL photo-statistics smearing factor in GeV^3/2 (def:0)
+    -b#      FCAL single block threshold in MeV (def:0)
+    -B       Don't process BCAL hits at all (def. process)
+    -Rthresh BCAL TDC threshold (def. 44.7 mV)
+    -Wthresh BCAL ADC threshold (def. 4 mV)
+    -Wsigma  BCAL fADC time resolution (def. 1.1547 ns)
+    -F       Don't smear BCAL energy (def. smear)
+    -G       Don't smear BCAL times (def. smear)
+    -H       Don't add BCAL dark hits (def. add)
+    -K       Don't apply BCAL sampling fluctuations (def. apply)
+    -L       Don't apply BCAL sampling floor term (def. apply)
+    -M       Don't apply BCAL Poisson statistics (def. apply)
+    -Q       Don't apply BCAL time jitter (def. apply)
+    -I       Don't apply discrim. thresh. to BCAL hits (def. cut)
+    -J       Create BCAL debug hists (only use with a few events!)
+    -D       Don't use the deprecated BCAL smearing scheme (def. use deprecated)
+    -f#      TOF sigma in psec (def: 100)
+    -h       Print this usage statement.
+\end{verbatim}
+\end{frame}
+
+\section{Exercises}
+
+\ft{Exercises}
+\bi
+\I Generate events with genr8
+\I Generate events with bggen
+\I Simulate events with hdgeant
+\I Smear events with mcsmear
+\ei
+
+\end{document}
