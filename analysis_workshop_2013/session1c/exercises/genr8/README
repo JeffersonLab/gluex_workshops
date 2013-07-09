@@ -1,0 +1,8 @@
+# 1. take a look at the input file
+less b1_pi.input
+# 2. generate 10 events with genr8
+genr8 -Agenr8_output.txt -M10 < b1_pi.input
+# 3. take a look at the output file
+less genr8_output.txt
+# 4. convert the text file to hddm format
+genr8_2_hddm -V"0 0 50 80" genr8_output.txt
