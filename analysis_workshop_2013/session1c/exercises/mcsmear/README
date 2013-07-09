@@ -1,0 +1,21 @@
+# 1. take a look at the mcsmear usage message
+
+mcsmear -h
+
+# 2. copy the output of the hdgeant exercise to the local directory
+
+cp -v ../hdgeant/hdgeant.hddm .
+
+# 3. run mcsmear on it
+
+mcsmear hdgeant.hddm
+
+# 4. take a look at the smeared output file (a lot of lines)
+
+hddm-xml hdgeant_smeared.hddm | less
+
+# 5. compare the input to the output
+
+hddm-xml hdgeant.hddm > unsmeared.xml
+hddm-xml hdgeant_smeared.hddm > smeared.xml
+diff unsmeared.xml smeared.xml | less
