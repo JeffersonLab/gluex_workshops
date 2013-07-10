@@ -4,6 +4,10 @@ Purpose:
 Data File:
  - $GLUEX_DATA/session3_and_4_and_5a/rest_60001.hddm (REST file of g, p -> pi+, pi+, pi-, n generated signal data)
 
+PRELIMINARY STEPS:
+ - cd $ANALYSIS_SCRIPTS
+ - svn update
+
 Exercise:
  - Using a JANA plugin ("workshop_4b" in this folder) and hd_root:
    - Using the "MakeAnalysisAction.pl" script pointed to in the "Helpful Links" section, create custom DAnalysisActions to histogram:
@@ -20,6 +24,9 @@ Helpful Links:
  - Workshop Wiki: https://halldweb1.jlab.org/wiki/index.php/July_2013_Tutorial
 
  - MakeAnalysisAction.pl: $ANALYSIS_SCRIPTS/MakeAnalysisAction.pl (in svn, located at: trunk/scripts/analysis/)
+
+ - particleType.h Source (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/particle_type_8h-source.html
+ - particleType.h Reference (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/particle_type_8h.html
 
  - DReaction (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_reaction.html
  - DParticleCombo (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_particle_combo.html

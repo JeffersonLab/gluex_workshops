@@ -24,6 +24,9 @@ Helpful Links:
  - Workshop Wiki: https://halldweb1.jlab.org/wiki/index.php/July_2013_Tutorial
  - MakeReactionPlugin.pl: $ANALYSIS_SCRIPTS/MakeAnalysisAction.pl (in svn, located at: trunk/scripts/analysis/)
 
+ - particleType.h Source (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/particle_type_8h-source.html
+ - particleType.h Reference (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/particle_type_8h.html
+
  - DHistogramActions.h Reference (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/_d_histogram_actions_8h.html
  - DHistogramActions.h Source (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/_d_histogram_actions_8h-source.html
 
@@ -31,5 +34,7 @@ Helpful Links:
  - DCutActions.h Source (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/_d_cut_actions_8h-source.html
 
  - DReaction (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_reaction.html
+ - DParticleCombo (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_particle_combo.html
+
  - ROOT TTree Format: https://halldweb1.jlab.org/wiki/index.php/Analysis_TTreeFormat
 

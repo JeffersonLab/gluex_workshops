@@ -22,8 +22,11 @@ Exercise 3:
 
 Helpful Links:
  - Workshop Wiki: https://halldweb1.jlab.org/wiki/index.php/July_2013_Tutorial
- - DNeutralShower (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_neutral_shower.html
+
+ - DKinematicData (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_kinematic_data.html
+
  - DBeamPhoton (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_beam_photon.html
  - DChargedTrackHypothesis (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_charged_track_hypothesis.html
- - DKinematicData (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_kinematic_data.html
+ - DNeutralShower (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_neutral_shower.html
+
 
