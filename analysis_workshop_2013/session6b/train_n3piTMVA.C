@@ -29,24 +29,22 @@ void train_n3piTMVA(TString myPath = "data/")
    TMVA::Factory *factory = new TMVA::Factory(baseName, outputFile,"!V:!Silent:Color:DrawProgressBar:Transformations=I");
 
    // 3 pi PID variables 
-   factory->AddVariable("(PiPlus1__ChiSq_Timing_KinFit==PiPlus1__ChiSq_Timing_KinFit) ? TMath::Prob(PiPlus1__ChiSq_Timing_KinFit,PiPlus1__NDF_Timing) : 0.","Timing FOM: #pi+ 1","",'F');
-   factory->AddVariable("TMath::Prob(PiPlus1__ChiSq_DCdEdx,PiPlus1__NDF_DCdEdx)","dE/dx FOM: #pi+ 1","",'F');
+   factory->AddVariable("PiPlus1__Timing_FOM := (PiPlus1__ChiSq_Timing_KinFit==PiPlus1__ChiSq_Timing_KinFit) ? TMath::Prob(PiPlus1__ChiSq_Timing_KinFit,PiPlus1__NDF_Timing) : 0.","Timing FOM: #pi+ 1","",'F');
+   factory->AddVariable("PiPlus1__DCdEdx_FOM := TMath::Prob(PiPlus1__ChiSq_DCdEdx,PiPlus1__NDF_DCdEdx)","dE/dx FOM: #pi+ 1","",'F');
    factory->AddVariable("PiPlus1__NDF_Tracking","Track Fit NDF: #pi+ 1","",'I');
-   factory->AddVariable("(PiPlus2__ChiSq_Timing_KinFit==PiPlus2__ChiSq_Timing_KinFit) ? TMath::Prob(PiPlus2__ChiSq_Timing_KinFit,PiPlus2__NDF_Timing) : 0.","Timing FOM: #pi+ 1","",'F');
-   factory->AddVariable("TMath::Prob(PiPlus2__ChiSq_DCdEdx,PiPlus2__NDF_DCdEdx)","dE/dx FOM: #pi+ 2","",'F');
+   factory->AddVariable("PiPlus2__Timing_FOM := (PiPlus2__ChiSq_Timing_KinFit==PiPlus2__ChiSq_Timing_KinFit) ? TMath::Prob(PiPlus2__ChiSq_Timing_KinFit,PiPlus2__NDF_Timing) : 0.","Timing FOM: #pi+ 1","",'F');
+   factory->AddVariable("PiPlus2__DCdEdx_FOM := TMath::Prob(PiPlus2__ChiSq_DCdEdx,PiPlus2__NDF_DCdEdx)","dE/dx FOM: #pi+ 2","",'F');
    factory->AddVariable("PiPlus2__NDF_Tracking","Track Fit NDF: #pi+ 2","",'I');
-   factory->AddVariable("(PiMinus__ChiSq_Timing_KinFit==PiMinus__ChiSq_Timing_KinFit) ? TMath::Prob(PiMinus__ChiSq_Timing_KinFit,PiMinus__NDF_Timing) : 0.","Timing FOM: #pi+ 1","",'F');
-   factory->AddVariable("TMath::Prob(PiMinus__ChiSq_DCdEdx,PiMinus__NDF_DCdEdx)","dE/dx FOM: #pi-","",'F');
+   factory->AddVariable("PiMinus__Timing_FOM := (PiMinus__ChiSq_Timing_KinFit==PiMinus__ChiSq_Timing_KinFit) ? TMath::Prob(PiMinus__ChiSq_Timing_KinFit,PiMinus__NDF_Timing) : 0.","Timing FOM: #pi+ 1","",'F');
+   factory->AddVariable("PiMinus__DCdEdx_FOM := TMath::Prob(PiMinus__ChiSq_DCdEdx,PiMinus__NDF_DCdEdx)","dE/dx FOM: #pi-","",'F');
    factory->AddVariable("PiMinus__NDF_Tracking","Track Fit NDF: #pi-","",'I');
 
    // Kinematic fit variables
-   factory->AddVariable("TMath::Prob(ChiSq_KinFit,NDF_KinFit)","Kinematic Fit Confidence Level","",'F');
-   factory->AddVariable("MissingNeutron__X4.Perp()","Primary Vertex Radius","cm",'F');
-   factory->AddVariable("MissingNeutron__P4.Perp()","Missing Neutron Transverse Momentum","GeV/c",'F');
+   factory->AddVariable("FOM_KinFit := TMath::Prob(ChiSq_KinFit,NDF_KinFit)","Kinematic Fit Confidence Level","",'F');
+   factory->AddVariable("PV_r := MissingNeutron__X4.Perp()","Primary Vertex Radius","cm",'F');
+   factory->AddVariable("MissingNeutron_PT := MissingNeutron__P4.Perp()","Missing Neutron Transverse Momentum","GeV/c",'F');
    
    // Computed variables from friend tree
-   factory->AddVariable("Unused__Energy_FCAL_Total","Isolated FCAL Sum Energy","GeV",'F');
-   factory->AddVariable("Unused__Energy_BCAL_Total","Isolated BCAL Sum Energy","GeV",'F');
    factory->AddVariable("Unused__Max_Proton_FOM","Unused Proton hypothesis track with largest FOM","",'F');
    factory->AddVariable("Unused__Max_KPlus_FOM","Unused K+ hypothesis track with largest FOM","",'F');
    factory->AddVariable("Unused__Max_KMinus_FOM","Unused K- hypothesis track with largest FOM","",'F');
@@ -87,7 +85,7 @@ void train_n3piTMVA(TString myPath = "data/")
    factory->PrepareTrainingAndTestTree( mycuts, mycutb,"nTrain_Signal=0:nTrain_Background=0:SplitMode=Random:NormMode=NumEvents:!V" );
 
    // book MVA method
-   factory->BookMethod( TMVA::Types::kBDT, "BDT","!H:!V:NTrees=100:nEventsMin=100:MaxDepth=5:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=200:PruneMethod=NoPruning" );
+   factory->BookMethod( TMVA::Types::kBDT, "BDT","!H:!V:NTrees=100:nEventsMin=100:MaxDepth=4:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=200:PruneMethod=NoPruning" );
 
    // --------------------------------------------------------------------------------------------------
 

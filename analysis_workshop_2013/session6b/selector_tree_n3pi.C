@@ -69,8 +69,6 @@ void selector_tree_n3pi::Begin(TTree * /*tree*/)
      tmvaReader->AddVariable("MissingNeutron_PT := MissingNeutron__P4.Perp()",&MissingNeutron_PT);
      
      // Computed variables (friend tree)
-     tmvaReader->AddVariable("Unused__Energy_FCAL_Total",&Unused__Energy_FCAL_Total);
-     tmvaReader->AddVariable("Unused__Energy_BCAL_Total",&Unused__Energy_BCAL_Total);
      tmvaReader->AddVariable("Unused__Max_Proton_FOM",&Unused__Max_Proton_FOM);
      tmvaReader->AddVariable("Unused__Max_KPlus_FOM",&Unused__Max_KPlus_FOM);
      tmvaReader->AddVariable("Unused__Max_KMinus_FOM" ,&Unused__Max_KMinus_FOM);
@@ -118,21 +116,12 @@ Bool_t selector_tree_n3pi::Process(Long64_t entry)
    if(entry%10000 == 0) cout<<"--- ... Processing combo: "<<entry<<endl;
    
    // compute sums from unused calorimeter energies and maximum PID FOMs
-   Unused__Energy_FCAL_Total=0.;
-   Unused__Energy_BCAL_Total=0.;
    Unused__Max_Proton_FOM=0.;
    Unused__Max_KPlus_FOM=0.;
    Unused__Max_KMinus_FOM=0.;
 
    // loop over unused hypotheses
    for(UInt_t i=0; i<NumUnused; i++){
-     
-     // select unused calorimeter energies not associated with a track
-     if(Unused__Energy_FCAL[i]==Unused__Energy_FCAL[i] && Unused__NDF_Tracking[i]==0)
-       Unused__Energy_FCAL_Total+=Unused__Energy_FCAL[i];
-     if(Unused__Energy_BCAL[i]==Unused__Energy_BCAL[i] && Unused__NDF_Tracking[i]==0)
-       Unused__Energy_BCAL_Total+=Unused__Energy_BCAL[i];
-
      // select unused tracks with some criteria for max PID FOM
      if(Unused__NDF_Tracking[i] > 5) {       
        // select highest CL for proton and kaon hypothesis
@@ -206,11 +195,13 @@ void selector_tree_n3pi::ProcessTMVA()
    
    BDT = tmvaReader->EvaluateMVA("BDT method");
 
-   TLorentzVector threePi_p4 =  *PiPlus1__P4_KinFit + *PiPlus2__P4_KinFit + *PiMinus__P4_KinFit;
-   //hBDT_threePiMass->Fill(threePi_p4.M(),BDT);
+   TLorentzVector threePi_p4 = *PiPlus1__P4_KinFit + *PiPlus2__P4_KinFit + *PiMinus__P4_KinFit;
 
-   // output for AmpTools analysis
-   if(BDT > user_BdtCut) outBdtTree->Fill();
+   // BDT based analysis
+   if(BDT > user_BdtCut) {
+     outBdtTree->Fill(); // output for AmpTools analysis
+     //hBDT_threePiMass->Fill(threePi_p4.M());
+   }
 
    // cuts based analysis
    if(FOM_KinFit>0.01 && PiPlus1__PID_FOM>0.01 && PiPlus2__PID_FOM>0.01 && PiMinus__PID_FOM>0.01) {

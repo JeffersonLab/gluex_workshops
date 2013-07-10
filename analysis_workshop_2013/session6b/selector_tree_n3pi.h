@@ -45,7 +45,6 @@ public :
 
    // variables for output friend tree
    Bool_t trueSignal;
-   Float_t Unused__Energy_FCAL_Total, Unused__Energy_BCAL_Total;
    Float_t Unused__Max_Proton_FOM, Unused__Max_KPlus_FOM, Unused__Max_KMinus_FOM;
    Float_t Measured__MissingMass;
 
@@ -342,8 +341,6 @@ void selector_tree_n3pi::Init(TTree *tree)
      outFile = new TFile("tree_n3piFriend.root","recreate");
      outTree = new TTree("n3piFriend_Tree","");
      outTree->Branch("trueSignal",&trueSignal);
-     outTree->Branch("Unused__Energy_FCAL_Total",&Unused__Energy_FCAL_Total);
-     outTree->Branch("Unused__Energy_BCAL_Total",&Unused__Energy_BCAL_Total);
      outTree->Branch("Unused__Max_Proton_FOM",&Unused__Max_Proton_FOM);
      outTree->Branch("Unused__Max_KPlus_FOM",&Unused__Max_KPlus_FOM);
      outTree->Branch("Unused__Max_KMinus_FOM",&Unused__Max_KMinus_FOM);
