@@ -1,6 +1,16 @@
 
 The goal of this excercise is to train a Boosted Decision Tree (BDT) using the analysis TTree's discussed in the previous session.  Simulation samples for the hadronic background (bggen) and signal MC (gen_3pi) have been generated, and using the trunk/home/pmatt/plugins/n3pi plugin generated analysis TTrees, which are stored on the VM at the path $GLUEX_DATA/ttree.  
 
+Introductory Scripts: No exercises, just code example to introduce TMVA
+$GLUEX_DATA/session6b/
+$GLUEX_DATA/session6b/
+
+Input Data:
+$GLUEX_DATA/session6b/tree_n3pi_bggen_train.root (2M generated bggen events)
+$GLUEX_DATA/session6b/tree_n3pi_signal_train.root (50K generated signal events)
+
+If you are using the VM image from a jump drive given to you at the workshop you will need to copy the file tree_n3pi_bggen_train.root (1.3GB) from the jump drive to the path $GLUEX_DATA/session6b/ as it would not fit in a single image on the jump drives used.  This copy can be done by dragging the file onto the VM desktop and then copying it to the proper path.
+
 Steps:
 
 1) First setup the working directory by creating soft links to the relevant scripts:
@@ -23,3 +33,8 @@ root -l train_n3piTMVA.C > logTraining &
 
 root -l '$ROOTSYS/tmva/test/TMVAGui.C("n3pi_trainTMVA.root")'
 
+5) Modify train_n3piTMVA.C to include the Measured__MissingMass variable and train the BDT again and compare to the BDT without this variable.  Note: need to change "baseName" variable in train_n3piTMVA.C as well to not overwrite previous weight and TMVA output ROOT files.
+
+
+Additional exercise (on your own):
+* Use TSelector to construct new variables to add to friend tree and include in BDT training to improve selection 

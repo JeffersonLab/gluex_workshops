@@ -38,15 +38,16 @@ public :
    Bool_t bggenData; 
    Float_t user_BdtCut;
 
-   // output friend tree file
+   // output friend tree file for TMVA training
    TFile *outFile;
    TTree *outTree;
    Int_t nSignal; //identified signal counter
 
    // variables for output friend tree
    Bool_t trueSignal;
-   Float_t Unused__Energy_FCAL_Total, Unused__Energy_BCAL_Total, Unused__Momentum_Track_Total;
-   Float_t Unused__Max_Proton_FOM, Unused__Max_KPlus_FOM, Unused__Max_KMinus_FOM, Unused__Max_PiPlus_FOM, Unused__Max_PiMinus_FOM;
+   Float_t Unused__Energy_FCAL_Total, Unused__Energy_BCAL_Total;
+   Float_t Unused__Max_Proton_FOM, Unused__Max_KPlus_FOM, Unused__Max_KMinus_FOM;
+   Float_t Measured__MissingMass;
 
    // for TMVA reader
    TFile *outBdtFile;
@@ -336,21 +337,20 @@ void selector_tree_n3pi::Init(TTree *tree)
    fChain = tree;
    fChain->SetMakeClass(1);
 
-   // output files
+   // output friend tree for TMVA training
    if(FriendOutput){
      outFile = new TFile("tree_n3piFriend.root","recreate");
      outTree = new TTree("n3piFriend_Tree","");
      outTree->Branch("trueSignal",&trueSignal);
      outTree->Branch("Unused__Energy_FCAL_Total",&Unused__Energy_FCAL_Total);
      outTree->Branch("Unused__Energy_BCAL_Total",&Unused__Energy_BCAL_Total);
-     outTree->Branch("Unused__Momentum_Track_Total",&Unused__Momentum_Track_Total);  
      outTree->Branch("Unused__Max_Proton_FOM",&Unused__Max_Proton_FOM);
      outTree->Branch("Unused__Max_KPlus_FOM",&Unused__Max_KPlus_FOM);
      outTree->Branch("Unused__Max_KMinus_FOM",&Unused__Max_KMinus_FOM);
-     outTree->Branch("Unused__Max_PiPlus_FOM",&Unused__Max_PiPlus_FOM);
-     outTree->Branch("Unused__Max_PiMinus_FOM",&Unused__Max_PiMinus_FOM);
+     outTree->Branch("Measured__MissingMass",&Measured__MissingMass);
    }     
    
+   // output tree after BDT cut for AmpTools fit
    if(EvalTMVA){
      outBdtFile = new TFile("tree_n3piBdtCut.root","recreate");
      outBdtTree = fChain->CloneTree(0);

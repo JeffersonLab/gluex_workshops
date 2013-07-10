@@ -47,7 +47,8 @@ void selector_tree_n3pi::Begin(TTree * /*tree*/)
      user_BdtCut = atof(option(firstEqual+1,4).Data());
    }
 
-   if(EvalTMVA) {
+   if(EvalTMVA) { //only used after BDT training completed
+
      // setup for TMVA evaluation
      tmvaReader = new TMVA::Reader( "!Color:!Silent" );
      
@@ -67,7 +68,7 @@ void selector_tree_n3pi::Begin(TTree * /*tree*/)
      tmvaReader->AddVariable("PV_r := MissingNeutron__X4.Perp()",&PV_r);
      tmvaReader->AddVariable("MissingNeutron_PT := MissingNeutron__P4.Perp()",&MissingNeutron_PT);
      
-     // Computed variables from friend tree
+     // Computed variables (friend tree)
      tmvaReader->AddVariable("Unused__Energy_FCAL_Total",&Unused__Energy_FCAL_Total);
      tmvaReader->AddVariable("Unused__Energy_BCAL_Total",&Unused__Energy_BCAL_Total);
      tmvaReader->AddVariable("Unused__Max_Proton_FOM",&Unused__Max_Proton_FOM);
@@ -113,17 +114,17 @@ Bool_t selector_tree_n3pi::Process(Long64_t entry)
    // The return value is currently not used.
 
    GetEntry(entry);
-   if(entry==0) cout<<"--- Processing: "<<fChain->GetTree()->GetEntries()<<" total events"<<endl;
-   if(entry%10000 == 0) cout<<"--- ... Processing event: "<<entry<<endl;
+   if(entry==0) cout<<"--- Processing: "<<fChain->GetTree()->GetEntries()<<" total combos"<<endl;
+   if(entry%10000 == 0) cout<<"--- ... Processing combo: "<<entry<<endl;
    
-   // compute sums from unused tracks and calorimeter energies
+   // compute sums from unused calorimeter energies and maximum PID FOMs
    Unused__Energy_FCAL_Total=0.;
    Unused__Energy_BCAL_Total=0.;
-   Unused__Momentum_Track_Total=0.;
    Unused__Max_Proton_FOM=0.;
    Unused__Max_KPlus_FOM=0.;
    Unused__Max_KMinus_FOM=0.;
 
+   // loop over unused hypotheses
    for(UInt_t i=0; i<NumUnused; i++){
      
      // select unused calorimeter energies not associated with a track
@@ -131,38 +132,38 @@ Bool_t selector_tree_n3pi::Process(Long64_t entry)
        Unused__Energy_FCAL_Total+=Unused__Energy_FCAL[i];
      if(Unused__Energy_BCAL[i]==Unused__Energy_BCAL[i] && Unused__NDF_Tracking[i]==0)
        Unused__Energy_BCAL_Total+=Unused__Energy_BCAL[i];
-     // select unused tracks with some criteria for sum and max FOM
-     if(Unused__NDF_Tracking[i] > 5) {
-       TLorentzVector *unusedTrackP4 = (TLorentzVector*)Unused__P4_Measured->At(i);
-       Unused__Momentum_Track_Total+=unusedTrackP4->Vect().Mag();
-       
+
+     // select unused tracks with some criteria for max PID FOM
+     if(Unused__NDF_Tracking[i] > 5) {       
        // select highest CL for proton and kaon hypothesis
-       float PID_FOM = TMath::Prob(Unused__ChiSq_DCdEdx[i]+Unused__ChiSq_Timing[i],Unused__NDF_DCdEdx[i]+Unused__NDF_Timing[i]);
+       Float_t PID_FOM = TMath::Prob(Unused__ChiSq_DCdEdx[i]+Unused__ChiSq_Timing[i],Unused__NDF_DCdEdx[i]+Unused__NDF_Timing[i]);
        if(Unused__PID[i] == 2212 && PID_FOM > Unused__Max_Proton_FOM) Unused__Max_Proton_FOM=PID_FOM; 
        if(Unused__PID[i] == 321  && PID_FOM > Unused__Max_KPlus_FOM) Unused__Max_KPlus_FOM=PID_FOM; 
        if(Unused__PID[i] == -321 && PID_FOM > Unused__Max_KMinus_FOM) Unused__Max_KMinus_FOM=PID_FOM; 
-       if(Unused__PID[i] == 211  && PID_FOM > Unused__Max_PiPlus_FOM) Unused__Max_PiPlus_FOM=PID_FOM; 
-       if(Unused__PID[i] == -211 && PID_FOM > Unused__Max_PiMinus_FOM) Unused__Max_PiMinus_FOM=PID_FOM;
      }
    }
 
    // identify exclusive 3pi n channel from beam energy and matched 3pi tracks
    TLorentzVector thrownMissingP4(0,0,BeamPhoton__P4_Measured->Energy(),BeamPhoton__P4_Measured->Energy()+0.938); 
-
-   // add thrown tracks to get missing mass of other thrown track
+   // add thrown track P4 to get missing mass of other thrown track
    Int_t MatchID[3] = {PiPlus1__MatchID, PiPlus2__MatchID, PiMinus__MatchID};
    for(int i=0; i<3; i++){
      if(MatchID[i]<0 || MatchID[i]>Thrown__P4_Thrown->GetSize()) continue;
      TLorentzVector *thrownP4 = (TLorentzVector*)Thrown__P4_Thrown->At(MatchID[i]);
      thrownMissingP4 -= TLorentzVector(thrownP4->Vect(),thrownP4->E());
    }
-   
-   // define signal as matched to proper thrown tracks and only other thrown track is a neutron
+
+   // define signal as matched to proper thrown tracks and only other thrown track has a neutron
    trueSignal = false;
    if(PiPlus1__MatchID>=0 && PiPlus2__MatchID>=0 && PiMinus__MatchID>=0 && Thrown__PID[PiPlus1__MatchID]==211 && Thrown__PID[PiPlus2__MatchID]==211 && Thrown__PID[PiMinus__MatchID]==-211 && thrownMissingP4.M()<0.94 && thrownMissingP4.M()>0.936) {
      trueSignal = true;
      nSignal++;
    }
+
+   // construct measured missing mass 
+   TLorentzVector measuredMissingP4(0,0,BeamPhoton__P4_Measured->Energy(),BeamPhoton__P4_Measured->Energy()+0.938);
+   measuredMissingP4 = measuredMissingP4 - *PiPlus1__P4_Measured - *PiPlus2__P4_Measured - *PiMinus__P4_Measured;
+   Measured__MissingMass = measuredMissingP4.M();
 
    if(EvalTMVA) ProcessTMVA();
    if(FriendOutput) outTree->Fill();
@@ -189,15 +190,15 @@ void selector_tree_n3pi::ProcessTMVA()
    // variables for reader
    PiPlus1__Timing_FOM = TMath::Prob(PiPlus1__ChiSq_Timing_KinFit,PiPlus1__NDF_Timing);
    PiPlus1__DCdEdx_FOM = TMath::Prob(PiPlus1__ChiSq_DCdEdx,PiPlus1__NDF_DCdEdx);
-   //float PiPlus1_PID_FOM = TMath::Prob(PiPlus1__ChiSq_Timing_KinFit+PiPlus1__ChiSq_DCdEdx,PiPlus1__NDF_Timing+PiPlus1__NDF_DCdEdx);
+   Float_t PiPlus1__PID_FOM = TMath::Prob(PiPlus1__ChiSq_Timing_KinFit+PiPlus1__ChiSq_DCdEdx,PiPlus1__NDF_Timing+PiPlus1__NDF_DCdEdx);
    
    PiPlus2__Timing_FOM = TMath::Prob(PiPlus2__ChiSq_Timing_KinFit,PiPlus2__NDF_Timing);
    PiPlus2__DCdEdx_FOM = TMath::Prob(PiPlus2__ChiSq_DCdEdx,PiPlus2__NDF_DCdEdx);
-   //float PiPlus2_PID_FOM = TMath::Prob(PiPlus2__ChiSq_Timing_KinFit+PiPlus2__ChiSq_DCdEdx,PiPlus2__NDF_Timing+PiPlus2__NDF_DCdEdx);
+   Float_t PiPlus2__PID_FOM = TMath::Prob(PiPlus2__ChiSq_Timing_KinFit+PiPlus2__ChiSq_DCdEdx,PiPlus2__NDF_Timing+PiPlus2__NDF_DCdEdx);
    
    PiMinus__Timing_FOM = TMath::Prob(PiMinus__ChiSq_Timing_KinFit,PiMinus__NDF_Timing);
    PiMinus__DCdEdx_FOM = TMath::Prob(PiMinus__ChiSq_DCdEdx,PiMinus__NDF_DCdEdx);
-   //float PiMinus_PID_FOM = TMath::Prob(PiMinus__ChiSq_Timing_KinFit+PiMinus__ChiSq_DCdEdx,PiMinus__NDF_Timing+PiMinus__NDF_DCdEdx);
+   Float_t PiMinus__PID_FOM = TMath::Prob(PiMinus__ChiSq_Timing_KinFit+PiMinus__ChiSq_DCdEdx,PiMinus__NDF_Timing+PiMinus__NDF_DCdEdx);
    
    FOM_KinFit = TMath::Prob(ChiSq_KinFit,NDF_KinFit);
    PV_r = MissingNeutron__X4->Perp();
@@ -205,10 +206,16 @@ void selector_tree_n3pi::ProcessTMVA()
    
    BDT = tmvaReader->EvaluateMVA("BDT method");
 
-   //TLorentzVector threePi_p4 =  *PiPlus1__P4_KinFit + *PiPlus2__P4_KinFit + *PiMinus__P4_KinFit;
+   TLorentzVector threePi_p4 =  *PiPlus1__P4_KinFit + *PiPlus2__P4_KinFit + *PiMinus__P4_KinFit;
    //hBDT_threePiMass->Fill(threePi_p4.M(),BDT);
 
+   // output for AmpTools analysis
    if(BDT > user_BdtCut) outBdtTree->Fill();
+
+   // cuts based analysis
+   if(FOM_KinFit>0.01 && PiPlus1__PID_FOM>0.01 && PiPlus2__PID_FOM>0.01 && PiMinus__PID_FOM>0.01) {
+     //hCuts_threePiMass->Fill(threePi_p4.M());
+   }
 
 }
 
