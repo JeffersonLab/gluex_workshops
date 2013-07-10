@@ -2,8 +2,7 @@
 The goal of this excercise is to train a Boosted Decision Tree (BDT) using the analysis TTree's discussed in the previous session.  Simulation samples for the hadronic background (bggen) and signal MC (gen_3pi) have been generated, and using the trunk/home/pmatt/plugins/n3pi plugin generated analysis TTrees, which are stored on the VM at the path $GLUEX_DATA/ttree.  
 
 Introductory Scripts: No exercises, just code example to introduce TMVA
-$GLUEX_DATA/session6b/
-$GLUEX_DATA/session6b/
+$GLUEX_DATA/session6b/TMVAClassification.C
 
 Input Data:
 $GLUEX_DATA/session6b/tree_n3pi_bggen_train.root (2M generated bggen events)
