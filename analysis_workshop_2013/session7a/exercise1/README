@@ -3,9 +3,10 @@ The goal of this excercise is to use the weights files generated in the BDT trai
 
 Steps:
 
-1) First setup the working directory by creating soft links to the relevant data:
+1) First setup the working directory by creating soft links to the relevant data and the weights files from the previous training:
 
 ln -s $GLUEX_DATA/session6b/ data
+ln -s ../../session6b/weights/ weights	
 
 2) Use a TSelector to process the analysis TTree and output a smaller analysis TTree containing only events which satisfy the user defined BDT cut with the following macro (not the different options passed to the TSelector from the previous exercise in session6b):
 
