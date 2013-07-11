@@ -18,11 +18,17 @@ Exercise:
      - cutting on the combined pid FOM & the kinematic fit FOM
      - filling the reaction-independent histograms (thrown & detected kinematics, track multiplicity, gen-recon comparison)
      - saving the results to an output ROOT TTree
+   - NOTE:
+     - The data provided in this exercise has already been skimmed (VERY loose cuts) to save execution time.  
+   - Suggestion:
+     - You may want to run over a subset of the data first to test your cuts / ROOT output before running over the full sample.  
+       To do that, run with "-PEVENTS_TO_KEEP=10000" or some other semi-small number.  
  - View the output histograms and TTree in ROOT: compare mass histograms before/after kinematic fit, etc.
 
 Helpful Links:
  - Workshop Wiki: https://halldweb1.jlab.org/wiki/index.php/July_2013_Tutorial
- - MakeReactionPlugin.pl: $ANALYSIS_SCRIPTS/MakeAnalysisAction.pl (in svn, located at: trunk/scripts/analysis/)
+ - MakeReactionPlugin.pl: $ANALYSIS_SCRIPTS/MakeReactionPlugin.pl (in svn, located at: trunk/scripts/analysis/)
+   - Run with no arguments for full usage instructions.  Only the first argument is required though (plugin name).  
 
  - particleType.h Source (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/particle_type_8h-source.html
  - particleType.h Reference (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/particle_type_8h.html
