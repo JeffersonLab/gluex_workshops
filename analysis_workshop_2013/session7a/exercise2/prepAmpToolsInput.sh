@@ -11,3 +11,6 @@ mv AmpToolsInputTree.root threepi_data.root
 tree_to_amptools $GLUEX_DATA/session7a/tree_n3piBdtCut0.1_signal_acc_eval.root n3pi_Tree
 mv AmpToolsInputTree.root threepi_acc.root
 
+#cleanup 
+rm tree_n3piBdtCut0.1_data.root
+

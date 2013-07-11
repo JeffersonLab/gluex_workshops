@@ -12,12 +12,8 @@ If you are using the VM image from a jump drive given to you at the workshop you
 
 Steps:
 
-1) First setup the working directory by creating soft links to the relevant scripts:
+1) First setup the working directory by creating soft links to the relevant data:
 
-ln -s $SESSIONS/session6b/selector_tree_n3pi.C
-ln -s $SESSIONS/session6b/selector_tree_n3pi.h
-ln -s $SESSIONS/session6b/preTrain_n3pi.C
-ln -s $SESSIONS/session6b/train_n3piTMVA.C
 ln -s $GLUEX_DATA/session6b/ data
 
 2) There are some variables we would like to compute which are not included in the default analysis TTree, such as whether or not the thrown topology is the 3pi n signal or not.  For this we use a TSelector to process the analysis TTree and output a friend TTree which contains the new variables we need for the BDT training by executing the following macro
@@ -28,12 +24,12 @@ root -l preTrain_n3pi.C
 
 root -l train_n3piTMVA.C > logTraining &
 
-4) Finally we use the TMVA GUI to look at the training performace in n3pi_trainTMVA.root, which can be launched using the following macro
+4) Use the TMVA GUI to look at the training performace in n3pi_trainTMVA.root, which can be launched using the following macro
 
 root -l '$ROOTSYS/tmva/test/TMVAGui.C("n3pi_trainTMVA.root")'
 
-5) Modify train_n3piTMVA.C to include the Measured__MissingMass variable and train the BDT again and compare to the BDT without this variable.  Note: need to change "baseName" variable in train_n3piTMVA.C as well to not overwrite previous weight and TMVA output ROOT files.
+5) Modify train_n3piTMVA.C to include the Measured__MissingMass variable and train the BDT again and compare to the BDT without this variable.  Note: need to change baseName string in train_n3piTMVA.C as well to not overwrite previous weight and TMVA output ROOT files.
 
 
 Additional exercise (on your own):
-* Use TSelector to construct new variables to add to friend tree and include in BDT training to improve selection 
+* Use TSelector to construct new variables to add to friend tree and include in BDT training to improve selection.  For example, include calorimeter information from BCAL/FCAL hits not matched to reconstructed tracks. 
