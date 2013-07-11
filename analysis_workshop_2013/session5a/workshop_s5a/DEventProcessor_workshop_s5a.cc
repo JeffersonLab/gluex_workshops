@@ -95,6 +95,13 @@ jerror_t DEventProcessor_workshop_s5a::evnt(jana::JEventLoop* locEventLoop, int 
 	locEventWriterROOT->Fill_DataTrees(locEventLoop, "workshop_s5a");
 	*/
 
+	/*
+	//Optional: Save event to output REST file. Use this to create skims.
+	const DEventWriterREST* locEventWriterREST = NULL;
+	locEventLoop->GetSingle(locEventWriterREST);
+	locEventWriterREST->Write_RESTEvent(locEventLoop, "workshop_s5a"); //string is part of output file name
+	*/
+
 	return NOERROR;
 }
 
