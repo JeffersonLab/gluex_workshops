@@ -3,11 +3,15 @@ The goal of this excercise is to use the weights files generated in the BDT trai
 
 Steps:
 
-1) Use a TSelector to process the analysis TTree and output a smaller analysis TTree containing only events which satisfy the user defined BDT cut with the following macro (not the different options passed to the TSelector from the previous exercise in session6b):
+1) First setup the working directory by creating soft links to the relevant data:
+
+ln -s $GLUEX_DATA/session6b/ data
+
+2) Use a TSelector to process the analysis TTree and output a smaller analysis TTree containing only events which satisfy the user defined BDT cut with the following macro (not the different options passed to the TSelector from the previous exercise in session6b):
 
 root -l postTrain_n3pi.C
 
-2) Goal is to plot signal and background 3 pi invariant mass distributions using a BDT cut and some other "simple" cut combination 
+3) Goal is to plot signal and background 3 pi invariant mass distributions using a BDT cut and some other "simple" cut combination 
 
    a) Add histograms to selector_tree_n3pi for 3pi mass after BDT cut and "simple" cuts on KinFit CL, etc (in EvalTMVA()). Then write them to the output TFile.
 
