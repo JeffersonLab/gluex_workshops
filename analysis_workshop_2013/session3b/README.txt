@@ -5,7 +5,7 @@ Data File:
  - $GLUEX_DATA/session3_and_4_and_5a/rest_60001.hddm (REST file of g, p -> pi+, pi+, pi-, n generated signal data)
 
 Exercise:
- - Using a JANA plugin ("workshop_3b" in this folder) and hd_root:
+ - Using a JANA plugin ("workshop_s3b" in this folder) and hd_root:
    - Configure the settings of the DReaction
      - Enable loose cuts on the combined tracking & PID FOMs
      - Enable p4 & vertex kinematic fitting
@@ -31,3 +31,4 @@ Helpful Links:
  - DKinFitResults (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_kin_fit_results.html
  - DChargedTrackHypothesis (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_charged_track_hypothesis.html
 
+ - GlueX Libraries Source Code: on virtual machine at: $HALLD_HOME/src/libraries/

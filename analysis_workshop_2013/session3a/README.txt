@@ -5,7 +5,7 @@ Data File:
  - $GLUEX_DATA/session3_and_4_and_5a/rest_60001.hddm (REST file of g, p -> pi+, pi+, pi-, n generated signal data)
 
 Exercise:
- - Using a JANA plugin ("workshop_3a" in this folder) and hd_root:
+ - Using a JANA plugin ("workshop_s3a" in this folder) and hd_root:
    - Create a DReaction for g, p -> (n), pi+, pi-, pi+
    - Using the DParticleCombo objects, histogram:
      - # of Particle Combinations for each event
@@ -25,3 +25,4 @@ Helpful Links:
 
  - DKinematicData (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_kinematic_data.html
 
+ - GlueX Libraries Source Code: on virtual machine at: $HALLD_HOME/src/libraries/

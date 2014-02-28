@@ -44,3 +44,4 @@ Helpful Links:
 
  - ROOT TTree Format: https://halldweb1.jlab.org/wiki/index.php/Analysis_TTreeFormat
 
+ - GlueX Libraries Source Code: on virtual machine at: $HALLD_HOME/src/libraries/

@@ -16,7 +16,7 @@ Exercise 3:
    - DChargedTrackHypothesis: PID, q, p, theta, phi, and vertex-z
    - DNeutralShower: Shower energy
    - DBeamPhoton: Beam energy
- - The "workshop_2b" plugin has already been created in this folder; just modify the contents of its evnt() method and compile it. 
+ - The "workshop_s2b" plugin has already been created in this folder; just modify the contents of its evnt() method and compile it. 
    - Note that DChargedTrackHypothesis & DBeamPhoton inherit from DKinematicData
  - Compare the results to the hd_dump output, and confirm that they agree.  
 
@@ -29,4 +29,4 @@ Helpful Links:
  - DChargedTrackHypothesis (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_charged_track_hypothesis.html
  - DNeutralShower (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/class_d_neutral_shower.html
 
-
+ - GlueX Libraries Source Code: on virtual machine at: $HALLD_HOME/src/libraries/

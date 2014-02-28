@@ -5,7 +5,7 @@ Data File:
  - $GLUEX_DATA/session3_and_4_and_5a/rest_60001.hddm (REST file of g, p -> pi+, pi+, pi-, n generated signal data)
 
 Exercise:
- - Using a JANA plugin ("workshop_4a" in this folder) and hd_root:
+ - Using a JANA plugin ("workshop_s4a" in this folder) and hd_root:
    - Add analysis actions to the DReaction to make histograms & place cuts:
      - REMEMBER: when creating two different actions of the same type, give at least one of them a unique (string) name!!!!
      - histogram PID & True PID
@@ -36,3 +36,4 @@ Helpful Links:
  - DCutActions.h Reference (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/_d_cut_actions_8h.html
  - DCutActions.h Source (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/_d_cut_actions_8h-source.html
 
+ - GlueX Libraries Source Code: on virtual machine at: $HALLD_HOME/src/libraries/

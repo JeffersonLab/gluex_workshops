@@ -9,7 +9,7 @@ PRELIMINARY STEPS:
  - svn update
 
 Exercise:
- - Using a JANA plugin ("workshop_4b" in this folder) and hd_root:
+ - Using a JANA plugin ("workshop_s4b" in this folder) and hd_root:
    - Using the "MakeAnalysisAction.pl" script pointed to in the "Helpful Links" section, create custom DAnalysisActions to histogram:
      - The invariant mass of pi+, pi-, pi+
      - A dalitz plot (invariant mass squared of pi+_1 & pi- vs. invariant mass squared of pi+_2 & pi-)
@@ -35,3 +35,4 @@ Helpful Links:
  - DHistogramActions.cc Source (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/_d_histogram_actions_8cc-source.html
  - DHistogramActions.h Source (DOxygen): http://www.jlab.org/Hall-D/software/HDSoftware_Documentation/_d_histogram_actions_8h-source.html
 
+ - GlueX Libraries Source Code: on virtual machine at: $HALLD_HOME/src/libraries/
