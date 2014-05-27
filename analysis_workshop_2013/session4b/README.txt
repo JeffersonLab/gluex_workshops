@@ -6,7 +6,7 @@ Data File:
 
 PRELIMINARY STEPS:
  - cd $ANALYSIS_SCRIPTS
- - svn update
+ - svn update -r11298
 
 Exercise:
  - Using a JANA plugin ("workshop_s4b" in this folder) and hd_root:
