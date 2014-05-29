@@ -12,10 +12,10 @@ Exercise:
    - Using the DParticleCombo objects, histogram:
      - PID FOM of pi+'s and pi-'s (separately)
        - Must cast combo particles (DKinematicData) to DChargedTrackHypothesis first!!!
-     - Missing Mass before kinematic fit
+     - Missing mass using measured data prior to cutting on the kinematic fit result
      - Kinematic Fit Confidence Level
        - Beware kinematic fits that don't converge!! (DParticleCombo::Get_KinFitResults() == NULL)
-     - Missing Mass using MEASURED data after placing a 1% confidence level cut on the kinematic fit
+     - Missing mass using measured data after placing a 1% confidence level cut on the kinematic fit
      - If time: DC dE/dx FOM of pi+'s and pi-'s (separately)
 
 Helpful Links:
