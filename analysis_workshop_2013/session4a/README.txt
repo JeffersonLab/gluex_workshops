@@ -12,7 +12,7 @@ Exercise:
      - place a 1% cut on the combined PID FOM
      - histogram kinematic fit results
      - place a 1% cut on the kinematic fit confidence level
-     - histogram missing mass: before and after the kinematic fit confidence level cut
+     - histogram missing mass using measured data: before and after the kinematic fit confidence level cut
      - histogram particle combon kinematics: both at the beginning and at the end
    - Create and execute reaction-independent actions in the event processor to histogram:
      - thrown & detected particle kinematics

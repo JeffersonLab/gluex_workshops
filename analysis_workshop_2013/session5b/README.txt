@@ -14,7 +14,7 @@ Exercise:
 
    - This entails:
      - performing a vertex-p4 kinematic fit
-     - histogramming kinematics, pid, kinematic fit results, missing/invariant mass peaks before & after kinematic fit
+     - histogramming kinematics, pid, kinematic fit results, missing/invariant mass peaks using measured data before & after a cut on the kinematic fit result
      - cutting on the combined pid FOM & the kinematic fit FOM
      - filling the reaction-independent histograms (thrown & detected kinematics, track multiplicity, gen-recon comparison)
      - saving the results to an output ROOT TTree
