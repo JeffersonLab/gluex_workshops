@@ -5,6 +5,7 @@
 
 #include "DSelector/DSelector.h"
 #include "DSelector/DHistogramActions.h"
+#include "DSelector/DCutActions.h"
 
 #include "TH1I.h"
 #include "TH2I.h"
@@ -47,11 +48,15 @@ class DSelector_p3pi_workshop : public DSelector
 		DHistogramAction_ParticleComboKinematics* dHistComboKinematics;
 		DHistogramAction_ParticleID* dHistComboPID, *dHistComboPID_KinFit;
 
+		// DEFINE YOUR CUT ACTIONS HERE
+		// EXAMPLES:
+		DCutAction_PIDDeltaT* dCutPIDDeltaT;
+
 		// DEFINE YOUR HISTOGRAMS HERE
 		// EXAMPLES:
 		TH1I* dHist_MissingMassSquared;
 		TH1I* dHist_BeamEnergy;
-		TH1I* dHist_M2gamma;
+		TH1I* dHist_M2gamma, *dHist_M3pi;
 
 	ClassDef(DSelector_p3pi_workshop, 0);
 };

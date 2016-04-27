@@ -26,18 +26,22 @@ void DSelector_p3pi_workshop::Init(TTree *locTree)
 	//DO WHATEVER YOU WANT HERE
 
 	//EXAMPLE HISTOGRAM ACTIONS
-	dHistComboKinematics = new DHistogramAction_ParticleComboKinematics(dComboWrapper, dTargetCenter.Z(), false); //false: use measured data
-	dHistComboPID = new DHistogramAction_ParticleID(dComboWrapper, false); //false: use measured data
-	dHistComboPID_KinFit = new DHistogramAction_ParticleID(dComboWrapper, true, "KinFit"); //false: use measured data
+	dHistComboKinematics = new DHistogramAction_ParticleComboKinematics(dComboWrapper, dTargetCenter.Z(), true); //true: use measured data
+	dHistComboPID = new DHistogramAction_ParticleID(dComboWrapper, true); //true: use measured data
+	dHistComboPID_KinFit = new DHistogramAction_ParticleID(dComboWrapper, false, "KinFit"); //true: use measured data
 	//change binning here
 	dHistComboKinematics->Initialize();
 	dHistComboPID->Initialize();
 	dHistComboPID_KinFit->Initialize();
 
+	//EXAMPLE CUT ACTIONS
+	dCutPIDDeltaT = new DCutAction_PIDDeltaT(dComboWrapper, true, 2, Unknown, SYS_NULL); //true: use measured data
+
 	//EXAMPLE MANUAL HISTOGRAMS:
 	dHist_MissingMassSquared = new TH1I("MissingMassSquared", ";Missing Mass Squared (GeV/c^{2})^{2}", 400, -0.08, 0.08);
 	dHist_BeamEnergy = new TH1I("BeamEnergy", ";Beam Energy (GeV)", 600, 0.0, 12.0);
-	dHist_M2gamma = new TH1I("M2gamma", ";M_{2#gamma} (GeV/c^{2})", 400, 0.05, 0.25);
+	dHist_M2gamma = new TH1I("M2gamma", ";M_{2#gamma} (GeV/c^{2})", 400, 0.05, 0.22);
+	dHist_M3pi = new TH1I("M3pi", ";M_{#pi^{+}#pi^{-}#pi^{0}} (GeV/c^{2})", 600, 0.5, 1.1);
 
 	/***************************************** ADVANCED: CHOOSE BRANCHES TO READ ****************************************/
 
@@ -96,6 +100,7 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 	set<map<Particle_t, set<Int_t> > > locUsedSoFar_MissingMass;
 
 	set<map<Particle_t, set<Int_t> > > locUsedSoFar_Pi0;
+	set<map<Particle_t, set<Int_t> > > locUsedSoFar_Omega;
 
 	//INSERT USER ANALYSIS UNIQUENESS TRACKING HERE
 
@@ -160,14 +165,19 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 		// Combine 4-vectors
 		TLorentzVector locMissingP4_Measured = locBeamP4_Measured + dTargetP4;
 		locMissingP4_Measured -= locProtonP4_Measured + locPiPlusP4_Measured + locPiMinusP4_Measured + locPhoton1P4_Measured + locPhoton2P4_Measured;
-		TLorentzVector locPi0P4_Measured = locPhoton1P4_Measured + locPhoton2P4_Measured;
+		TLorentzVector locPi0P4 = locPhoton1P4 + locPhoton2P4;
+		TLorentzVector locOmegaP4 = locPiPlusP4 + locPiMinusP4 + locPhoton1P4 + locPhoton2P4;
 
 		/**************************************** EXAMPLE: HISTOGRAM KINEMATICS ******************************************/
 
 		dHistComboKinematics->Perform_Action();
 		dHistComboPID->Perform_Action();
 		dHistComboPID_KinFit->Perform_Action();
-			
+
+		// veto combos based on cut action
+		if(!dCutPIDDeltaT->Perform_Action())
+			continue;
+
 		/**************************************** EXAMPLE: HISTOGRAM BEAM ENERGY *****************************************/
 
 		//Histogram beam energy (if haven't already)
@@ -175,15 +185,6 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 		{
 			dHist_BeamEnergy->Fill(locBeamP4.E());
 			locUsedSoFar_BeamEnergy.insert(locBeamID);
-		}
-
-		map<Particle_t, set<Int_t> > locUsedThisCombo_Pi0Mass;
-		locUsedThisCombo_Pi0Mass[Gamma].insert(locPhoton1NeutralID);
-		locUsedThisCombo_Pi0Mass[Gamma].insert(locPhoton2NeutralID);
-		if(locUsedSoFar_Pi0.find(locUsedThisCombo_Pi0Mass) == locUsedSoFar_Pi0.end())
-		{
-			dHist_M2gamma->Fill(locPi0P4_Measured.M());
-			locUsedSoFar_Pi0.insert(locUsedThisCombo_Pi0Mass);
 		}
 
 		/************************************ EXAMPLE: HISTOGRAM MISSING MASS SQUARED ************************************/
@@ -209,9 +210,34 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 			locUsedSoFar_MissingMass.insert(locUsedThisCombo_MissingMass);
 		}
 
-		//E.g. Cut
-		//if((locMissingMassSquared < -0.04) || (locMissingMassSquared > 0.04))
-		//	continue; //could also mark combo as cut, then save cut results to a new TTree
+		// kinematic fit CL cut
+		if(dComboWrapper->Get_ConfidenceLevel_KinFit() < 0.1) 
+			continue;
+
+		// pi0 mass histogram and cut
+		map<Particle_t, set<Int_t> > locUsedThisCombo_Pi0Mass;
+		locUsedThisCombo_Pi0Mass[Gamma].insert(locPhoton1NeutralID);
+		locUsedThisCombo_Pi0Mass[Gamma].insert(locPhoton2NeutralID);
+		if(locUsedSoFar_Pi0.find(locUsedThisCombo_Pi0Mass) == locUsedSoFar_Pi0.end())
+		{
+			dHist_M2gamma->Fill(locPi0P4.M());
+			locUsedSoFar_Pi0.insert(locUsedThisCombo_Pi0Mass);
+		}
+
+		if(locPi0P4.M() < 0.11 || locPi0P4.M() > 0.16)
+			continue; 
+
+		// pi0 mass histogram and cut
+		map<Particle_t, set<Int_t> > locUsedThisCombo_OmegaMass;
+		locUsedThisCombo_OmegaMass[PiPlus].insert(locPiPlusTrackID);
+		locUsedThisCombo_OmegaMass[PiMinus].insert(locPiMinusTrackID);
+		locUsedThisCombo_OmegaMass[Gamma].insert(locPhoton1NeutralID);
+		locUsedThisCombo_OmegaMass[Gamma].insert(locPhoton2NeutralID);
+		if(locUsedSoFar_Omega.find(locUsedThisCombo_Pi0Mass) == locUsedSoFar_Omega.end())
+		{
+			dHist_M3pi->Fill(locOmegaP4.M());
+			locUsedSoFar_Omega.insert(locUsedThisCombo_OmegaMass);
+		}
 	}
 
 	/******************************************* LOOP OVER THROWN DATA (OPTIONAL) ***************************************/
