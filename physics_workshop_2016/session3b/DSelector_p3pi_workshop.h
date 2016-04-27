@@ -21,7 +21,6 @@ class DSelector_p3pi_workshop : public DSelector
 		Bool_t Process(Long64_t entry);
 
 	private:
-
 		void Get_ComboWrappers(void);
 		void Finalize(void);
 

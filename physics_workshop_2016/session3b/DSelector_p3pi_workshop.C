@@ -7,8 +7,9 @@ void DSelector_p3pi_workshop::Init(TTree *locTree)
 	// Init() will be called many times when running on PROOF (once per file to be processed).
 
 	//SET OUTPUT FILE NAME //can be overriden by user in PROOF
-	dOutputFileName = "myfile.root"; //"" for none
-
+	dOutputFileName = "hist_p3pi_omega.root"; //"" for none
+	dOutputTreeFileName = "tree_p3pi_omega.root"; //"" for none
+	
 	//DO THIS NEXT
 	//Because this function gets called for each TTree in the TChain, we must be careful:
 		//We need to re-initialize the tree interface & branch wrappers, but don't want to recreate histograms
@@ -119,7 +120,6 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 		/********************************************** GET PARTICLE INDICES *********************************************/
 
 		//Used for tracking uniqueness when filling histograms, and for determining unused particles
-
 		//Step 0
 		Int_t locBeamID = dComboBeamWrapper->Get_BeamID();
 		Int_t locProtonTrackID = dProtonWrapper->Get_TrackID();
@@ -211,8 +211,10 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 		}
 
 		// kinematic fit CL cut
-		if(dComboWrapper->Get_ConfidenceLevel_KinFit() < 0.1) 
+		if(dComboWrapper->Get_ConfidenceLevel_KinFit() < 0.1) {
+			dComboWrapper->Set_IsComboCut(true);
 			continue;
+		}
 
 		// pi0 mass histogram and cut
 		map<Particle_t, set<Int_t> > locUsedThisCombo_Pi0Mass;
@@ -224,8 +226,10 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 			locUsedSoFar_Pi0.insert(locUsedThisCombo_Pi0Mass);
 		}
 
-		if(locPi0P4.M() < 0.11 || locPi0P4.M() > 0.16)
+		if(locPi0P4.M() < 0.11 || locPi0P4.M() > 0.16) {
+			dComboWrapper->Set_IsComboCut(true);
 			continue; 
+		}
 
 		// pi0 mass histogram and cut
 		map<Particle_t, set<Int_t> > locUsedThisCombo_OmegaMass;
@@ -240,51 +244,20 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 		}
 	}
 
-	/******************************************* LOOP OVER THROWN DATA (OPTIONAL) ***************************************/
-/*
-	//Thrown beam: just use directly
-	if(dThrownBeam != NULL)
-		double locEnergy = dThrownBeam->Get_P4().E();
 
-	//Loop over throwns
-	for(UInt_t loc_i = 0; loc_i < Get_NumThrown(); ++loc_i)
-	{
-		//Set branch array indices corresponding to this particle
-		dThrownWrapper->Set_ArrayIndex(loc_i);
-
-		//Do stuff with the wrapper here ...
-	}
-*/
-	/****************************************** LOOP OVER OTHER ARRAYS (OPTIONAL) ***************************************/
-/*
-	//Loop over beam particles (note, only those appearing in combos are present)
-	for(UInt_t loc_i = 0; loc_i < Get_NumBeam(); ++loc_i)
-	{
-		//Set branch array indices corresponding to this particle
-		dBeamWrapper->Set_ArrayIndex(loc_i);
-
-		//Do stuff with the wrapper here ...
-	}
-
-	//Loop over charged track hypotheses (all are present, even those not in any combos)
-	for(UInt_t loc_i = 0; loc_i < Get_NumChargedHypos(); ++loc_i)
-	{
-		//Set branch array indices corresponding to this particle
-		dChargedHypoWrapper->Set_ArrayIndex(loc_i);
-
-		//Do stuff with the wrapper here ...
-	}
-
-	//Loop over neutral particle hypotheses (all are present, even those not in any combos)
-	for(UInt_t loc_i = 0; loc_i < Get_NumNeutralHypos(); ++loc_i)
-	{
-		//Set branch array indices corresponding to this particle
-		dNeutralHypoWrapper->Set_ArrayIndex(loc_i);
-
-		//Do stuff with the wrapper here ...
-	}
-*/
-
+        /************************************ EXAMPLE: FILL CLONE OF TTREE HERE WITH CUTS APPLIED ************************************/
+        Bool_t locIsEventCut = true;
+        for(UInt_t loc_i = 0; loc_i < Get_NumCombos(); ++loc_i) {
+                //Set branch array indices for combo and all combo particles
+                dComboWrapper->Set_ComboIndex(loc_i);
+                
+                // Is used to indicate when combos have been cut
+                if(!dComboWrapper->Get_IsComboCut()) // Is false when tree originally created
+                        locIsEventCut = false; // Combo has been cut previously
+        }
+        if(!locIsEventCut && dOutputTreeFileName != "") 
+                FillOutputTree();
+	
 	return kTRUE;
 }
 
