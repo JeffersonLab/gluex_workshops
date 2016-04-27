@@ -68,6 +68,12 @@ jerror_t DReaction_factory_omega_skim::evnt(JEventLoop* locEventLoop, uint64_t l
 
 	/**************************************************** omega_skim Control Settings ****************************************************/
 
+	// Recommended: Type of kinematic fit to perform (default is d_NoFit)
+		//fit types are of type DKinFitType, an enum defined in sim-recon/src/libraries/ANALYSIS/DReaction.h
+		//Options: d_NoFit (default), d_P4Fit, d_VertexFit, d_P4AndVertexFit
+		//P4 fits automatically constrain decaying particle masses, unless they are manually disabled
+	locReaction->Set_KinFitType(d_P4AndVertexFit);
+
 	// Highly Recommended: When generating particle combinations, reject all beam photons that match to a different RF bunch (delta_t > 1.002 ns)
 	locReaction->Set_MaxPhotonRFDeltaT(0.5*dBeamBunchPeriod); //should be minimum cut value
 
