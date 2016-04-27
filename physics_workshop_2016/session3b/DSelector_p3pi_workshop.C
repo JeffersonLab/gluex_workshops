@@ -175,8 +175,10 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 		dHistComboPID_KinFit->Perform_Action();
 
 		// veto combos based on cut action
-		if(!dCutPIDDeltaT->Perform_Action())
+		if(!dCutPIDDeltaT->Perform_Action()) {
+			dComboWrapper->Set_IsComboCut(true);
 			continue;
+		}
 
 		/**************************************** EXAMPLE: HISTOGRAM BEAM ENERGY *****************************************/
 
