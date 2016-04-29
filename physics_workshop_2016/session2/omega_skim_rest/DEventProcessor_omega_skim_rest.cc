@@ -1,11 +1,11 @@
 // $Id$
 //
-//    File: DEventProcessor_omega_skim.cc
-// Created: Tue Apr 26 11:29:50 EDT 2016
+//    File: DEventProcessor_omega_skim_rest.cc
+// Created: Fri Apr 29 15:22:47 EDT 2016
 // Creator: pmatt (on Linux pmattdesktop.jlab.org 2.6.32-573.22.1.el6.x86_64 x86_64)
 //
 
-#include "DEventProcessor_omega_skim.h"
+#include "DEventProcessor_omega_skim_rest.h"
 
 // Routine used to create our DEventProcessor
 
@@ -14,21 +14,21 @@ extern "C"
 	void InitPlugin(JApplication *locApplication)
 	{
 		InitJANAPlugin(locApplication);
-		locApplication->AddProcessor(new DEventProcessor_omega_skim()); //register this plugin
-		locApplication->AddFactoryGenerator(new DFactoryGenerator_omega_skim()); //register the factory generator
+		locApplication->AddProcessor(new DEventProcessor_omega_skim_rest()); //register this plugin
+		locApplication->AddFactoryGenerator(new DFactoryGenerator_omega_skim_rest()); //register the factory generator
 	}
 } // "C"
 
 //------------------
 // init
 //------------------
-jerror_t DEventProcessor_omega_skim::init(void)
+jerror_t DEventProcessor_omega_skim_rest::init(void)
 {
 	// This is called once at program startup.
 
 	/*
 	//OPTIONAL: Create an EventStore skim.  
-	string locSkimFileName = "omega_skim.idxa";
+	string locSkimFileName = "omega_skim_rest.idxa";
 	dEventStoreSkimStream.open(locSkimFileName.c_str());
 	dEventStoreSkimStream << "IDXA" << endl;
 	*/
@@ -39,14 +39,16 @@ jerror_t DEventProcessor_omega_skim::init(void)
 //------------------
 // brun
 //------------------
-jerror_t DEventProcessor_omega_skim::brun(jana::JEventLoop* locEventLoop, int32_t locRunNumber)
+jerror_t DEventProcessor_omega_skim_rest::brun(jana::JEventLoop* locEventLoop, int32_t locRunNumber)
 {
 	// This is called whenever the run number changes
 
+	/*
 	//Recommended: Create output ROOT TTrees (nothing is done if already created)
 	const DEventWriterROOT* locEventWriterROOT = NULL;
 	locEventLoop->GetSingle(locEventWriterROOT);
 	locEventWriterROOT->Create_DataTrees(locEventLoop);
+	*/
 
 	return NOERROR;
 }
@@ -54,7 +56,7 @@ jerror_t DEventProcessor_omega_skim::brun(jana::JEventLoop* locEventLoop, int32_
 //------------------
 // evnt
 //------------------
-jerror_t DEventProcessor_omega_skim::evnt(jana::JEventLoop* locEventLoop, uint64_t locEventNumber)
+jerror_t DEventProcessor_omega_skim_rest::evnt(jana::JEventLoop* locEventLoop, uint64_t locEventNumber)
 {
 	// This is called for every event. Use of common resources like writing
 	// to a file or filling a histogram should be mutex protected. Using
@@ -79,13 +81,15 @@ jerror_t DEventProcessor_omega_skim::evnt(jana::JEventLoop* locEventLoop, uint64
 	//REQUIRED: To run an analysis, You MUST call one at least of the below code fragments. 
 		//JANA is on-demand, so if you don't call one of these, then your analysis won't run. 
 
+	/*
 	//Recommended: Write surviving particle combinations (if any) to output ROOT TTree
 		//If no cuts are performed by the analysis actions added to a DReaction, then this saves all of its particle combinations. 
 		//The event writer gets the DAnalysisResults objects from JANA, performing the analysis. 
 	// string is DReaction factory tag: will fill trees for all DReactions that are defined in the specified factory
 	const DEventWriterROOT* locEventWriterROOT = NULL;
 	locEventLoop->GetSingle(locEventWriterROOT);
-	locEventWriterROOT->Fill_DataTrees(locEventLoop, "omega_skim");
+	locEventWriterROOT->Fill_DataTrees(locEventLoop, "omega_skim_rest");
+	*/
 
 	//Optional: Get the analysis results for all DReactions. 
 		//Getting these objects triggers the analysis, if it wasn't performed already. 
@@ -103,7 +107,7 @@ jerror_t DEventProcessor_omega_skim::evnt(jana::JEventLoop* locEventLoop, uint64
 	for(size_t loc_i = 0; loc_i < locParticleCombos.size(); ++loc_i)
 	{
 		const DParticleCombo* locParticleCombo = locParticleCombos[loc_i];
-		if(locParticleCombo->Get_Reaction()->Get_ReactionName() != "omega_skim")
+		if(locParticleCombo->Get_Reaction()->Get_ReactionName() != "omega_skim_rest")
 			continue; // particle combination was for a different reaction
 		//perform further analysis steps here...
 	}
@@ -114,7 +118,7 @@ jerror_t DEventProcessor_omega_skim::evnt(jana::JEventLoop* locEventLoop, uint64
 	for(size_t loc_i = 0; loc_i < locAnalysisResultsVector.size(); ++loc_i)
 	{
 		const DAnalysisResults* locAnalysisResults = locAnalysisResultsVector[loc_i];
-		if(locAnalysisResults->Get_Reaction()->Get_ReactionName() != "omega_skim")
+		if(locAnalysisResults->Get_Reaction()->Get_ReactionName() != "omega_skim_rest")
 			continue; // analysis results were for a different reaction
 		//get the DParticleCombo objects for this DReaction that survived all of the DAnalysisAction cuts
 		deque<const DParticleCombo*> locPassedParticleCombos;
@@ -135,7 +139,7 @@ jerror_t DEventProcessor_omega_skim::evnt(jana::JEventLoop* locEventLoop, uint64
 	for(size_t loc_i = 0; loc_i < locAnalysisResultsVector.size(); ++loc_i)
 	{
 		const DAnalysisResults* locAnalysisResults = locAnalysisResultsVector[loc_i];
-		if(locAnalysisResults->Get_Reaction()->Get_ReactionName() != "omega_skim")
+		if(locAnalysisResults->Get_Reaction()->Get_ReactionName() != "omega_skim_rest")
 			continue; // analysis results were for a different reaction
 
 		//get the DParticleCombo objects for this DReaction that survived all of the DAnalysisAction cuts
@@ -160,24 +164,24 @@ jerror_t DEventProcessor_omega_skim::evnt(jana::JEventLoop* locEventLoop, uint64
 	for(size_t loc_i = 0; loc_i < locAnalysisResultsVector.size(); ++loc_i)
 	{
 		const DAnalysisResults* locAnalysisResults = locAnalysisResultsVector[loc_i];
-		if(locAnalysisResults->Get_Reaction()->Get_ReactionName() != "omega_skim")
+		if(locAnalysisResults->Get_Reaction()->Get_ReactionName() != "omega_skim_rest")
 			continue; // analysis results were for a different reaction
 		if(locAnalysisResults->Get_NumPassedParticleCombos() == 0)
 			continue; // no combos passed
 
 		//MUST LOCK AROUND MODIFICATION OF MEMBER VARIABLES IN brun() or evnt().
-		japp->WriteLock("omega_skim.idxa"); //Lock is unique to this output file
+		japp->WriteLock("omega_skim_rest.idxa"); //Lock is unique to this output file
 		{
 			dEventStoreSkimStream << locRunNumber << " " << locEventNumber << " " << locUniqueID << endl;
 		}
-		japp->Unlock("omega_skim.idxa");
+		japp->Unlock("omega_skim_rest.idxa");
 	}
 	*/
 
 	return NOERROR;
 }
 
-int DEventProcessor_omega_skim::Get_FileNumber(JEventLoop* locEventLoop) const
+int DEventProcessor_omega_skim_rest::Get_FileNumber(JEventLoop* locEventLoop) const
 {
 	//Assume that the file name is in the format: *_X.ext, where:
 		//X is the file number (a string of numbers of any length)
@@ -210,7 +214,7 @@ int DEventProcessor_omega_skim::Get_FileNumber(JEventLoop* locEventLoop) const
 //------------------
 // erun
 //------------------
-jerror_t DEventProcessor_omega_skim::erun(void)
+jerror_t DEventProcessor_omega_skim_rest::erun(void)
 {
 	// This is called whenever the run number changes, before it is
 	// changed to give you a chance to clean up before processing
@@ -221,7 +225,7 @@ jerror_t DEventProcessor_omega_skim::erun(void)
 //------------------
 // fini
 //------------------
-jerror_t DEventProcessor_omega_skim::fini(void)
+jerror_t DEventProcessor_omega_skim_rest::fini(void)
 {
 	// Called before program exit after event processing is finished.
 	if(dEventStoreSkimStream.is_open())

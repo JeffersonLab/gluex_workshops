@@ -1,12 +1,12 @@
 // $Id$
 //
-//    File: DEventProcessor_omega_skim.h
-// Created: Tue Apr 26 11:29:50 EDT 2016
+//    File: DEventProcessor_omega_skim_rest.h
+// Created: Fri Apr 29 15:22:47 EDT 2016
 // Creator: pmatt (on Linux pmattdesktop.jlab.org 2.6.32-573.22.1.el6.x86_64 x86_64)
 //
 
-#ifndef _DEventProcessor_omega_skim_
-#define _DEventProcessor_omega_skim_
+#ifndef _DEventProcessor_omega_skim_rest_
+#define _DEventProcessor_omega_skim_rest_
 
 #include <JANA/JEventProcessor.h>
 #include <JANA/JApplication.h>
@@ -15,15 +15,15 @@
 #include <HDDM/DEventWriterREST.h>
 #include <ANALYSIS/DHistogramActions.h>
 
-#include "DFactoryGenerator_omega_skim.h"
+#include "DFactoryGenerator_omega_skim_rest.h"
 
 using namespace jana;
 using namespace std;
 
-class DEventProcessor_omega_skim : public jana::JEventProcessor
+class DEventProcessor_omega_skim_rest : public jana::JEventProcessor
 {
 	public:
-		const char* className(void){return "DEventProcessor_omega_skim";}
+		const char* className(void){return "DEventProcessor_omega_skim_rest";}
 
 	private:
 		jerror_t init(void);						///< Called once at program start.
@@ -39,5 +39,5 @@ class DEventProcessor_omega_skim : public jana::JEventProcessor
 		ofstream dEventStoreSkimStream;
 };
 
-#endif // _DEventProcessor_omega_skim_
+#endif // _DEventProcessor_omega_skim_rest_
 
