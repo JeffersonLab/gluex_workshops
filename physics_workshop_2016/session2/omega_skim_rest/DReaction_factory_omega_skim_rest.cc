@@ -1,17 +1,17 @@
 // $Id$
 //
-//    File: DReaction_factory_omega_skim.cc
-// Created: Tue Apr 26 11:29:50 EDT 2016
+//    File: DReaction_factory_omega_skim_rest.cc
+// Created: Fri Apr 29 15:22:47 EDT 2016
 // Creator: pmatt (on Linux pmattdesktop.jlab.org 2.6.32-573.22.1.el6.x86_64 x86_64)
 //
 
 
-#include "DReaction_factory_omega_skim.h"
+#include "DReaction_factory_omega_skim_rest.h"
 
 //------------------
 // brun
 //------------------
-jerror_t DReaction_factory_omega_skim::brun(JEventLoop* locEventLoop, int32_t locRunNumber)
+jerror_t DReaction_factory_omega_skim_rest::brun(JEventLoop* locEventLoop, int32_t locRunNumber)
 {
 	vector<double> locBeamPeriodVector;
 	locEventLoop->GetCalib("PHOTON_BEAM/RF/beam_period", locBeamPeriodVector);
@@ -23,7 +23,7 @@ jerror_t DReaction_factory_omega_skim::brun(JEventLoop* locEventLoop, int32_t lo
 //------------------
 // evnt
 //------------------
-jerror_t DReaction_factory_omega_skim::evnt(JEventLoop* locEventLoop, uint64_t locEventNumber)
+jerror_t DReaction_factory_omega_skim_rest::evnt(JEventLoop* locEventLoop, uint64_t locEventNumber)
 {
 	// Make as many DReaction objects as desired
 	DReactionStep* locReactionStep = NULL;
@@ -33,9 +33,9 @@ jerror_t DReaction_factory_omega_skim::evnt(JEventLoop* locEventLoop, uint64_t l
 	// ANALYSIS library: https://halldweb1.jlab.org/wiki/index.php/GlueX_Analysis_Software
 	// DReaction factory: https://halldweb1.jlab.org/wiki/index.php/Analysis_DReaction
 
-	/************************************************** omega_skim Reaction Definition *************************************************/
+	/************************************************** omega_skim_rest Reaction Definition *************************************************/
 
-	locReaction = new DReaction("omega_skim");
+	locReaction = new DReaction("omega_skim_rest");
 
 	//Required: DReactionSteps to specify the channel and decay chain you want to study
 		//Particles are of type Particle_t, an enum defined in sim-recon/src/libraries/include/particleType.h
@@ -66,7 +66,7 @@ jerror_t DReaction_factory_omega_skim::evnt(JEventLoop* locEventLoop, uint64_t l
 	locReaction->Add_ReactionStep(locReactionStep);
 	dReactionStepPool.push_back(locReactionStep); //register so will be deleted later: prevent memory leak
 
-	/**************************************************** omega_skim Control Settings ****************************************************/
+	/**************************************************** omega_skim_rest Control Settings ****************************************************/
 
 	// Recommended: Type of kinematic fit to perform (default is d_NoFit)
 		//fit types are of type DKinFitType, an enum defined in sim-recon/src/libraries/ANALYSIS/DReaction.h
@@ -84,7 +84,7 @@ jerror_t DReaction_factory_omega_skim::evnt(JEventLoop* locEventLoop, uint64_t l
 	// Highly Recommended: Enable ROOT TTree output for this DReaction
 	locReaction->Enable_TTreeOutput("tree_omega.root"); //string is file name (must end in ".root"!!): doen't need to be unique, feel free to change
 
-	/************************************************** omega_skim Pre-Combo Custom Cuts *************************************************/
+	/************************************************** omega_skim_rest Pre-Combo Custom Cuts *************************************************/
 
 	// Highly Recommended: Very loose invariant mass cuts, applied during DParticleComboBlueprint construction
 	locReaction->Set_InvariantMassCut(Pi0, 0.05, 0.22);
@@ -93,7 +93,7 @@ jerror_t DReaction_factory_omega_skim::evnt(JEventLoop* locEventLoop, uint64_t l
 	// Highly Recommended: Very loose DAnalysisAction cuts, applied just after creating the combination (before saving it)
 	locReaction->Add_ComboPreSelectionAction(new DCutAction_MissingMassSquared(locReaction, false, -0.08, 0.08));
 
-	/**************************************************** omega_skim Analysis Actions ****************************************************/
+	/**************************************************** omega_skim_rest Analysis Actions ****************************************************/
 
 	_data.push_back(locReaction); //Register the DReaction with the factory
 
@@ -103,7 +103,7 @@ jerror_t DReaction_factory_omega_skim::evnt(JEventLoop* locEventLoop, uint64_t l
 //------------------
 // fini
 //------------------
-jerror_t DReaction_factory_omega_skim::fini(void)
+jerror_t DReaction_factory_omega_skim_rest::fini(void)
 {
 	for(size_t loc_i = 0; loc_i < dReactionStepPool.size(); ++loc_i)
 		delete dReactionStepPool[loc_i]; //cleanup memory

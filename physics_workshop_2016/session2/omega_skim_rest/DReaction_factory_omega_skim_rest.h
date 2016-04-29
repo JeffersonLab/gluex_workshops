@@ -1,12 +1,12 @@
 // $Id$
 //
-//    File: DReaction_factory_omega_skim.h
-// Created: Tue Apr 26 11:29:50 EDT 2016
+//    File: DReaction_factory_omega_skim_rest.h
+// Created: Fri Apr 29 15:22:47 EDT 2016
 // Creator: pmatt (on Linux pmattdesktop.jlab.org 2.6.32-573.22.1.el6.x86_64 x86_64)
 //
 
-#ifndef _DReaction_factory_omega_skim_
-#define _DReaction_factory_omega_skim_
+#ifndef _DReaction_factory_omega_skim_rest_
+#define _DReaction_factory_omega_skim_rest_
 
 #include <iostream>
 #include <iomanip>
@@ -19,15 +19,15 @@
 using namespace std;
 using namespace jana;
 
-class DReaction_factory_omega_skim : public jana::JFactory<DReaction>
+class DReaction_factory_omega_skim_rest : public jana::JFactory<DReaction>
 {
 	public:
-		DReaction_factory_omega_skim()
+		DReaction_factory_omega_skim_rest()
 		{
 			// This is so that the created DReaction objects persist throughout the life of the program instead of being cleared each event. 
 			SetFactoryFlag(PERSISTANT);
 		}
-		const char* Tag(void){return "omega_skim";}
+		const char* Tag(void){return "omega_skim_rest";}
 
 	private:
 		jerror_t brun(JEventLoop* locEventLoop, int32_t locRunNumber);
@@ -38,5 +38,5 @@ class DReaction_factory_omega_skim : public jana::JFactory<DReaction>
 		deque<DReactionStep*> dReactionStepPool; //to prevent memory leaks
 };
 
-#endif // _DReaction_factory_omega_skim_
+#endif // _DReaction_factory_omega_skim_rest_
 
