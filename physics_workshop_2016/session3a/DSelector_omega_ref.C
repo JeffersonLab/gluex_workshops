@@ -92,8 +92,8 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 	set<map<Particle_t, set<Int_t> > > locUsedSoFar_MissingMass;
 
 	//INSERT USER ANALYSIS UNIQUENESS TRACKING HERE
-	set<set<Int_t> > locUsedSoFar_MassPi0; //Outer set is combo, inner set is photon
-	set<map<Particle_t, set<Int_t> > > locUsedSoFar_MassOmega;
+	set<set<Int_t> > locUsedSoFar_Pi0Mass; //Outer set is combo, inner set is photon
+	set<map<Particle_t, set<Int_t> > > locUsedSoFar_OmegaMass;
 
 	/************************************************* LOOP OVER COMBOS *************************************************/
 
@@ -205,16 +205,16 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 		double locPi0Mass = locPi0P4_Measured.M();
 
 		//Uniqueness tracking:
-		set<Int_t> locUsedThisCombo_MassPi0;
-		locUsedThisCombo_MassPi0.insert(locPhoton1NeutralID);
-		locUsedThisCombo_MassPi0.insert(locPhoton2NeutralID);
+		set<Int_t> locUsedThisCombo_Pi0Mass;
+		locUsedThisCombo_Pi0Mass.insert(locPhoton1NeutralID);
+		locUsedThisCombo_Pi0Mass.insert(locPhoton2NeutralID);
 
 		//compare to what's been used so far
-		if(locUsedSoFar_MassPi0.find(locUsedThisCombo_MassPi0) == locUsedSoFar_MassPi0.end())
+		if(locUsedSoFar_Pi0Mass.find(locUsedThisCombo_Pi0Mass) == locUsedSoFar_Pi0Mass.end())
 		{
 			//unique missing mass combo: histogram it, and register this combo of particles
 			dHist_Pi0Mass->Fill(locPi0Mass);
-			locUsedSoFar_MassPi0.insert(locUsedThisCombo_MassPi0);
+			locUsedSoFar_Pi0Mass.insert(locUsedThisCombo_Pi0Mass);
 		}
 
 		/**************************************** HISTOGRAM OMEGA INVARIANT MASS *****************************************/
@@ -223,19 +223,19 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 		double locOmegaMass_KinFit = locOmegaP4.M();
 
 		//Uniqueness tracking:
-		set<Int_t> locUsedThisCombo_MassOmega;
-		locUsedThisCombo_MassOmega.insert(locPhoton1NeutralID);
-		locUsedThisCombo_MassOmega.insert(locPhoton2NeutralID);
-		locUsedThisCombo_MassOmega.insert(locPiPlusTrackID);
-		locUsedThisCombo_MassOmega.insert(locPiMinusTrackID);
+		map<Particle_t, set<Int_t> > locUsedThisCombo_OmegaMass;
+		locUsedThisCombo_OmegaMass[Gamma].insert(locPhoton1NeutralID);
+		locUsedThisCombo_OmegaMass[Gamma].insert(locPhoton2NeutralID);
+		locUsedThisCombo_OmegaMass[PiPlus].insert(locPiPlusTrackID);
+		locUsedThisCombo_OmegaMass[PiMinus].insert(locPiMinusTrackID);
 
 		//compare to what's been used so far
-		if(locUsedSoFar_MassOmega.find(locUsedThisCombo_MassOmega) == locUsedSoFar_MassOmega.end())
+		if(locUsedSoFar_OmegaMass.find(locUsedThisCombo_OmegaMass) == locUsedSoFar_OmegaMass.end())
 		{
 			//unique missing mass combo: histogram it, and register this combo of particles
-			dHist_MassOmega_Measured->Fill(locOmegaMass_Measured);
-			dHist_MassOmega_KinFit->Fill(locOmegaMass_KinFit);
-			locUsedSoFar_MassOmega.insert(locUsedThisCombo_MassOmega);
+			dHist_OmegaMass_Measured->Fill(locOmegaMass_Measured);
+			dHist_OmegaMass_KinFit->Fill(locOmegaMass_KinFit);
+			locUsedSoFar_OmegaMass.insert(locUsedThisCombo_OmegaMass);
 		}
 	}
 
