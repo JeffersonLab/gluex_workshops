@@ -173,6 +173,11 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 			locUsedSoFar_BeamEnergy.insert(locBeamID);
 		}
 
+		/***************************************** CUT KINFIT CONFIDENCE LEVEL *******************************************/
+
+		if(dComboWrapper->Get_ConfidenceLevel_KinFit() < 5.73303E-7)
+			continue; //could also mark combo as cut, then save cut results to a new TTree
+
 		/************************************ EXAMPLE: HISTOGRAM MISSING MASS SQUARED ************************************/
 
 		//Missing Mass Squared
