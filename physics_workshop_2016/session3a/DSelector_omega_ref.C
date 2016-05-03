@@ -26,7 +26,7 @@ void DSelector_omega_ref::Init(TTree *locTree)
 	//DO WHATEVER YOU WANT HERE
 
 	//EXAMPLE HISTOGRAM ACTIONS
-	dHistComboKinematics = new DHistogramAction_ParticleComboKinematics(dComboWrapper, dTargetCenter.Z(), true); //true: use measured data
+	dHistComboKinematics = new DHistogramAction_ParticleComboKinematics(dComboWrapper, dTargetCenter.Z(), false); //false: use measured data
 	//change binning here
 	dHistComboKinematics->Initialize();
 
