@@ -33,6 +33,7 @@ void DSelector_omega_ref::Init(TTree *locTree)
 	//EXAMPLE MANUAL HISTOGRAMS:
 	dHist_MissingMassSquared = new TH1I("MissingMassSquared", ";Missing Mass Squared (GeV/c^{2})^{2}", 600, -0.06, 0.06);
 	dHist_BeamEnergy = new TH1I("BeamEnergy", ";Beam Energy (GeV)", 600, 0.0, 12.0);
+	dHist_KinFitConLev = new TH1I("KinFitConLev", ";Kinematic Fit Confidence Level", 500, 0.0, 1.0);
 	dHist_Pi0Mass = new TH1I("Pi0Mass", ";#gamma#gamma Invariant Mass", 680, 0.05, 0.22);
 	dHist_OmegaMass_Measured = new TH1I("OmegaMass_Measured", ";#pi^{#plus}#pi^{#minus}#gamma#gamma Invariant Mass", 300, 0.5, 1.1);
 	dHist_OmegaMass_KinFit = new TH1I("OmegaMass_KinFit", ";#pi^{#plus}#pi^{#minus}#pi^{0} Invariant Mass", 300, 0.5, 1.1);
@@ -173,10 +174,12 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 			locUsedSoFar_BeamEnergy.insert(locBeamID);
 		}
 
-		/***************************************** CUT KINFIT CONFIDENCE LEVEL *******************************************/
+		/************************************** HIST, CUT KINFIT CONFIDENCE LEVEL ****************************************/
 
-		if(dComboWrapper->Get_ConfidenceLevel_KinFit() < 5.73303E-7)
+		double locKinFitConLev = dComboWrapper->Get_ConfidenceLevel_KinFit();
+		if(locKinFitConLev < 5.73303E-7)
 			continue; //could also mark combo as cut, then save cut results to a new TTree
+		dHist_KinFitConLev->Fill(locKinFitConLev); //no need to track uniquness: unique for each combo (uses all particles)
 
 		/************************************ EXAMPLE: HISTOGRAM MISSING MASS SQUARED ************************************/
 

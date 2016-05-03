@@ -50,6 +50,7 @@ class DSelector_omega_ref : public DSelector
 		// EXAMPLES:
 		TH1I* dHist_MissingMassSquared;
 		TH1I* dHist_BeamEnergy;
+		TH1I* dHist_KinFitConLev;
 		TH1I* dHist_Pi0Mass;
 		TH1I* dHist_OmegaMass_Measured;
 		TH1I* dHist_OmegaMass_KinFit;
