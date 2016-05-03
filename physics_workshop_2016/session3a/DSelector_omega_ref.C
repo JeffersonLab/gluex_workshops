@@ -7,7 +7,7 @@ void DSelector_omega_ref::Init(TTree *locTree)
 	// Init() will be called many times when running on PROOF (once per file to be processed).
 
 	//SET OUTPUT FILE NAME //can be overriden by user in PROOF
-	dOutputFileName = "myfile.root"; //"" for none
+	dOutputFileName = "omega_ref_hists.root"; //"" for none
 
 	//DO THIS NEXT
 	//Because this function gets called for each TTree in the TChain, we must be careful:
@@ -33,6 +33,9 @@ void DSelector_omega_ref::Init(TTree *locTree)
 	//EXAMPLE MANUAL HISTOGRAMS:
 	dHist_MissingMassSquared = new TH1I("MissingMassSquared", ";Missing Mass Squared (GeV/c^{2})^{2}", 600, -0.06, 0.06);
 	dHist_BeamEnergy = new TH1I("BeamEnergy", ";Beam Energy (GeV)", 600, 0.0, 12.0);
+	dHist_Pi0Mass = new TH1I("Pi0Mass", ";#gamma#gamma Invariant Mass", 680, 0.05, 0.22);
+	dHist_OmegaMass_Measured = new TH1I("OmegaMass_Measured", ";#pi^{#plus}#pi^{#minus}#gamma#gamma Invariant Mass", 300, 0.5, 1.1);
+	dHist_OmegaMass_KinFit = new TH1I("OmegaMass_KinFit", ";#pi^{#plus}#pi^{#minus}#pi^{0} Invariant Mass", 300, 0.5, 1.1);
 
 	/***************************************** ADVANCED: CHOOSE BRANCHES TO READ ****************************************/
 
@@ -84,11 +87,13 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 
 	//EXAMPLE 2: Combo-specific info:
 		//In general: Could have multiple particles with the same PID: Use a set of Int_t's
-		//In general: Multiple PIDs, so multiple sets: Contain within a map
+		//In general: If multiple PIDs, so multiple sets: Contain within a map
 		//Multiple combos: Contain maps within a set (easier, faster to search)
 	set<map<Particle_t, set<Int_t> > > locUsedSoFar_MissingMass;
 
 	//INSERT USER ANALYSIS UNIQUENESS TRACKING HERE
+	set<set<Int_t> > locUsedSoFar_MassPi0; //Outer set is combo, inner set is photon
+	set<map<Particle_t, set<Int_t> > > locUsedSoFar_MassOmega;
 
 	/************************************************* LOOP OVER COMBOS *************************************************/
 
@@ -147,6 +152,9 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 		/********************************************* COMBINE FOUR-MOMENTUM ********************************************/
 
 		// DO YOUR STUFF HERE
+		TLorentzVector locPi0P4_Measured = locPhoton1P4_Measured + locPhoton2P4_Measured;
+		TLorentzVector locOmegaP4_Measured = locPi0P4_Measured + locPiPlusP4_Measured + locPiMinusP4_Measured;
+		TLorentzVector locOmegaP4 = locDecayingPi0P4 + locPiPlusP4 + locPiMinusP4;
 
 		// Combine 4-vectors
 		TLorentzVector locMissingP4_Measured = locBeamP4_Measured + dTargetP4;
@@ -191,6 +199,44 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 		//E.g. Cut
 		//if((locMissingMassSquared < -0.04) || (locMissingMassSquared > 0.04))
 		//	continue; //could also mark combo as cut, then save cut results to a new TTree
+
+		/***************************************** HISTOGRAM Pi0 INVARIANT MASS ******************************************/
+
+		double locPi0Mass = locPi0P4_Measured.M();
+
+		//Uniqueness tracking:
+		set<Int_t> locUsedThisCombo_MassPi0;
+		locUsedThisCombo_MassPi0.insert(locPhoton1NeutralID);
+		locUsedThisCombo_MassPi0.insert(locPhoton2NeutralID);
+
+		//compare to what's been used so far
+		if(locUsedSoFar_MassPi0.find(locUsedThisCombo_MassPi0) == locUsedSoFar_MassPi0.end())
+		{
+			//unique missing mass combo: histogram it, and register this combo of particles
+			dHist_Pi0Mass->Fill(locPi0Mass);
+			locUsedSoFar_MassPi0.insert(locUsedThisCombo_MassPi0);
+		}
+
+		/**************************************** HISTOGRAM OMEGA INVARIANT MASS *****************************************/
+
+		double locOmegaMass_Measured = locOmegaP4_Measured.M();
+		double locOmegaMass_KinFit = locOmegaP4.M();
+
+		//Uniqueness tracking:
+		set<Int_t> locUsedThisCombo_MassOmega;
+		locUsedThisCombo_MassOmega.insert(locPhoton1NeutralID);
+		locUsedThisCombo_MassOmega.insert(locPhoton2NeutralID);
+		locUsedThisCombo_MassOmega.insert(locPiPlusTrackID);
+		locUsedThisCombo_MassOmega.insert(locPiMinusTrackID);
+
+		//compare to what's been used so far
+		if(locUsedSoFar_MassOmega.find(locUsedThisCombo_MassOmega) == locUsedSoFar_MassOmega.end())
+		{
+			//unique missing mass combo: histogram it, and register this combo of particles
+			dHist_MassOmega_Measured->Fill(locOmegaMass_Measured);
+			dHist_MassOmega_KinFit->Fill(locOmegaMass_KinFit);
+			locUsedSoFar_MassOmega.insert(locUsedThisCombo_MassOmega);
+		}
 	}
 
 	/******************************************* LOOP OVER THROWN DATA (OPTIONAL) ***************************************/
