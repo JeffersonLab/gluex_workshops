@@ -9,6 +9,9 @@
 
 #include "TH1I.h"
 #include "TH2I.h"
+#include "TF1.h"
+
+#include "TLorentzRotation.h"
 
 class DSelector_p3pi_workshop : public DSelector
 {
@@ -55,7 +58,14 @@ class DSelector_p3pi_workshop : public DSelector
 		// EXAMPLES:
 		TH1I* dHist_MissingMassSquared;
 		TH1I* dHist_BeamEnergy;
-		TH1I* dHist_M2gamma, *dHist_M3pi;
+		TH1I* dHist_M3pi, *dHist_t;
+		TH2I* dHist_Proton_dEdx_P;
+		TH2I* dHist_CosTheta_Psi;
+
+		// DEFINE CUT PARAMETERS HERE
+		TF1 *fMinProton_dEdx;
+		TF1 *fMaxPiPlus_dEdx;
+		double dMinKinFitCL, dMinBeamEnergy, dMaxBeamEnergy, dMinOmegaMass, dMaxOmegaMass;
 
 	ClassDef(DSelector_p3pi_workshop, 0);
 };

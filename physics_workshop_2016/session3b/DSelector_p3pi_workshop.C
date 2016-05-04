@@ -26,23 +26,37 @@ void DSelector_p3pi_workshop::Init(TTree *locTree)
 
 	//DO WHATEVER YOU WANT HERE
 
-	//EXAMPLE HISTOGRAM ACTIONS
-	dHistComboKinematics = new DHistogramAction_ParticleComboKinematics(dComboWrapper, dTargetCenter.Z(), true); //true: use measured data
-	dHistComboPID = new DHistogramAction_ParticleID(dComboWrapper, true); //true: use measured data
-	dHistComboPID_KinFit = new DHistogramAction_ParticleID(dComboWrapper, false, "KinFit"); //true: use measured data
+	//EXAMPLE HISTOGRAM ACTIONS:
+	dHistComboKinematics = new DHistogramAction_ParticleComboKinematics(dComboWrapper, dTargetCenter.Z(), false); //false: use measured data
+	dHistComboPID = new DHistogramAction_ParticleID(dComboWrapper, false); //false: use measured data
+	dHistComboPID_KinFit = new DHistogramAction_ParticleID(dComboWrapper, true, "KinFit"); //true: use kinfit data
 	//change binning here
 	dHistComboKinematics->Initialize();
 	dHistComboPID->Initialize();
 	dHistComboPID_KinFit->Initialize();
 
-	//EXAMPLE CUT ACTIONS
+	//EXAMPLE CUT ACTIONS:
 	dCutPIDDeltaT = new DCutAction_PIDDeltaT(dComboWrapper, true, 2, Unknown, SYS_NULL); //true: use measured data
 
 	//EXAMPLE MANUAL HISTOGRAMS:
+	dHist_Proton_dEdx_P = new TH2I("Proton_dEdx_P", " ;p_{proton} GeV/c; dE/dx (keV/cm)", 250, 0.0, 5.0, 250, 0.0, 25.);
+
 	dHist_MissingMassSquared = new TH1I("MissingMassSquared", ";Missing Mass Squared (GeV/c^{2})^{2}", 400, -0.08, 0.08);
 	dHist_BeamEnergy = new TH1I("BeamEnergy", ";Beam Energy (GeV)", 600, 0.0, 12.0);
-	dHist_M2gamma = new TH1I("M2gamma", ";M_{2#gamma} (GeV/c^{2})", 400, 0.05, 0.22);
 	dHist_M3pi = new TH1I("M3pi", ";M_{#pi^{+}#pi^{-}#pi^{0}} (GeV/c^{2})", 600, 0.5, 1.1);
+	dHist_t = new TH1I("t", ";|t| (GeV/c)^{2}", 100, 0.0, 2.0);
+	dHist_CosTheta_Psi = new TH2I("CosTheta_Psi", "; #psi; cos#theta", 360, -180., 180, 200, -1., 1.);
+
+	// EXAMPLE CUT PARAMETERS:
+	fMinProton_dEdx = new TF1("fMinProton_dEdx", "exp(-1.*[0]*x + [1]) + [2]", 0., 10.);
+	fMinProton_dEdx->SetParameters(4.0, 2.5, 1.25);
+	fMaxPiPlus_dEdx = new TF1("fMaxPiPlus_dEdx", "exp(-1.*[0]*x + [1]) + [2]", 0., 10.);
+	fMaxPiPlus_dEdx->SetParameters(4.0, 2.0, 2.25);
+	dMinKinFitCL = 0.001;
+	dMinBeamEnergy = 8.4;
+	dMaxBeamEnergy = 9.0;
+	dMinOmegaMass = 0.757;
+	dMaxOmegaMass = 0.807;
 
 	/***************************************** ADVANCED: CHOOSE BRANCHES TO READ ****************************************/
 
@@ -99,8 +113,6 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 		//In general: Multiple PIDs, so multiple sets: Contain within a map
 		//Multiple combos: Contain maps within a set (easier, faster to search)
 	set<map<Particle_t, set<Int_t> > > locUsedSoFar_MissingMass;
-
-	set<map<Particle_t, set<Int_t> > > locUsedSoFar_Pi0;
 	set<map<Particle_t, set<Int_t> > > locUsedSoFar_Omega;
 
 	//INSERT USER ANALYSIS UNIQUENESS TRACKING HERE
@@ -116,6 +128,12 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 		// Is used to indicate when combos have been cut
 		if(dComboWrapper->Get_IsComboCut()) // Is false when tree originally created
 			continue; // Combo has been cut previously
+
+		// Reject true omega events from sim1 (ie. bggen) since adding signal from AmpTools generator
+		if(Get_IsThrownTopology()) {// && dOption.Contains("bggen")) {
+			dComboWrapper->Set_IsComboCut(true);
+			continue;
+		}
 
 		/********************************************** GET PARTICLE INDICES *********************************************/
 
@@ -165,17 +183,30 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 		// Combine 4-vectors
 		TLorentzVector locMissingP4_Measured = locBeamP4_Measured + dTargetP4;
 		locMissingP4_Measured -= locProtonP4_Measured + locPiPlusP4_Measured + locPiMinusP4_Measured + locPhoton1P4_Measured + locPhoton2P4_Measured;
-		TLorentzVector locPi0P4 = locPhoton1P4 + locPhoton2P4;
 		TLorentzVector locOmegaP4 = locPiPlusP4 + locPiMinusP4 + locPhoton1P4 + locPhoton2P4;
 
-		/**************************************** EXAMPLE: HISTOGRAM KINEMATICS ******************************************/
+		// Utility function to compute unused energy
+		//set<Int_t> locUsed_PhotonNeutralID;
+		//locUsed_PhotonNeutralID.insert(locPhoton1NeutralID);
+		//locUsed_PhotonNeutralID.insert(locPhoton2NeutralID);
+		//double locUnusedEnergy = Calc_UnusedEnergy( dNeutralHypoWrapper, locUsed_PhotonNeutralID, Get_NumNeutralHypo());
+
+		/**************************************** EXAMPLE: HISTOGRAM KINEMATICS and PID ******************************************/
 
 		dHistComboKinematics->Perform_Action();
 		dHistComboPID->Perform_Action();
 		dHistComboPID_KinFit->Perform_Action();
 
-		// veto combos based on cut action
+		/**************************************** EXAMPLE: PID CUT ACTION ************************************************/
 		if(!dCutPIDDeltaT->Perform_Action()) {
+			dComboWrapper->Set_IsComboCut(true);
+			continue;
+		}
+
+		// Proton CDC dE/dx histogram and cut 
+		double locProton_dEdx_CDC = dProtonWrapper->Get_dEdx_CDC()*1e6;
+		dHist_Proton_dEdx_P->Fill(locProtonP4.P(), locProton_dEdx_CDC);
+		if(locProton_dEdx_CDC < fMinProton_dEdx->Eval(locProtonP4.P())) {
 			dComboWrapper->Set_IsComboCut(true);
 			continue;
 		}
@@ -213,53 +244,75 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 		}
 
 		// kinematic fit CL cut
-		if(dComboWrapper->Get_ConfidenceLevel_KinFit() < 0.1) {
+		if(dComboWrapper->Get_ConfidenceLevel_KinFit() < dMinKinFitCL) {
 			dComboWrapper->Set_IsComboCut(true);
 			continue;
 		}
 
-		// pi0 mass histogram and cut
-		map<Particle_t, set<Int_t> > locUsedThisCombo_Pi0Mass;
-		locUsedThisCombo_Pi0Mass[Gamma].insert(locPhoton1NeutralID);
-		locUsedThisCombo_Pi0Mass[Gamma].insert(locPhoton2NeutralID);
-		if(locUsedSoFar_Pi0.find(locUsedThisCombo_Pi0Mass) == locUsedSoFar_Pi0.end())
-		{
-			dHist_M2gamma->Fill(locPi0P4.M());
-			locUsedSoFar_Pi0.insert(locUsedThisCombo_Pi0Mass);
-		}
-
-		if(locPi0P4.M() < 0.11 || locPi0P4.M() > 0.16) {
-			dComboWrapper->Set_IsComboCut(true);
-			continue; 
-		}
-
-		// pi0 mass histogram and cut
+		// beam energy cut for SDME
+		if(locBeamP4.E() < dMinBeamEnergy || locBeamP4.E() > dMaxBeamEnergy) {
+                        dComboWrapper->Set_IsComboCut(true);
+                        continue;
+                }
+		
+		// omega mass histogram and cut
 		map<Particle_t, set<Int_t> > locUsedThisCombo_OmegaMass;
 		locUsedThisCombo_OmegaMass[PiPlus].insert(locPiPlusTrackID);
 		locUsedThisCombo_OmegaMass[PiMinus].insert(locPiMinusTrackID);
 		locUsedThisCombo_OmegaMass[Gamma].insert(locPhoton1NeutralID);
 		locUsedThisCombo_OmegaMass[Gamma].insert(locPhoton2NeutralID);
-		if(locUsedSoFar_Omega.find(locUsedThisCombo_Pi0Mass) == locUsedSoFar_Omega.end())
+		if(locUsedSoFar_Omega.find(locUsedThisCombo_OmegaMass) == locUsedSoFar_Omega.end())
 		{
 			dHist_M3pi->Fill(locOmegaP4.M());
 			locUsedSoFar_Omega.insert(locUsedThisCombo_OmegaMass);
 		}
-	}
+		if(locOmegaP4.M() < dMinOmegaMass || locOmegaP4.M() > dMaxOmegaMass) {
+			dComboWrapper->Set_IsComboCut(true);
+                        continue;
+		} 
 
+		// calculate kinematic and angular variables
+		double t = (locProtonP4 - dTargetP4).M2();
+		TLorentzRotation resonanceBoost( -locOmegaP4.BoostVector() );
+		TLorentzVector beam_res = resonanceBoost * locBeamP4;
+		TLorentzVector recoil_res = resonanceBoost * locProtonP4;
+		TLorentzVector p1_res = resonanceBoost * locPiPlusP4;
+		TLorentzVector p2_res = resonanceBoost * locPiMinusP4;
+		TLorentzVector p3_res = resonanceBoost * locDecayingPi0P4;
+		
+		TVector3 z = -recoil_res.Vect().Unit();
+		TVector3 y = beam_res.Vect().Cross(z).Unit();
+		TVector3 x = y.Cross(z).Unit();
+
+		TVector3 norm = p1_res.Vect().Cross(p2_res.Vect()).Unit();
+		TVector3 angles(   norm.Dot(x),
+				   norm.Dot(y),
+				   norm.Dot(z) );
+		
+		double CosTheta = angles.CosTheta();
+		
+		double phi = angles.Phi()*180./TMath::Pi();
+		double Phi = locProtonP4.Vect().Phi()*180./TMath::Pi();
+		double psi = phi - Phi;
+		if(psi < -180.) psi += 360.;
+		if(psi > 180.) psi -= 360.;
+
+		dHist_t->Fill(fabs(t));
+		dHist_CosTheta_Psi->Fill(psi, CosTheta);
+	}
 
         /************************************ EXAMPLE: FILL CLONE OF TTREE HERE WITH CUTS APPLIED ************************************/
         Bool_t locIsEventCut = true;
         for(UInt_t loc_i = 0; loc_i < Get_NumCombos(); ++loc_i) {
                 //Set branch array indices for combo and all combo particles
                 dComboWrapper->Set_ComboIndex(loc_i);
-                
                 // Is used to indicate when combos have been cut
                 if(!dComboWrapper->Get_IsComboCut()) // Is false when tree originally created
                         locIsEventCut = false; // Combo has been cut previously
         }
         if(!locIsEventCut && dOutputTreeFileName != "") 
-                FillOutputTree();
-	
+	FillOutputTree();
+
 	return kTRUE;
 }
 
