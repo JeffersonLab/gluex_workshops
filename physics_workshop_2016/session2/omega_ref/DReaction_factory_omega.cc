@@ -107,17 +107,8 @@ jerror_t DReaction_factory_omega::evnt(JEventLoop* locEventLoop, uint64_t locEve
 
 	// CUT PID
 	// SYS_TOF, SYS_BCAL, SYS_FCAL, ...: DetectorSystem_t: Defined in libraries/include/GlueX.h
-	locReaction->Add_AnalysisAction(new DCutAction_PIDDeltaT(locReaction, false, 1.0, Proton, SYS_TOF)); //cut at delta-t +/- 1.0 //false: measured data
-	locReaction->Add_AnalysisAction(new DCutAction_PIDDeltaT(locReaction, false, 1.0, Proton, SYS_BCAL)); //cut at delta-t +/- 1.0 //false: measured data
-	locReaction->Add_AnalysisAction(new DCutAction_PIDDeltaT(locReaction, false, 2.0, Proton, SYS_FCAL)); //cut at delta-t +/- 2.0 //false: measured data
-	locReaction->Add_AnalysisAction(new DCutAction_PIDDeltaT(locReaction, false, 1.0, PiPlus, SYS_TOF)); //cut at delta-t +/- 1.0 //false: measured data
-	locReaction->Add_AnalysisAction(new DCutAction_PIDDeltaT(locReaction, false, 1.0, PiPlus, SYS_BCAL)); //cut at delta-t +/- 1.0 //false: measured data
-	locReaction->Add_AnalysisAction(new DCutAction_PIDDeltaT(locReaction, false, 2.0, PiPlus, SYS_FCAL)); //cut at delta-t +/- 2.0 //false: measured data
-	locReaction->Add_AnalysisAction(new DCutAction_PIDDeltaT(locReaction, false, 1.0, PiMinus, SYS_TOF)); //cut at delta-t +/- 1.0 //false: measured data
-	locReaction->Add_AnalysisAction(new DCutAction_PIDDeltaT(locReaction, false, 1.0, PiMinus, SYS_BCAL)); //cut at delta-t +/- 1.0 //false: measured data
-	locReaction->Add_AnalysisAction(new DCutAction_PIDDeltaT(locReaction, false, 2.0, PiMinus, SYS_FCAL)); //cut at delta-t +/- 2.0 //false: measured data
-	locReaction->Add_AnalysisAction(new DCutAction_PIDDeltaT(locReaction, false, 1.5, Gamma, SYS_BCAL)); //cut at delta-t +/- 1.5 //false: measured data
-	locReaction->Add_AnalysisAction(new DCutAction_PIDDeltaT(locReaction, false, 2.0, Gamma, SYS_FCAL)); //cut at delta-t +/- 2.0 //false: measured data
+	// SYS_NULL: All systems. Unknown: All particles
+	locReaction->Add_AnalysisAction(new DCutAction_PIDDeltaT(locReaction, false, 2.0, Unknown, SYS_NULL)); //cut at delta-t +/- 2.0 //false: measured data
 
 	// HISTOGRAM MASSES: PRE-KINFIT //false/true: measured/kinfit data
 	locReaction->Add_AnalysisAction(new DHistogramAction_InvariantMass(locReaction, Pi0, false, 170, 0.05, 0.22, "Pi0_PreKinFit"));

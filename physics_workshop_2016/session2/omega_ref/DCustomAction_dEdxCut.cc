@@ -23,7 +23,7 @@ void DCustomAction_dEdxCut::Initialize(JEventLoop* locEventLoop)
 		else
 		{
 			dFunc_dEdxCut_SelectHeavy = new TF1(locFuncName.c_str(), "exp(-1.0*[0]*x + [1]) + [2]", 0.0, 12.0);
-			dFunc_dEdxCut_SelectHeavy->SetParameters(3.93024, 3.0, 1.0);
+			dFunc_dEdxCut_SelectHeavy->SetParameters(4.0, 2.5, 1.25);
 		}
 
 		locFuncName = "df_dEdxCut_SelectLight"; //e.g. pions, kaons
@@ -32,7 +32,7 @@ void DCustomAction_dEdxCut::Initialize(JEventLoop* locEventLoop)
 		else
 		{
 			dFunc_dEdxCut_SelectLight = new TF1(locFuncName.c_str(), "exp(-1.0*[0]*x + [1]) + [2]", 0.0, 12.0);
-			dFunc_dEdxCut_SelectLight->SetParameters(6.0, 2.80149, 2.55);
+			dFunc_dEdxCut_SelectLight->SetParameters(4.0, 2.0, 2.25);
 		}
 	}
 	japp->RootUnLock(); //RELEASE ROOT LOCK!!
