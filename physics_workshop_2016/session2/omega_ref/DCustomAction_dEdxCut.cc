@@ -32,7 +32,7 @@ void DCustomAction_dEdxCut::Initialize(JEventLoop* locEventLoop)
 		else
 		{
 			dFunc_dEdxCut_SelectLight = new TF1(locFuncName.c_str(), "exp(-1.0*[0]*x + [1]) + [2]", 0.0, 12.0);
-			dFunc_dEdxCut_SelectLight->SetParameters(4.0, 2.0, 2.25);
+			dFunc_dEdxCut_SelectLight->SetParameters(4.0, 2.0, 2.5);
 		}
 	}
 	japp->RootUnLock(); //RELEASE ROOT LOCK!!
