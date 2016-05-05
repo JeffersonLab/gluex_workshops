@@ -115,6 +115,13 @@ jerror_t DReaction_factory_omega::evnt(JEventLoop* locEventLoop, uint64_t locEve
 	locReaction->Add_AnalysisAction(new DHistogramAction_InvariantMass(locReaction, Pi0, false, 170, 0.05, 0.22, "Pi0_PreKinFit"));
 	locReaction->Add_AnalysisAction(new DHistogramAction_InvariantMass(locReaction, omega, false, 300, 0.5, 1.1, "Omega_PreKinFit"));
 	locReaction->Add_AnalysisAction(new DHistogramAction_MissingMassSquared(locReaction, false, 400, -0.08, 0.08, "PreKinFit"));
+	deque<Particle_t> locXPIDs, locYPIDs;
+	locXPIDs.push_back(PiPlus);  locXPIDs.push_back(PiMinus);
+	locYPIDs.push_back(PiPlus);  locYPIDs.push_back(PiMinus);  locYPIDs.push_back(Pi0);
+	locReaction->Add_AnalysisAction(new DHistogramAction_2DInvariantMass(locReaction, 1, locXPIDs, locYPIDs, false, 300, 0.5, 1.1, 300, 0.5, 1.1, "PreKinFit"));
+
+	// MISSING TRANSVERSE MOMENTUM
+	locReaction->Add_AnalysisAction(new DHistogramAction_MissingTransverseMomentum(locReaction, false, 400, 0.0, 0.4, "PreKinFit"));
 
 	// KINEMATIC FIT
 	locReaction->Add_AnalysisAction(new DHistogramAction_KinFitResults(locReaction, 0.05)); //5% confidence level cut on pull histograms only
@@ -125,6 +132,7 @@ jerror_t DReaction_factory_omega::evnt(JEventLoop* locEventLoop, uint64_t locEve
 	locReaction->Add_AnalysisAction(new DHistogramAction_MissingMassSquared(locReaction, false, 400, -0.08, 0.08, "PostKinFit"));
 	locReaction->Add_AnalysisAction(new DHistogramAction_InvariantMass(locReaction, omega, false, 300, 0.5, 1.1, "Omega_PostKinFit"));
 	locReaction->Add_AnalysisAction(new DHistogramAction_InvariantMass(locReaction, omega, true, 300, 0.5, 1.1, "Omega_KinFit"));
+	locReaction->Add_AnalysisAction(new DHistogramAction_2DInvariantMass(locReaction, 1, locXPIDs, locYPIDs, false, 300, 0.5, 1.1, 300, 0.5, 1.1, "PostKinFit"));
 
 	// KINEMATIC FIT CUT
 	locReaction->Add_AnalysisAction(new DCutAction_KinFitFOM(locReaction, 5.73303E-7)); // +/- 5 sigma confidence level cut
@@ -134,10 +142,18 @@ jerror_t DReaction_factory_omega::evnt(JEventLoop* locEventLoop, uint64_t locEve
 	locReaction->Add_AnalysisAction(new DHistogramAction_MissingMassSquared(locReaction, false, 400, -0.08, 0.08, "KinFitCut"));
 	locReaction->Add_AnalysisAction(new DHistogramAction_InvariantMass(locReaction, omega, false, 300, 0.5, 1.1, "Omega_KinFitCut"));
 	locReaction->Add_AnalysisAction(new DHistogramAction_InvariantMass(locReaction, omega, true, 300, 0.5, 1.1, "Omega_KinFit_KinFitCut"));
+	locReaction->Add_AnalysisAction(new DHistogramAction_2DInvariantMass(locReaction, 1, locXPIDs, locYPIDs, false, 300, 0.5, 1.1, 300, 0.5, 1.1, "KinFitCut"));
+
+	// MISSING TRANSVERSE MOMENTUM
+	locReaction->Add_AnalysisAction(new DHistogramAction_MissingTransverseMomentum(locReaction, false, 400, 0.0, 0.4, "KinFitCut"));
 
 	// KINEMATICS
 	locReaction->Add_AnalysisAction(new DHistogramAction_ParticleComboKinematics(locReaction, true, "KinFit")); //true: kinematic-fit data
 	locReaction->Add_AnalysisAction(new DHistogramAction_TrackVertexComparison(locReaction));
+
+	// KINEMATICS COMPARISON
+	locReaction->Add_AnalysisAction(new DHistogramAction_ParticleComboGenReconComparison(locReaction, false, "Measured"));
+	locReaction->Add_AnalysisAction(new DHistogramAction_ParticleComboGenReconComparison(locReaction, true, "KinFit"));
 
 	_data.push_back(locReaction); //Register the DReaction with the factory
 
