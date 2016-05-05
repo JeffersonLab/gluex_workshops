@@ -1,0 +1,31 @@
+PURPOSE:
+The purpose of this exercise is to familiarize users with histogramming and cuts in JANA.  
+
+Input REST Skim File:
+~/workshop_data/session2/dana_rest_omega.hddm
+
+STARTING (REFERENCE) PLUGIN:
+$WORKSHOP/session2/omega_ref/
+
+EXERCISES:
+0a) In $HALLD_MY, create your own plugin from scratch, following the steps during the talk. 
+0b) OR: Copy the reference plugin to your $HALLD_MY folder, so that you have your own copy to edit.  This will install over the original though. 
+1) Histogram missing transverse momentum
+   - Do this before the kinematic fit, and after the +/- 5 sigma kinematic fit confidence level cut
+2) To look at the size of the rho background, histogram 2d invariant mass: 3pi vs pi+,pi-
+   - Do this before the kinematic fit
+   - Do this with the kinfit results: with a 0% kinfit confidence level cut, and a +/- 5 sigma cut (5.73303E-7)
+3) For combo particles, hist comparison between generated & reconstructed kinematics (after the +/- 5 sigma kinfit cut)
+   - Using both measured data and kinematic-fit data
+
+HELPFUL LINKS:
+ - Histogram actions: $HALLD_HOME/src/libraries/ANALYSIS/DHistogramActions_*.h
+ - Analysis library documentation: https://halldweb1.jlab.org/wiki/index.php/GlueX_Analysis_Software
+
+SOLUTIONS:
+See $WORKSHOP/session2/omega_solutions/
+
+MISC:
+ - ROOT histogram file from creating above skim file: ~/workshop_data/session2/hd_root_omega_skim.root
+ - Original bggen REST files used for skim (first 10 files at): /mss/halld/gluex_simulations/sim1/rest/
+
