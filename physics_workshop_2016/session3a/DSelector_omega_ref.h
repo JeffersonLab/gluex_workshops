@@ -5,6 +5,7 @@
 
 #include "DSelector/DSelector.h"
 #include "DSelector/DHistogramActions.h"
+#include "DSelector/DCutActions.h"
 
 #include "TH1I.h"
 #include "TH2I.h"
@@ -43,8 +44,11 @@ class DSelector_omega_ref : public DSelector
 		DNeutralParticleHypothesis* dPhoton2Wrapper;
 
 		// DEFINE YOUR HISTOGRAM ACTIONS HERE
-		// EXAMPLES:
+		// EXAMPLE HISTOGRAM ACTIONS:
 		DHistogramAction_ParticleComboKinematics* dHistComboKinematics;
+		DHistogramAction_ParticleID* dHistComboPID;
+		// EXAMPLE CUT ACTIONS:
+		DCutAction_PIDDeltaT* dCutPIDDeltaT;
 
 		// DEFINE YOUR HISTOGRAMS HERE
 		// EXAMPLES:

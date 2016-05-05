@@ -8,6 +8,7 @@ void DSelector_omega_ref::Init(TTree *locTree)
 
 	//SET OUTPUT FILE NAME //can be overriden by user in PROOF
 	dOutputFileName = "omega_ref_hists.root"; //"" for none
+	dOutputTreeFileName = ""; //"" for none
 
 	//DO THIS NEXT
 	//Because this function gets called for each TTree in the TChain, we must be careful:
@@ -25,10 +26,16 @@ void DSelector_omega_ref::Init(TTree *locTree)
 
 	//DO WHATEVER YOU WANT HERE
 
-	//EXAMPLE HISTOGRAM ACTIONS
+	//EXAMPLE HISTOGRAM ACTIONS:
 	dHistComboKinematics = new DHistogramAction_ParticleComboKinematics(dComboWrapper, dTargetCenter.Z(), false); //false: use measured data
+	dHistComboPID = new DHistogramAction_ParticleID(dComboWrapper, false); //false: use measured data
 	//change binning here
 	dHistComboKinematics->Initialize();
+	dHistComboPID->Initialize();
+
+	//EXAMPLE CUT ACTIONS:
+	//below: false: measured data, value: +/- N ns, Unknown: All PIDs, SYS_NULL: all timing systems
+	dCutPIDDeltaT = new DCutAction_PIDDeltaT(dComboWrapper, false, 2.0, Unknown, SYS_NULL);
 
 	//EXAMPLE MANUAL HISTOGRAMS:
 	dHist_MissingMassSquared = new TH1I("MissingMassSquared", ";Missing Mass Squared (GeV/c^{2})^{2}", 600, -0.06, 0.06);
@@ -71,6 +78,7 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 
 	//Reset uniqueness tracking for each action
 	dHistComboKinematics->Reset_NewEvent();
+	dHistComboPID->Reset_NewEvent();
 
 	//INSERT OTHER USER ACTIONS HERE
 
@@ -88,7 +96,7 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 
 	//EXAMPLE 2: Combo-specific info:
 		//In general: Could have multiple particles with the same PID: Use a set of Int_t's
-		//In general: If multiple PIDs, so multiple sets: Contain within a map
+		//In general: Multiple PIDs, so multiple sets: Contain within a map
 		//Multiple combos: Contain maps within a set (easier, faster to search)
 	set<map<Particle_t, set<Int_t> > > locUsedSoFar_MissingMass;
 
@@ -164,7 +172,15 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 		/**************************************** EXAMPLE: HISTOGRAM KINEMATICS ******************************************/
 
 		dHistComboKinematics->Perform_Action();
+		dHistComboPID->Perform_Action();
 
+		/**************************************** EXAMPLE: PID CUT ACTION ************************************************/
+/*
+		if(!dCutPIDDeltaT->Perform_Action()) {
+			dComboWrapper->Set_IsComboCut(true);
+			continue;
+		}
+*/
 		/**************************************** EXAMPLE: HISTOGRAM BEAM ENERGY *****************************************/
 
 		//Histogram beam energy (if haven't already)
@@ -290,6 +306,22 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 
 		//Do stuff with the wrapper here ...
 	}
+*/
+
+	/************************************ EXAMPLE: FILL CLONE OF TTREE HERE WITH CUTS APPLIED ************************************/
+/*
+	Bool_t locIsEventCut = true;
+	for(UInt_t loc_i = 0; loc_i < Get_NumCombos(); ++loc_i) {
+		//Set branch array indices for combo and all combo particles
+		dComboWrapper->Set_ComboIndex(loc_i);
+		// Is used to indicate when combos have been cut
+		if(dComboWrapper->Get_IsComboCut())
+			continue;
+		locIsEventCut = false; // At least one combo succeeded
+		break;
+	}
+	if(!locIsEventCut && dOutputTreeFileName != "")
+		FillOutputTree();
 */
 
 	return kTRUE;
