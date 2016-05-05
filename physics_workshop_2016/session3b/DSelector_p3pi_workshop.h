@@ -64,7 +64,7 @@ class DSelector_p3pi_workshop : public DSelector
 
 		// DEFINE CUT PARAMETERS HERE
 		TF1 *fMinProton_dEdx;
-		TF1 *fMaxPiPlus_dEdx;
+		TF1 *fMaxPion_dEdx;
 		double dMinKinFitCL, dMinBeamEnergy, dMaxBeamEnergy, dMinOmegaMass, dMaxOmegaMass;
 
 	ClassDef(DSelector_p3pi_workshop, 0);

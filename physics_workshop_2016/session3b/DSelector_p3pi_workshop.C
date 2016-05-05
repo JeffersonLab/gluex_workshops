@@ -36,6 +36,7 @@ void DSelector_p3pi_workshop::Init(TTree *locTree)
 	dHistComboPID_KinFit->Initialize();
 
 	//EXAMPLE CUT ACTIONS:
+	//below: false: measured data, value: +/- N ns, Unknown: All PIDs, SYS_NULL: all timing systems
 	dCutPIDDeltaT = new DCutAction_PIDDeltaT(dComboWrapper, true, 2, Unknown, SYS_NULL); //true: use measured data
 
 	//EXAMPLE MANUAL HISTOGRAMS:
@@ -50,8 +51,8 @@ void DSelector_p3pi_workshop::Init(TTree *locTree)
 	// EXAMPLE CUT PARAMETERS:
 	fMinProton_dEdx = new TF1("fMinProton_dEdx", "exp(-1.*[0]*x + [1]) + [2]", 0., 10.);
 	fMinProton_dEdx->SetParameters(4.0, 2.5, 1.25);
-	fMaxPiPlus_dEdx = new TF1("fMaxPiPlus_dEdx", "exp(-1.*[0]*x + [1]) + [2]", 0., 10.);
-	fMaxPiPlus_dEdx->SetParameters(4.0, 2.0, 2.25);
+	fMaxPion_dEdx = new TF1("fMaxPion_dEdx", "exp(-1.*[0]*x + [1]) + [2]", 0., 10.);
+	fMaxPion_dEdx->SetParameters(4.0, 2.0, 2.5);
 	dMinKinFitCL = 0.001;
 	dMinBeamEnergy = 8.4;
 	dMaxBeamEnergy = 9.0;
@@ -107,13 +108,13 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 
 	//EXAMPLE 1: Particle-specific info:
 	set<Int_t> locUsedSoFar_BeamEnergy; //Int_t: Unique ID for beam particles. set: easy to use, fast to search
+	set<Int_t> locUsedSoFar_Proton;
 
 	//EXAMPLE 2: Combo-specific info:
 		//In general: Could have multiple particles with the same PID: Use a set of Int_t's
 		//In general: Multiple PIDs, so multiple sets: Contain within a map
 		//Multiple combos: Contain maps within a set (easier, faster to search)
-	set<map<Particle_t, set<Int_t> > > locUsedSoFar_MissingMass;
-	set<map<Particle_t, set<Int_t> > > locUsedSoFar_Omega;
+	set<map<Particle_t, set<Int_t> > > locUsedSoFar_MissingMass, locUsedSoFar_Omega, locUsedSoFar_Angles;
 
 	//INSERT USER ANALYSIS UNIQUENESS TRACKING HERE
 
@@ -130,7 +131,7 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 			continue; // Combo has been cut previously
 
 		// Reject true omega events from sim1 (ie. bggen) since adding signal from AmpTools generator
-		if(Get_IsThrownTopology()) {// && dOption.Contains("bggen")) {
+		if(Get_IsThrownTopology() && dOption.Contains("sim1")) {
 			dComboWrapper->Set_IsComboCut(true);
 			continue;
 		}
@@ -205,8 +206,20 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 
 		// Proton CDC dE/dx histogram and cut 
 		double locProton_dEdx_CDC = dProtonWrapper->Get_dEdx_CDC()*1e6;
-		dHist_Proton_dEdx_P->Fill(locProtonP4.P(), locProton_dEdx_CDC);
+		if(locUsedSoFar_Proton.find(locProtonTrackID) == locUsedSoFar_Proton.end())
+		{
+			dHist_Proton_dEdx_P->Fill(locProtonP4.P(), locProton_dEdx_CDC);
+			locUsedSoFar_Proton.insert(locProtonTrackID);
+		}
 		if(locProton_dEdx_CDC < fMinProton_dEdx->Eval(locProtonP4.P())) {
+			dComboWrapper->Set_IsComboCut(true);
+			continue;
+		}
+		
+		// Pi+/- CDC dE/dx histogram cut (histograms in HistComboPID action)
+		double locPiPlus_dEdx_CDC = dPiPlusWrapper->Get_dEdx_CDC()*1e6;
+		double locPiMinus_dEdx_CDC = dPiMinusWrapper->Get_dEdx_CDC()*1e6;
+		if(locPiPlus_dEdx_CDC > fMaxPion_dEdx->Eval(locPiPlusP4.P()) || locPiMinus_dEdx_CDC > fMaxPion_dEdx->Eval(locPiMinusP4.P())) {
 			dComboWrapper->Set_IsComboCut(true);
 			continue;
 		}
@@ -297,8 +310,19 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 		if(psi < -180.) psi += 360.;
 		if(psi > 180.) psi -= 360.;
 
-		dHist_t->Fill(fabs(t));
-		dHist_CosTheta_Psi->Fill(psi, CosTheta);
+		map<Particle_t, set<Int_t> > locUsedThisCombo_Angles;
+		locUsedThisCombo_Angles[Unknown].insert(locBeamID); //beam
+		locUsedThisCombo_Angles[Proton].insert(locProtonTrackID);
+		locUsedThisCombo_Angles[PiPlus].insert(locPiPlusTrackID);
+		locUsedThisCombo_Angles[PiMinus].insert(locPiMinusTrackID);
+		locUsedThisCombo_Angles[Gamma].insert(locPhoton1NeutralID);
+		locUsedThisCombo_Angles[Gamma].insert(locPhoton2NeutralID);
+		if(locUsedSoFar_Angles.find(locUsedThisCombo_Angles) == locUsedSoFar_Angles.end())
+		{
+			dHist_t->Fill(fabs(t));
+			dHist_CosTheta_Psi->Fill(psi, CosTheta);
+			locUsedSoFar_Angles.insert(locUsedThisCombo_Angles);
+		}
 	}
 
         /************************************ EXAMPLE: FILL CLONE OF TTREE HERE WITH CUTS APPLIED ************************************/
