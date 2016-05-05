@@ -1,2 +1,26 @@
 
 The goal of this session is to practice loading GlueX software and running jobs on the JLab CUE.
+These scripts can be used as a starting point for further data analysis.
+
+To configure the GlueX software, load the gluex_env_jlab.[c]sh script as in the following:
+
+   source gluex_env_jlab.sh
+
+To use your a diffent copy of sim-recon, change version_workshop.xml 
+- To use one of the tagged "official" versions:
+    <package name="sim-recon" version="1.11.1"\>
+- To use one of your own personal copies (example):
+    <package name="sim-recon" home="/work/halld2/home/sdobbs/my-sim-recon-dir"/>
+
+For more information:
+
+
+To submit analysis jobs to the batch queue:
+
+1) Edit swif_gluex_analysis.py to set the configuration variables for your job
+
+2) Run the script, e.g., "./swif_gluex_analysis.py" - this will create a SWIF workflow.
+   You can then deal with the workflow using standard SWIF commnads, e.g.
+      "swif run -workflow MY_WORKFLOW_NAME"
+
+For more information: 
