@@ -27,7 +27,7 @@ void DSelector_omega_ref::Init(TTree *locTree)
 	//DO WHATEVER YOU WANT HERE
 
 	//EXAMPLE HISTOGRAM ACTIONS:
-	dHistComboKinematics = new DHistogramAction_ParticleComboKinematics(dComboWrapper, dTargetCenter.Z(), false); //false: use measured data
+	dHistComboKinematics = new DHistogramAction_ParticleComboKinematics(dComboWrapper, false); //false: use measured data
 	dHistComboPID = new DHistogramAction_ParticleID(dComboWrapper, false); //false: use measured data
 	//change binning here
 	dHistComboKinematics->Initialize();
@@ -38,12 +38,9 @@ void DSelector_omega_ref::Init(TTree *locTree)
 	dCutPIDDeltaT = new DCutAction_PIDDeltaT(dComboWrapper, false, 2.0, Unknown, SYS_NULL);
 
 	//EXAMPLE MANUAL HISTOGRAMS:
-	dHist_MissingMassSquared = new TH1I("MissingMassSquared", ";Missing Mass Squared (GeV/c^{2})^{2}", 600, -0.06, 0.06);
+	dHist_MissingMassSquared = new TH1I("MissingMassSquared", ";Missing Mass Squared (GeV/c^{2})^{2}", 800, -0.08, 0.08);
 	dHist_BeamEnergy = new TH1I("BeamEnergy", ";Beam Energy (GeV)", 600, 0.0, 12.0);
-	dHist_KinFitConLev = new TH1I("KinFitConLev", ";Kinematic Fit Confidence Level", 500, 0.0, 1.0);
 	dHist_Pi0Mass = new TH1I("Pi0Mass", ";#gamma#gamma Invariant Mass", 680, 0.05, 0.22);
-	dHist_OmegaMass_Measured = new TH1I("OmegaMass_Measured", ";#pi^{#plus}#pi^{#minus}#gamma#gamma Invariant Mass", 300, 0.5, 1.1);
-	dHist_OmegaMass_KinFit = new TH1I("OmegaMass_KinFit", ";#pi^{#plus}#pi^{#minus}#pi^{0} Invariant Mass", 300, 0.5, 1.1);
 
 	/***************************************** ADVANCED: CHOOSE BRANCHES TO READ ****************************************/
 
@@ -160,14 +157,12 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 
 		/********************************************* COMBINE FOUR-MOMENTUM ********************************************/
 
-		// DO YOUR STUFF HERE
-		TLorentzVector locPi0P4_Measured = locPhoton1P4_Measured + locPhoton2P4_Measured;
-		TLorentzVector locOmegaP4_Measured = locPi0P4_Measured + locPiPlusP4_Measured + locPiMinusP4_Measured;
-		TLorentzVector locOmegaP4 = locDecayingPi0P4 + locPiPlusP4 + locPiMinusP4;
-
 		// Combine 4-vectors
 		TLorentzVector locMissingP4_Measured = locBeamP4_Measured + dTargetP4;
 		locMissingP4_Measured -= locProtonP4_Measured + locPiPlusP4_Measured + locPiMinusP4_Measured + locPhoton1P4_Measured + locPhoton2P4_Measured;
+
+		// DO YOUR STUFF HERE
+		TLorentzVector locPi0P4_Measured = locPhoton1P4_Measured + locPhoton2P4_Measured;
 
 		/**************************************** EXAMPLE: HISTOGRAM KINEMATICS ******************************************/
 
@@ -189,13 +184,6 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 			dHist_BeamEnergy->Fill(locBeamP4.E());
 			locUsedSoFar_BeamEnergy.insert(locBeamID);
 		}
-
-		/************************************** HIST, CUT KINFIT CONFIDENCE LEVEL ****************************************/
-
-		double locKinFitConLev = dComboWrapper->Get_ConfidenceLevel_KinFit();
-		if(locKinFitConLev < 5.73303E-7)
-			continue; //could also mark combo as cut, then save cut results to a new TTree
-		dHist_KinFitConLev->Fill(locKinFitConLev); //no need to track uniquness: unique for each combo (uses all particles)
 
 		/************************************ EXAMPLE: HISTOGRAM MISSING MASS SQUARED ************************************/
 
@@ -241,26 +229,6 @@ Bool_t DSelector_omega_ref::Process(Long64_t locEntry)
 			locUsedSoFar_Pi0Mass.insert(locUsedThisCombo_Pi0Mass);
 		}
 
-		/**************************************** HISTOGRAM OMEGA INVARIANT MASS *****************************************/
-
-		double locOmegaMass_Measured = locOmegaP4_Measured.M();
-		double locOmegaMass_KinFit = locOmegaP4.M();
-
-		//Uniqueness tracking:
-		map<Particle_t, set<Int_t> > locUsedThisCombo_OmegaMass;
-		locUsedThisCombo_OmegaMass[Gamma].insert(locPhoton1NeutralID);
-		locUsedThisCombo_OmegaMass[Gamma].insert(locPhoton2NeutralID);
-		locUsedThisCombo_OmegaMass[PiPlus].insert(locPiPlusTrackID);
-		locUsedThisCombo_OmegaMass[PiMinus].insert(locPiMinusTrackID);
-
-		//compare to what's been used so far
-		if(locUsedSoFar_OmegaMass.find(locUsedThisCombo_OmegaMass) == locUsedSoFar_OmegaMass.end())
-		{
-			//unique missing mass combo: histogram it, and register this combo of particles
-			dHist_OmegaMass_Measured->Fill(locOmegaMass_Measured);
-			dHist_OmegaMass_KinFit->Fill(locOmegaMass_KinFit);
-			locUsedSoFar_OmegaMass.insert(locUsedThisCombo_OmegaMass);
-		}
 	}
 
 	/******************************************* LOOP OVER THROWN DATA (OPTIONAL) ***************************************/
