@@ -1,2 +1,27 @@
+PURPOSE:
+The purpose of this exercise is to familiarize users with using DSelector's in ROOT.  
 
-The goal of this session is...
+Input ROOT TTree File:
+~/workshop_data/session3/tree_omega_sim1_10000_0.root
+
+STARTING (REFERENCE) DSELECTOR:
+$WORKSHOP/session3a/DSelector_omega_ref.*
+
+EXERCISES: 
+0a) FOR ALL: Make sure to check for uniqueness before histogramming (don't histogram duplicates!)
+0b) In ~/Scratch/, create your own DSelector from scratch, following the steps during the talk. 
+0c) OR: Copy the reference DSelector files to ~/Scratch/, so that you have your own copy to edit. 
+1) Histogram the kinematic fit confidence level. Cut it at +/- 5 sigma (5.73303E-7).
+2) Histogram the omega invariant mass after the kinfit cut: with measured data, and then with kinfit data. 
+
+HELPFUL LINKS:
+ - DSelector: https://halldweb.jlab.org/wiki/index.php/DSelector
+ - TTree Data Format (PART): https://halldweb.jlab.org/wiki/index.php/Analysis_TTreeFormat
+
+SOLUTIONS:
+$WORKSHOP/session3a/DSelector_omega_solutions.*
+
+MISC:
+ - TTree created using the plugin at: $WORKSHOP/session3b/omega_skim_tree/
+ - Original bggen REST files used for skim (first 50 files) on tape at: /mss/halld/gluex_simulations/sim1/rest/
+

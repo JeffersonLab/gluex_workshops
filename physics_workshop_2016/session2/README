@@ -27,5 +27,5 @@ See $WORKSHOP/session2/omega_solutions/
 
 MISC:
  - ROOT histogram file from creating above skim file: ~/workshop_data/session2/hd_root_omega_skim.root
- - Original bggen REST files used for skim (first 10 files at): /mss/halld/gluex_simulations/sim1/rest/
+ - Original bggen REST files used for skim (first 10 files) on tape at: /mss/halld/gluex_simulations/sim1/rest/
 
