@@ -1,2 +1,13 @@
 
-The goal of this session is...
+The goal of this exercise is to select a sample of  gp -> omega p events, and write out a new TTree which can be used to extract the Spin Density Matrix Elements in session 6a.  Simulation samples for the background ("sim1") and omega signal ("angles") events can be found at:
+
+~/workshop_data/session3b/tree_omega_sim1.root (3.75M generated bggen events)
+~/workshop_data/session3b/tree_omega_angles.root (20K generated omega signal events with polarized photon beam)
+
+Excercise steps:
+
+1) Use runDSelector.C to process the sim1 and angles samples wtih no cuts on PID or kinematic fit confidence level.
+2) Add cut in DSelector to remove omega signal from sim1 sample.  Process both samples again and fit omega mass distribution with Hist_FitOmega.C
+3) Add PID cuts in DSelector and evaluate event selection with Hist_FitOmega.C
+4) Add kinematic fit CL cuts in DSelector and evaluate event selection with Hist_FitOmega.C
+5) Write TTree clone with events satisfying your cuts to output file.
