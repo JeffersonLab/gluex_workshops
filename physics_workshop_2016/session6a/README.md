@@ -45,26 +45,43 @@ browse the root file:
     root -l monitoring_hists_1Mevents.root
     [0] new TBrowser
 
-The next step is to skim events from the hddm file that are consistent with the
+The next step is to skim events from the hddm file that are consistent with omega->3pi events. This is done
+using the DSelector you developed in session 3b. This can be run over the data with the following command.
+
+    root -l -q tree_omega.root ${ROOT_ANALYSIS_HOME}/scripts/Load_DSelector.C
+    [0] omega_skim_Tree->Process(gSystem->ExpandPathName("${WORKSHOP}/session3b/DSelector_p3pi_workshop.C+"))
+
+Finally, we need to convert the tree passing all of our cuts to a format suitable for AmpTools. To do this you can
+issue the following command
+
+    tree_to_amptools tree_p3pi_omega.root omega_skim_Tree
+
+This is the input file suitable for use in AmpTools. At this point you have gone through all of the steps before the 
+final fit. we have already processed 1M events for you to use in a fit. The fit configuration file is found in 'fit_omega_3pi.cfg'.
+The following command will fit the data.
+
+    fit -c fit_omega_3pi.cfg
 
 Now that you have completed the exercise, you can always cheat if you want to do it again:
 
-    source README
+    source README.md
 
 test:
 
 # Make some utility scripts
     echo '{ \n TBrowser g; \n}' > ! tbr.C
-    echo '{ \n omega_skim_Tree->Process(gSystem->ExpandPathName("$SESSION3B/DSelector_p3pi_workshop.C+"));\n}' > ! RunDSelector.C
+    echo '{ \n omega_skim_Tree->Process(gSystem->ExpandPathName("${WORKSHOP}/session3b/DSelector_p3pi_workshop.C+"));\n}' > ! RunDSelector.C
 
 # Run the code
-    gen_omega_3pi -c $SESSION6A/gen_omega_3pi.cfg -o AmpToolsFormatThrown.root -hd HDDMFormatThrown.hddm -n 20 -r 10000
+    gen_omega_3pi -c ${WORKSHOP}/session6a/gen_omega_3pi.cfg -o AmpToolsFormatThrown.root -hd HDDMFormatThrown.hddm -n 20 -r 10000
     setenv JANA_CALIB_CONTEXT "variation=mc_sim1"
     hdgeant
     mcsmear hdgeant.hddm -PTHREAD_TIMEOUT_FIRST_EVENT=300 -PTHREAD_TIMEOUT=300
     hd_root hdgeant_smeared.hddm -PPLUGINS=danarest,monitoring_hists -PTHREAD_TIMEOUT_FIRST_EVENT=300 -PTHREAD_TIMEOUT=300
     hd_root -PPLUGINS=omega_skim dana_rest.hddm
     root -l -q tree_omega.root ${ROOT_ANALYSIS_HOME}/scripts/Load_DSelector.C RunDSelector.C
+    tree_to_amptools tree_p3pi_omega.root omega_skim_Tree
+    fit -c fit_omega_3pi.cfg
 
 # Open a browser
     root -l hd_root.root gen_omega_3pi_diagnostic.root hist_p3pi_omega.root tbr.C
