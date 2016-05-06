@@ -6,19 +6,29 @@
 #include "TString.h"
 #include "TSystem.h"
    
-void runDSelector(TString sample = "sim1", TString path = "/work/halld2/home/pmatt/workshop/session3/") 
+void runDSelector(string sample = "sim1", bool proof = 1, string path = "~/workshop_data/session3b/") 
 {
 	// Load DSelector library
 	gROOT->ProcessLine(".x $(ROOT_ANALYSIS_HOME)/scripts/Load_DSelector.C");
-       	
+	int proof_Nthreads = 1;
+
 	// open ROOT file and TTree
 	TString fileName = path;
-	fileName += Form("tree_omega_%s_10000_0.root", sample.Data());
-	TFile *f = TFile::Open(fileName);
-	TTree *tree = (TTree*)f->Get("omega_skim_Tree");
+	fileName += Form("tree_omega_%s.root", sample.data());
 
-	TString options = "";
-	tree->Process("DSelector_p3pi_workshop.C+", options);
-
+	string options = sample;
+	if(proof) { // add TTree to chain and use PROOFLiteManager
+		TChain *chain = new TChain("omega_skim_Tree");
+		chain->Add(fileName);
+		string outputHistFileName = Form("hist_omega_%s.acc.root", sample.data());
+		string outputTreeFileName = Form("tree_omega_%s.acc.root", sample.data());
+		DPROOFLiteManager::Process_Chain(chain, "DSelector_p3pi_workshop.C+", outputHistFileName, outputTreeFileName, options, proof_Nthreads);
+	}
+	else { // get TTree and use standard TTree::Process
+		TFile *f = TFile::Open(fileName);
+		TTree *tree = (TTree*)f->Get("omega_skim_Tree");
+		tree->Process("DSelector_p3pi_workshop.C+", options.data());
+	}
+		
 	return;
 }

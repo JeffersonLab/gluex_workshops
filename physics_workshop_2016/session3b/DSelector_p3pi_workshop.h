@@ -56,6 +56,7 @@ class DSelector_p3pi_workshop : public DSelector
 
 		// DEFINE YOUR HISTOGRAMS HERE
 		// EXAMPLES:
+		TH1I* dHist_KinFitChiSq, *dHist_KinFitCL;
 		TH1I* dHist_MissingMassSquared;
 		TH1I* dHist_BeamEnergy;
 		TH1I* dHist_M3pi, *dHist_t;
@@ -65,7 +66,7 @@ class DSelector_p3pi_workshop : public DSelector
 		// DEFINE CUT PARAMETERS HERE
 		TF1 *fMinProton_dEdx;
 		TF1 *fMaxPion_dEdx;
-		double dMinKinFitCL, dMinBeamEnergy, dMaxBeamEnergy, dMinOmegaMass, dMaxOmegaMass;
+		double dMinKinFitCL, dMaxKinFitChiSq, dMinBeamEnergy, dMaxBeamEnergy, dMinOmegaMass, dMaxOmegaMass;
 
 	ClassDef(DSelector_p3pi_workshop, 0);
 };

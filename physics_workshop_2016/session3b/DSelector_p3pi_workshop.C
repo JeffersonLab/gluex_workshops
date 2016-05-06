@@ -7,8 +7,8 @@ void DSelector_p3pi_workshop::Init(TTree *locTree)
 	// Init() will be called many times when running on PROOF (once per file to be processed).
 
 	//SET OUTPUT FILE NAME //can be overriden by user in PROOF
-	dOutputFileName = "hist_p3pi_omega.root"; //"" for none
-	dOutputTreeFileName = "tree_p3pi_omega.root"; //"" for none
+	dOutputFileName = "hist_omega.root"; //"" for none
+	dOutputTreeFileName = "tree_omega.root"; //"" for none
 	
 	//DO THIS NEXT
 	//Because this function gets called for each TTree in the TChain, we must be careful:
@@ -27,7 +27,7 @@ void DSelector_p3pi_workshop::Init(TTree *locTree)
 	//DO WHATEVER YOU WANT HERE
 
 	//EXAMPLE HISTOGRAM ACTIONS:
-	dHistComboKinematics = new DHistogramAction_ParticleComboKinematics(dComboWrapper, dTargetCenter.Z(), false); //false: use measured data
+	dHistComboKinematics = new DHistogramAction_ParticleComboKinematics(dComboWrapper, false); //false: use measured data
 	dHistComboPID = new DHistogramAction_ParticleID(dComboWrapper, false); //false: use measured data
 	dHistComboPID_KinFit = new DHistogramAction_ParticleID(dComboWrapper, true, "KinFit"); //true: use kinfit data
 	//change binning here
@@ -38,9 +38,12 @@ void DSelector_p3pi_workshop::Init(TTree *locTree)
 	//EXAMPLE CUT ACTIONS:
 	//below: false: measured data, value: +/- N ns, Unknown: All PIDs, SYS_NULL: all timing systems
 	dCutPIDDeltaT = new DCutAction_PIDDeltaT(dComboWrapper, true, 2, Unknown, SYS_NULL); //true: use measured data
+	dCutPIDDeltaT->Initialize();
 
 	//EXAMPLE MANUAL HISTOGRAMS:
 	dHist_Proton_dEdx_P = new TH2I("Proton_dEdx_P", " ;p_{proton} GeV/c; dE/dx (keV/cm)", 250, 0.0, 5.0, 250, 0.0, 25.);
+	dHist_KinFitChiSq = new TH1I("KinFitChiSq", ";Kinematic Fit #chi^{2}/NDF", 250, 0., 25.);
+	dHist_KinFitCL = new TH1I("KinFitCL", ";Kinematic Fit Confidence Level", 100, 0., 1.);
 
 	dHist_MissingMassSquared = new TH1I("MissingMassSquared", ";Missing Mass Squared (GeV/c^{2})^{2}", 400, -0.08, 0.08);
 	dHist_BeamEnergy = new TH1I("BeamEnergy", ";Beam Energy (GeV)", 600, 0.0, 12.0);
@@ -53,7 +56,8 @@ void DSelector_p3pi_workshop::Init(TTree *locTree)
 	fMinProton_dEdx->SetParameters(4.0, 2.5, 1.25);
 	fMaxPion_dEdx = new TF1("fMaxPion_dEdx", "exp(-1.*[0]*x + [1]) + [2]", 0., 10.);
 	fMaxPion_dEdx->SetParameters(4.0, 2.0, 2.5);
-	dMinKinFitCL = 0.001;
+	dMinKinFitCL = 0.0; //5.73303e-7;
+	dMaxKinFitChiSq = 5.0;
 	dMinBeamEnergy = 8.4;
 	dMaxBeamEnergy = 9.0;
 	dMinOmegaMass = 0.757;
@@ -131,10 +135,12 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 			continue; // Combo has been cut previously
 
 		// Reject true omega events from sim1 (ie. bggen) since adding signal from AmpTools generator
+/*
 		if(Get_IsThrownTopology() && dOption.Contains("sim1")) {
 			dComboWrapper->Set_IsComboCut(true);
 			continue;
 		}
+*/
 
 		/********************************************** GET PARTICLE INDICES *********************************************/
 
@@ -186,12 +192,6 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 		locMissingP4_Measured -= locProtonP4_Measured + locPiPlusP4_Measured + locPiMinusP4_Measured + locPhoton1P4_Measured + locPhoton2P4_Measured;
 		TLorentzVector locOmegaP4 = locPiPlusP4 + locPiMinusP4 + locPhoton1P4 + locPhoton2P4;
 
-		// Utility function to compute unused energy
-		//set<Int_t> locUsed_PhotonNeutralID;
-		//locUsed_PhotonNeutralID.insert(locPhoton1NeutralID);
-		//locUsed_PhotonNeutralID.insert(locPhoton2NeutralID);
-		//double locUnusedEnergy = Calc_UnusedEnergy( dNeutralHypoWrapper, locUsed_PhotonNeutralID, Get_NumNeutralHypo());
-
 		/**************************************** EXAMPLE: HISTOGRAM KINEMATICS and PID ******************************************/
 
 		dHistComboKinematics->Perform_Action();
@@ -199,6 +199,7 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 		dHistComboPID_KinFit->Perform_Action();
 
 		/**************************************** EXAMPLE: PID CUT ACTION ************************************************/
+/*
 		if(!dCutPIDDeltaT->Perform_Action()) {
 			dComboWrapper->Set_IsComboCut(true);
 			continue;
@@ -223,6 +224,7 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 			dComboWrapper->Set_IsComboCut(true);
 			continue;
 		}
+*/
 
 		/**************************************** EXAMPLE: HISTOGRAM BEAM ENERGY *****************************************/
 
@@ -257,6 +259,8 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 		}
 
 		// kinematic fit CL cut
+		dHist_KinFitChiSq->Fill(dComboWrapper->Get_ChiSq_KinFit()/dComboWrapper->Get_NDF_KinFit());
+		dHist_KinFitCL->Fill(dComboWrapper->Get_ConfidenceLevel_KinFit());
 		if(dComboWrapper->Get_ConfidenceLevel_KinFit() < dMinKinFitCL) {
 			dComboWrapper->Set_IsComboCut(true);
 			continue;
@@ -326,6 +330,7 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
 	}
 
         /************************************ EXAMPLE: FILL CLONE OF TTREE HERE WITH CUTS APPLIED ************************************/
+/*
         Bool_t locIsEventCut = true;
         for(UInt_t loc_i = 0; loc_i < Get_NumCombos(); ++loc_i) {
                 //Set branch array indices for combo and all combo particles
@@ -336,6 +341,7 @@ Bool_t DSelector_p3pi_workshop::Process(Long64_t locEntry)
         }
         if(!locIsEventCut && dOutputTreeFileName != "") 
 	FillOutputTree();
+*/
 
 	return kTRUE;
 }
