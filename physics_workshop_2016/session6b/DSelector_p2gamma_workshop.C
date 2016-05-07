@@ -7,7 +7,7 @@ void DSelector_p2gamma_workshop::Init(TTree *locTree)
 	// Init() will be called many times when running on PROOF (once per file to be processed).
 
 	//SET OUTPUT FILE NAME //can be overriden by user in PROOF
-	dOutputFileName = "hist_p2gamma_pi0.root"; //"" for none
+	dOutputFileName = "hist_p2gamma.root"; //"" for none
 	dOutputTreeFileName = ""; //"" for none
 
 	//DO THIS NEXT
@@ -27,7 +27,7 @@ void DSelector_p2gamma_workshop::Init(TTree *locTree)
 	//DO WHATEVER YOU WANT HERE
 
 	//EXAMPLE HISTOGRAM ACTIONS:
-	dHistComboKinematics = new DHistogramAction_ParticleComboKinematics(dComboWrapper, dTargetCenter.Z(), false); //false: use measured data
+	dHistComboKinematics = new DHistogramAction_ParticleComboKinematics(dComboWrapper, false); //false: use measured data
 	dHistComboPID = new DHistogramAction_ParticleID(dComboWrapper, false); //false: use measured data
 	//change binning here
 	dHistComboKinematics->Initialize();
@@ -36,6 +36,7 @@ void DSelector_p2gamma_workshop::Init(TTree *locTree)
 	//EXAMPLE CUT ACTIONS:
 	//below: false: measured data, value: +/- N ns, Unknown: All PIDs, SYS_NULL: all timing systems
 	dCutPIDDeltaT = new DCutAction_PIDDeltaT(dComboWrapper, false, 2.0, Unknown, SYS_NULL);
+	dCutPIDDeltaT->Initialize();
 
 	//EXAMPLE MANUAL HISTOGRAMS:
 	dHist_Proton_dEdx_P = new TH2I("Proton_dEdx_P", " ;p_{proton} GeV/c; dE/dx (keV/cm)", 250, 0.0, 5.0, 250, 0.0, 25.);
@@ -44,6 +45,7 @@ void DSelector_p2gamma_workshop::Init(TTree *locTree)
 	dHist_BeamEnergy = new TH1I("BeamEnergy", ";Beam Energy (GeV)", 600, 0.0, 12.0);
 	dHist_M2gamma = new TH1I("M2gamma", ";M_{#gamma#gamma} (GeV/c^{2})", 600, 0.0, 1.5);
 	dHist_phi_t = new TH2I("phi_t", ";-t (GeV/c)^{2}; #phi_{proton}", 100, 0.0, 2.0, 360, -180., 180.);
+	dHist_acc_phi_t = new TH2I("acc_phi_t", ";-t (GeV/c)^{2}; #phi_{proton}", 100, 0.0, 2.0, 360, -180., 180.);
 
 	// EXAMPLE CUT PARAMETERS:
         fMinProton_dEdx = new TF1("fMinProton_dEdx", "exp(-1.*[0]*x + [1]) + [2]", 0., 10.);
@@ -252,6 +254,11 @@ Bool_t DSelector_p2gamma_workshop::Process(Long64_t locEntry)
                         continue;
                 }
 		
+		// calculate beam RF
+		TLorentzVector locBeamX4 = dComboBeamWrapper->Get_X4();
+		double locRFTime = dComboWrapper->Get_RFTime_Measured();
+		double locDeltaTRF = locBeamX4.T() - (locRFTime + (locBeamX4.Z() - dTargetCenter.Z())/29.9792458);
+
 		// calculate kinematic and angular variables
                 double t = (locProtonP4 - dTargetP4).M2();
 		double phi = locProtonP4.Phi()*180/TMath::Pi();
@@ -265,7 +272,11 @@ Bool_t DSelector_p2gamma_workshop::Process(Long64_t locEntry)
 		locUsedThisCombo_Angles[Gamma].insert(locPhoton2NeutralID);
 		if(locUsedSoFar_Angles.find(locUsedThisCombo_Angles) == locUsedSoFar_Angles.end())
 		{
-			dHist_phi_t->Fill(-1.*t, phi);
+			if(fabs(locDeltaTRF) < 2.004) {
+				dHist_phi_t->Fill(-1.*t, phi);
+			}
+			else 
+				dHist_acc_phi_t->Fill(-1.*t, phi);
 			locUsedSoFar_Angles.insert(locUsedThisCombo_Angles);
 		}
 	}

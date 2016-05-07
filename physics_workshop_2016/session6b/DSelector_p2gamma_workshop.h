@@ -52,7 +52,7 @@ class DSelector_p2gamma_workshop : public DSelector
 		TH1I* dHist_BeamEnergy;
 		TH1I* dHist_M2gamma;
 		TH2I* dHist_Proton_dEdx_P;
-                TH2I* dHist_phi_t;
+                TH2I* dHist_phi_t, *dHist_acc_phi_t;
 
 		// DEFINE CUT PARAMETERS HERE
                 TF1 *fMinProton_dEdx;
