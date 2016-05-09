@@ -2,10 +2,10 @@ PURPOSE:
 The purpose of this exercise is to familiarize users with histogramming and cuts in JANA.  
 
 Input REST Skim File:
-~/workshop_data/session2b/dana_rest_omega.hddm
+~/workshop_data/session2/dana_rest_omega.hddm
 
 STARTING (REFERENCE) PLUGIN:
-$WORKSHOP/session2b/omega_ref/
+$WORKSHOP/session2/omega_ref/
 
 EXERCISES:
 0a) In $HALLD_MY, create your own plugin from scratch, following the steps during the talk. 
@@ -20,12 +20,12 @@ EXERCISES:
 
 HELPFUL LINKS:
  - Histogram actions: $HALLD_HOME/src/libraries/ANALYSIS/DHistogramActions_*.h
- - Analysis library documentation: https://halldweb1.jlab.org/wiki/index.php/GlueX_Analysis_Software
+ - Analysis library documentation: https://halldweb.jlab.org/wiki/index.php/GlueX_Analysis_Software
 
 SOLUTIONS:
-See $WORKSHOP/session2b/omega_solutions/
+See $WORKSHOP/session2/omega_solutions/
 
 MISC:
- - ROOT histogram file from creating above skim file: ~/workshop_data/session2b/hd_root_omega_skim.root
+ - ROOT histogram file from creating above skim file: ~/workshop_data/session2/hd_root_omega_skim.root
  - Original bggen REST files used for skim (first 10 files) on tape at: /mss/halld/gluex_simulations/sim1/rest/
 
