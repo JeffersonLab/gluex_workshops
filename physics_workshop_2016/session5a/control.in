@@ -1,0 +1,347 @@
+c This is the control file for the GEANT simulation.  Parameters defined
+c in this file control the kind and extent of simulation that is performed.
+c The full list of options is given in section BASE-40 of the GEANT manual.
+c
+c In addition, some new cards have been defined to set up the input source
+c for the simulation.  Three kinds of simulation runs are available, selected
+c by which of the following three "cards" are present below.
+c    1. Input from Monte Carlo generator (card INFILE)
+c    2. Built-in coherent bremsstrahlung source (card BEAM)
+c    3. Built-in single-track event generator (card KINE)
+c The order of the list is significant, that is if INFILE is present then the
+c BEAM and KINE cards are ignored, otherwise if BEAM is present then KINE is
+c ignored.  For example, the 3-card sequence:
+c     INFILE 'phi-1680.hddm'
+c     SKIP 25
+c     TRIG 100
+c instructs HDGeant to open ./phi-1680.hddm, skip the first 25 events and then
+c process the following 100 input events and stop.  If the end of the file is
+c reached before the event count specified in card TRIG is exhausted then the
+c processing will stop at the end of file.
+INFILE 'HDDMFormatThrown.hddm'
+cTRIG 10000
+
+c The BEAM card configures the built-in coherent bremsstralung photon
+c beam generator in HDGeant.  If the INFILE card is not present and BEAM
+c is specified, the internal coherent bremsstralung generator is the primary
+c source of events for the simulation.  If INFILE is specified, the primary
+c event source is the external Monte Carlo generator that produced the file,
+c but the BEAM card may still be present, and it is needed if beam-related
+c backgrounds are being superimposed on top of the primary event signals,
+c as requested with the BGRATE card (see below).  The beam card accepts
+c the following five parameters.  
+c      Emax   - end-point energy of the electron beam (GeV)
+c      Epeak  - energy of the primary coherent peak edge (GeV)
+c      Emin   - minimum energy of the coherent bremsstrahlung beam (GeV)
+c      collz  - z position of collimator in m
+c      colld  - diameter of collimator in m 
+c Omitting the final parameter Emin results in the default value being used.
+BEAM 12. 9. 0.0012 76.00 0.0034
+
+c Commenting out the following line will disable simulated hits output.
+OUTFILE 'hdgeant.hddm'
+
+c The following are used to automatically invoke the mcsmear program
+c to do the final stage digitization of hits after the simulation
+c stage is complete. This simply invokes the mcsmear program passing
+c it any optional arguments supplied here and then optionally deletes
+c the OUTFILE specified above leaving only the smeared file. This stage
+c can be invoked by hand afterwards, but having it done automatically
+c here allows hdgeant and mcsmear to function as though it were a single
+c program. The specific keys are as follows.
+c
+c POSTSMEAR  - set this 1 to auto-invoke the mcsmear program and 0 to not
+c DELETEUNSMEARED - set this to 1 to delete the OUTFILE after running mcsmear
+c MCSMEAROPTS - String to specify additional arguments to pass to mcsmear
+POSTSMEAR 0
+DELETEUNSMEARED 0
+c MCSMEAROPTS '-t1000 -d0'
+
+c The following card enables single-track generation (for testing).
+c For a single-particle gun, set the momentum (GeV/c), direction
+c theta,phi (degrees) and vertex position (cm), and for the particle
+c type insert the Geant particle type code plus 100 (eg. 101=gamma,
+c 103=electron, 107=pi0, 108=pi+, 109=pi-, 114=proton).  If you use
+c the particle code but do not add 100 then theta,phi are ignored
+c and the particle direction is generated randomly over 4pi sr.
+c For a listing of the Geant particle types, see the following URL.
+c http://wwwasdoc.web.cern.ch/wwwasdoc/geant_html3/node72.html
+c The meaning of the arguments to KINE are as follows.
+c  - particle = GEANT particle type of primary track + 100
+c  - momentum = initial track momentum, central value (GeV/c)
+c  - theta = initial track polar angle, central value (degrees)
+c  - phi = initial track azimuthal angle, central value (degrees)
+c  - delta_momentum = spread in initial track momentum, full width (GeV/c)
+c  - delta_theta = spread in initial track polar angle, full width (degrees)
+c  - delta_phi = spread in initial track azimuthal angle, full width (degrees)
+c
+c If you do explicitly specify the momentum/angle (by adding 100 as
+c described above, you may also choose to distibute tracks evenly in
+c log(P) or log(theta) by setting the appropriate PLOG and TLOG flags
+c to a non-zero value.
+c PLOG 1
+c TLOG 1
+c
+c   particle  momentum  theta  phi  delta_momentum delta_theta delta_phi
+KINE   108      1.0       50.   0.      0.              0.        360.
+
+c The SCAP card determines the vertex position for the particle gun.  It
+c supports the following three arguments, all of which default to 0.
+c
+c    vertex_x vertex_y vertex_z
+SCAP    0.       0.      65.
+
+c The TGTWIDTH card is used to determine an extended volume from
+c which the particle gun will generate vertexes. The vertex position
+c is sampled evenly from a cylindrical volume whose radius is given
+c by the first parameter and whose full z-extent is given by the second.
+c The volume is centered on the coordinates specified by SCAP above.
+c If the card is not specified, then both the r and z extent default
+c to zero meaning the vertex is always located at the point specified
+c by SCAP. Note that this only affects the particle gun. Events read
+c from a file contain their own vertex information.
+c
+c            vertex_extent_r  vertext_extent_z
+c TGTWIDTH           0.5              0.2
+
+c If you specify a non-zero value for vertex_x and/or vertex_y above then
+c all tracks will emerge from the given point.  If you leave them at zero,
+c you have the option of specifying the HALO card which causes the simulation
+c to generate events with a transverse profile modeled after the 12 GeV
+c electron beam.  The argument only argument to HALO is fhalo, the fraction
+c of the beam that lies in the halo region surrounding the core gaussian.
+c The nominal value taken from CASA technical note JLAB-TN-06-048 is 5e-5.
+c This card is only effective for electron beam simulations with gxtwist.
+c
+c    fhalo
+HALO  5e-5
+
+c The following lines control the rate (GHz) of background beam photons
+c that are overlayed on each event in the simulation, in addition to the
+c particles produced by the standard generation mechanism.  A value of
+c 1.10 corresponds to nominal GlueX running conditions at an intensity of
+c 10^7 tagged photons on target per second.  To disable the generation of
+c random beam background, comment this line out or set the value of BGRATE
+c to zero.  Background beam photons are generated during the time interval
+c given by the BGGATE card, whose two arguments specify the earliest and
+c latest times (ns relative to the time of the original photon that caused
+c the event) that a random beam photon could produce background hits
+c somewhere in the detector.  Note that for this to work, the BEAM card
+c must be present (see above).  This means that background generation is
+c disabled when the simulation operates in particle gun mode.
+c If Emin is set in the BEAM card (see above), the rate of background photons
+c is automatically rescaled as follows:
+c       Rate(E_gamma > Thr)  =  Rate(E_gamma = 0.12 Gev) * K,
+c where K is a scale factor calculated inside uginit.F:
+c       K = 1 for Thr = 0.12 GeV,
+c       K > 1 for Thr < 0.12 GeV. 
+c Note, K is calculated assuming the beam energies Emax = 12, Epeak = 9. 
+BGRATE 1.10
+BGGATE -800. 800.
+
+c The following line controls the uncertainty of the event time reference
+c relative to the RF structure of the beam. The event time reference is
+c normally set by the level 1 trigger, whose transitions are synced to
+c a clock in the trigger processor whose resolution is more coarse than
+c the accelerator RF clock. Using a digitized copy of the RF clock signal,
+c all times in the event can be synchronized offline to a nearby RF bucket,
+c but the RF bucket closest to the trigger time will not in general be the 
+c one that contained the beam photon that produced the trigger. The spread
+c of trigger RF buckets times relative to the interaction RF bucket is
+c set by the TREFSIGMA card below, specified as a RMS value in ns. The
+c the displacement of the (unknown) true RF bucket from the trigger RF
+c bucket will be generated by the simulation in multiples of 2 ns. If
+c this line is commented out, a default value of 10ns is assumed. The
+c decimal point is significant.
+TREFSIGMA 10.
+
+
+c The following card seeds the random number generator, though it may be
+c overridden if seeds are found in the input file (see below). It must be
+c unique for each run.  There are two ways to specify the random seed here.
+c  1. One argument, must be an integer in the range [1,215]
+c  2. Two arguments, must be a pair of positive Integer*4 numbers
+c In the first case, one of a limited set of prepared starting seeds is
+c chosen from a list.  These seeds have been certified to produce random
+c sequences that do not repeat within the first 10^9 or so random numbers.
+c For cases where more choices are needed, the two-argument form gives
+c access to a total of 2^62 choices, with no guarantees about closed loops.
+c
+c NOTE: If one uses events read from an HDDM file and that file contains
+c random number seeds for the event, those seeds will be used, overwriting
+c any value(s) specified here. Most event generators do not include the
+c seeds. The seeds are written to the output HDDM file though so if one
+c uses the output file for input to another invocation of hdgeant(++)
+c then the same seeds will be used. You may check for seeds in the input
+c file using hddm-xml file.hddm | grep random .
+RNDM 121
+
+c The following line controls the cutoffs for tracking of particles.
+c CUTS cutgam cutele cutneu cuthad cutmuo bcute bcutm dcute dcutm ppcutm tofmax
+c  - cutgam = Cut for gammas (0.001 GeV)
+c  - cutele = Cut for electrons (0.001 GeV)
+c  - cutneu = Cut for neutral hadrons (0.01 GeV)
+c  - cuthad = Cut for charged hadrons (0.01 GeV)
+c  - cutmuo = Cut for muons (0.01 GeV)
+c  - bcute  = Cut for electron brems. (CUTGAM)
+c  - bcutm  = Cut for muon brems. (CUTGAM)
+c  - dcute  = Cut for electron delta-rays. (10 TeV)
+c  - dcutm  = Cut for muon delta-rays. (10 TeV)
+c  - ppcutm = Cut for e+e- pairs by muons. (0.01 GeV)
+c  - tofmax = Time of flight cut (1.E+10 sec)
+c  - gcuts  = 5 user words (0.)
+CUTS 1e-4 1e-4 1e-3 1e-3 1e-4
+
+c The following line controls a set of generic flags that are used to
+c control aspects of the simulation generally related to debugging.
+c For normal debugging runs these should be left at zero (or omitted).
+c At present the following functionality is defined (assumes debug on).
+c  SWIT(2) = 0 turns off trajectory tracing
+c          = 2 turns on step-by-step trace during tracking (verbose!)
+c          = 3 turns on trajectory plotting after tracking is done
+c          = 4 turns on step-by-step plotting during tracking
+c  SWIT(3) = 1 stores track trajectories for plotting after tracking is done
+c  SWIT(4) = 0 trace trajectories of all particle types
+c          = 3 trace only charged particle trajectories
+SWIT 0 0 0 0 0 0 0 0 0 0
+
+c The following card enables the GelHad package (from BaBar)
+c   on/off  ecut   scale   mode   thresh
+GELH  1     0.2     1.0     4     0.160
+
+c The following card selects the hadronic physics package
+c   HADR 0	no hadronic interactions
+c   HADR 1	GHEISHA only (default)
+c   HADR 2	GHEISHA only, with no generation of secondaries
+c   HADR 3      FLUKA (with GHEISHA for neutrons below 20MeV)
+c   HADR 4	FLUKA (with MICAP for neutrons below 20MeV)
+HADR 1
+
+c The following cards are needed if optical photons are being
+c being generated and tracked in the simulation.  The CKOV directive
+c enables Cerenkov generation in materials for which the refractive
+c index table has been specified.  The LABS card enables absorption
+c of optical photons.  The ABAN directive controls a special feature
+c of Geant which allows it to "abandon" tracking of charged particles
+c once their remaining range drops below the distance to the next
+c discrete interaction or geometric boundary.  Particles abandoned
+c during tracking are stopped immediately and dump all remaining energy
+c where they lie.  The remaining energy is dumped in the correct volume
+c so this is OK in most cases, but it can cut into the yield of
+c Cerenkov photons (eg. in a lead glass calorimeter) at the end of
+c a particle track.  If this might be important, set ABAN to 0.
+CKOV 1
+LABS 1
+
+c The following card prevents GEANT tracking code from abandoning the
+c tracking of particles near the end of their range, once it determines
+c that their fate is just to stop (i.e. electrons and protons).  This
+c behaviour is normal in most cases, but in the case of Cerenkov light
+c generation it leads to an underestimate for the yields.
+c   ABAN 1   abandon stopping tracks (default)
+c   ABAN 0   do not abandon stopping tracks
+ABAN 0
+
+c The following card sets up the simulation to perform debugging on
+c a subset of the simulated events.
+c DEBUG first last step
+c  - first (int) = event number of first event to debug
+c  - last (int) = event number of last event to debug
+c  - step (int) = only debug one event every step events
+DEBU 1 10 1000
+
+c The following card can be used to turn off generation of secondary
+c particles in the simulation, ordinarily it should be 0 (or omitted).
+NOSECONDARIES 0
+
+c The following card tells the simulation to store particle trajectories
+c in the event output stream.  This output can be verbose, use with caution.
+c The value set here determines the amount of output recorded:
+c
+c TRAJECTORIES = 0  don't store trajectory info
+c TRAJECTORIES = 1  store birth and death points of primary tracks
+c TRAJECTORIES = 2  store birth and death points of all particles
+c TRAJECTORIES = 3  store full trajectory of primary tracks
+c TRAJECTORIES = 4  store full trajectory of primary tracks and birth/death points of secondaries
+c TRAJECTORIES = 5  store full trajectory for all particles
+c
+TRAJECTORIES 0
+
+c The following tracking parameters are defined for each tracking medium
+c   TMAXFD (REAL) maximum angular deviation due to the magnetic field
+c                 permitted in one step (degrees)
+c   DEEMAX (REAL) maximum fractional energy loss in one step (0< DEEMAX <=0.1)
+c   STEMAX (REAL) maximum step permitted (cm)
+c   STMIN  (REAL) minimum value for the maximum step imposed by energy loss,
+c                 multiple scattering, Cerenkov or magnetic field effects (cm)
+c Normally they are assigned appropriate values calculated automatically by
+c Geant when the geometry is defined, overwriting the values declared by
+c the user code in the GSTMED() call.  Users who know what they are doing can
+c force Geant to instead use the values passed in the arguments to GSTMED()
+c by removing the comment in front of the following card.  Any parameters with
+c zero values are still assigned automatic values even when AUTO is turned off.
+cAUTO 0
+
+c The magnetic field map is accessed through the HDGEOMETRY library
+c so that the same map can be used for both simulation and reconstruction.
+c There are multiple map types and for each type, more than one map may
+c exist. The map types consist of the default type of "CalibDB", the 
+c constant type of "Const" and the spoiled field type of "Spoiled".
+c The type is set using the BFIELDTYPE card. If no BFIELDTYPE card is
+c present, then no the default type "CalibDB" is used.
+c The specific parameters used for the field can be specified using the
+c BFIELDMAP card. If undefined, then the default that is hardcoded into
+c the HDGEOMETRY library is used. Note that these correspond to the
+c similarly named configuration parameters used in the econstruction.
+c The difference being that underscores are not allowed here. To
+c specify the values to the reconstruction code used here, use the
+c -PBFIELD_TYPE=CalibDB and -PBFIELD_MAP=Magents/Solenoid/solenoid_1500
+c BFIELDMAP 'Magnets/Solenoid/solenoid_1200A_poisson_20140520'
+c BFIELDTYPE 'Const'
+
+c Use this card to enable/disable ( SAVEHITS  1/0 ) writing events with no 
+c hits in the detector to the hddm output file. Default value is 0.
+  SAVEHITS  0
+
+
+c This card is used to enable/disable ( SHOWERS_IN_COL 1/0 ) simulation of 
+c showers in the primary and secondary collimators placed in the collimator cave. 
+c The default value is set to 0.
+  SHOWERSINCOL 0
+
+c This card enables/disables (DRIFTCLUSTERS 1/0) simulation of electron 
+c clusters within a drift cell in the FDC or the CDC
+c The default value is 0.  
+  DRIFTCLUSTERS 0
+
+c The following cards allow one to switch on/off some physics processes in GEANT:
+c MULS 0 no multiple scattering
+c      1 Moliere or Coulomb scattering (default)  
+c 
+c BREM 0 no bremsstrahlung 
+c      1 bremsstrahlung (default)
+c
+c COMP 0 no Compton
+c      1 Compton scattering (default)
+c 
+c PAIR 0 no pair production
+c      1 pair production (default)
+c 
+c LOSS 0 (controls energy losses) no energy loss
+c      1  delta-rays are produced above the threshold. Reduced fluctuations from 
+c         delta-rays below the threshold are added to the energy losses. The threshold
+c         energies for delta-ray production can be set using the CUTS card (see above). 
+c         The fields 'dcute' and 'dcutm' in the CUTS card correspond to energy thresholds 
+c         for electron and muon delta-rays, respectively. The default energy threshold 
+c         value is 100 keV (default  see uginit.F  12/16/2011  DL). 
+c      2  no delta-rays are produced. Complete fluctuations are calculated .
+c
+c DCAY 0 no decay in flight
+c      1 decay in flight with generation of secondaries (default)
+c      2 decay in flight without generation of secondaries
+c
+c DRAY 0 no delta ray production
+c      1 delta ray production with generation of secondaries (default)
+c      2 delta ray production without generation of secondaries
+
+END
