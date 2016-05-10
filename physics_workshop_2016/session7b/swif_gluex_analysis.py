@@ -15,6 +15,7 @@
 
 from optparse import OptionParser
 import os.path
+import os
 import sys
 import re
 import subprocess
@@ -47,14 +48,14 @@ DATA_SOURCE_TYPE      = "file" #"mss" or "file"
 DATA_SOURCE_BASE_DIR  = "/cache/halld/offline_monitoring/"
 
 # OUTPUT DATA LOCATION
-DATA_OUTPUT_BASE_DIR    = "/volatile/halld/home/%s/analysis_output/"%(env['USER'])
+DATA_OUTPUT_BASE_DIR    = "/volatile/halld/home/%s/analysis_output/"%(os.environ['USER'])
 
 # JOB EXECUTION
 #SCRIPTFILE        = "/work/halld2/home/sdobbs/jobs/analysis/script.sh"
-SCRIPTFILE        = "/work/halld/home/USER/analysis_jobs/script.sh"            ## CHANGE
-ENVFILE           = "/work/halld/home/USER/analysis_jobs/gluex_env_jlab.csh"   ## CHANGE
+SCRIPTFILE        = "/work/halld/home/gluex/analysis_jobs/script.sh"            ## CHANGE
+ENVFILE           = "/work/halld/home/gluex/analysis_jobs/gluex_env_jlab.csh"   ## CHANGE
 #CONFIG_FILE_PATH  = "/work/halld2/home/sdobbs/jobs/analysis/analysis.conf"
-CONFIG_FILE_PATH  = "/work/halld/home/USER/analysis_jobs/analysis.conf"        ## CHANGE
+CONFIG_FILE_PATH  = "/work/halld/home/gluex/analysis_jobs/analysis.conf"        ## CHANGE
 TREE_NAMES        = "omega"
 
 # CONFIG FILE CONTENTS
@@ -163,6 +164,8 @@ def main(argv):
 		DATA_SOURCE_DIR = DATA_SOURCE_BASE_DIR + "/RunPeriod-" + RUN_PERIOD + "/" + VERSION + "/REST/" + FORMATTED_RUN + "/"
 		if(os.path.exists(DATA_SOURCE_DIR)):
 			file_list = find_files(DATA_SOURCE_DIR)
+		else:
+			continue
 		if(len(file_list) == 0):
 			continue
 
