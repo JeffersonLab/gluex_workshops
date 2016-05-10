@@ -16,6 +16,19 @@ For more information:  https://halldweb.jlab.org/docs/gluex_build/    OR
                        http://argus.phys.uregina.ca/cgi-bin/public/DocDB/ShowDocument?docid=2793
 
 
+To setup your batch job exercise:
+
+mkdir -p /work/halld/home/$USER/
+cp -R /group/halld/Software/workshops/physics_workshop_2016/session7b /work/halld/home/$USER/workshop_exercise
+cd /work/halld/home/$USER/workshop_exercise
+
+To setup the plugin for the exercise:
+
+mkdir -p $HALLD_MY/plugins/omega_ref
+cp -R /group/halld/Software/workshops/physics_workshop_2016/session2/omega_ref $HALLD_MY/plugins/omega_ref
+cd $HALLD_MY/plugins/omega_ref
+scons install
+
 To submit analysis jobs to the batch queue:
 
 1) Edit swif_gluex_analysis.py to set the configuration variables for your job
