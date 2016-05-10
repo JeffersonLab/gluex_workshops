@@ -8,6 +8,9 @@ The goal of this exercise is to select a sample of  gp -> omega p events, and wr
 Excercise steps:
 
 1) Use runDSelector.C to process the sim1 and angles samples wtih no cuts on PID or kinematic fit confidence level.
+
+root -b -q 'runDSelector.C("sim1")'     (and similar for "angles")
+
 2) Add cut in DSelector to remove omega signal from sim1 sample.  Process both samples again and fit omega mass distribution with Hist_FitOmega.C
 3) Add PID cuts in DSelector and evaluate event selection with Hist_FitOmega.C
 4) Add kinematic fit CL cuts in DSelector and evaluate event selection with Hist_FitOmega.C
@@ -18,7 +21,7 @@ Results for full simulation samples:
 
 The histograms from the full simulation sample (187.5M generated bggen events and 1M generated omega signal events), are at 
 
-~/workshop_data/session6a/sim_1M_omega/histograms/hist_reconstructed_bkgr.root
-~/workshop_data/session6a/sim_1M_omega/histograms/hist_reconstructed_angles.root
+~/workshop_data/session5a/sim_1M_omega/histograms/hist_reconstructed_bkgr.root
+~/workshop_data/session5a/sim_1M_omega/histograms/hist_reconstructed_angles.root
 
 which you can use in Hist_FitOmega.C to get a higher statistics version of the omega mass fit.

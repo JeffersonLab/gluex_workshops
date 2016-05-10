@@ -1,12 +1,15 @@
 
 The goal of this exercise is to select a sample of  gp -> pi0 p events, and determine the beam asymmetry from a fit to the phi distributions.  Simulation samples for the background ("sim1") and pi0 signal ("para" and "perp") events can be found at:
 
-~/workshop_data/session6b/tree_p2gamma_sim1.root (375M generated bggen events)
-~/workshop_data/session6b/tree_p2gamma_para.root (100K generated pi0 signal events with polarized photon beam in para orientation)
-~/workshop_data/session6b/tree_p2gamma_perp.root (100K generated pi0 signal events with polarized photon beam in perp orientation)
+~/workshop_data/session5b/tree_p2gamma_sim1.root (375M generated bggen events)
+~/workshop_data/session5b/tree_p2gamma_para.root (100K generated pi0 signal events with polarized photon beam in para orientation)
+~/workshop_data/session5b/tree_p2gamma_perp.root (100K generated pi0 signal events with polarized photon beam in perp orientation)
 
 Excercise steps:
 
 1) Use runDSelector.C to process the sim1, para, and perp samples, following similar steps as in session 3b for the omega sample.
+
+root -b -q 'runDSelector.C("sim1")'     (and similar for "para" and "perp") 
+
 2) Fit phi distribution with Hist_FitAsymmetry.C
 3) Add a phi-dependent inefficiency in the DSelector to mimic a detector inefficiency and verify that the acceptance effect cancels in the asymmetry.
