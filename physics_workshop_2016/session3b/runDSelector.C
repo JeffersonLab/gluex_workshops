@@ -6,7 +6,7 @@
 #include "TString.h"
 #include "TSystem.h"
    
-void runDSelector(string sample = "sim1", bool proof = 1, string path = "~/workshop_data/session3b/") 
+void runDSelector(string sample = "sim1", bool proof = 1, string path = "$DATA/session3b/") 
 {
 	// Load DSelector library
 	gROOT->ProcessLine(".x $(ROOT_ANALYSIS_HOME)/scripts/Load_DSelector.C");
