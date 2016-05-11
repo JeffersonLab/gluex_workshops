@@ -7,11 +7,10 @@ void Hist_FitOmega() {
 	TFile *fangles = TFile::Open("hist_omega_angles.acc.root");
 	if(!fangles) return;
 
-	int rebin = 10;
+	int rebin = 5;
 	TH1I* locHist_M3pi_sim1 = (TH1I*)fsim1->Get("M3pi"); 
 	locHist_M3pi_sim1->SetLineColor(kRed); locHist_M3pi_sim1->Rebin(rebin);
 	TH1I* locHist_M3pi_angles = (TH1I*)fangles->Get("M3pi");
-	//locHist_M3pi_angles->Scale(0.5);
 	locHist_M3pi_angles->SetLineColor(kBlue); locHist_M3pi_angles->Rebin(rebin);
 
 	// "data" sample with signal and background
