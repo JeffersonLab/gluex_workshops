@@ -27,12 +27,16 @@ Now, we want to simulate the passage of the thrown particles through the GlueX d
 for this step is contained in the 'control.in' file in this directory and is loaded automatically by hdgeant. 
 We want to use the ccdb variation 'mc_sim1', so we will set our environment, then launch hdgeant.
 
+on VM (bash):
+    export JANA_CALIB_CONTEXT="variation=mc_sim1"
+on ifarm (csh):
     setenv JANA_CALIB_CONTEXT "variation=mc_sim1"
+
     hdgeant
 
 Next we need to smear the output of hdgeant to simulate the detector response.
 
-    mcsmear hdgeant.hddm -PTHREAD_TIMEOUT_FIRST_EVENT=300 -PTHREAD_TIMEOUT=300
+    mcsmear hdgeant.hddm
 
 We can look at these smeared events on the viewer
 
@@ -40,24 +44,25 @@ We can look at these smeared events on the viewer
 
 Now we can reconstruct the smeared events, and produce some generic histograms to look at results of reconstruction.
 
-    hd_root hdgeant_smeared.hddm -PPLUGINS=danarest,monitoring_hists -PTHREAD_TIMEOUT_FIRST_EVENT=300 -PTHREAD_TIMEOUT=300
+    hd_root hdgeant_smeared.hddm -PPLUGINS=danarest,monitoring_hists
 
 There are two output files at the end of this step: 'hd_root.root' and 'danarest.hddm'. We will look at the root
 file later to view various histograms related to the quality of the resonstruction. Now we will produce a root tree 
 using the very loose cuts developed in session 2.
 
-    hd_root danarest.hddm -PPLUGINS=omega_ref
+    hd_root dana_rest.hddm -PPLUGINS=omega_ref
 
 The next step is to select events from the root file that are consistent with omega->3pi events. This is done
-using the DSelector you developed in session 3b. This can be run over the data with the following command.
+using the DSelector you developed in session 3b (solutions are in this folder. This can be run over the data with 
+the following command.
 
-    root -l -q tree_omega_skim.root ${ROOT_ANALYSIS_HOME}/scripts/Load_DSelector.C
+    root -l tree_omega_skim.root ${ROOT_ANALYSIS_HOME}/scripts/Load_DSelector.C
     [0] omega_Tree->Process(gSystem->ExpandPathName("${WORKSHOP}/session5a/DSelector_p3pi_workshop.C+"))
 
 Finally, we need to convert the tree passing all of our cuts to a format suitable for AmpTools. To do this you can
 issue the following command
 
-    tree_to_amptools tree_p3pi_omega.root omega_skim_Tree
+    tree_to_amptools tree_p3pi_omega.root omega_Tree
 
 We can look at some of the results for the full 1M event data set:
 
