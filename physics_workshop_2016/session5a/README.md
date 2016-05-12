@@ -51,9 +51,8 @@ using the very loose cuts developed in session 2.
 The next step is to select events from the root file that are consistent with omega->3pi events. This is done
 using the DSelector you developed in session 3b. This can be run over the data with the following command.
 
-    mv tree_omega.root tree_omega_skim.root
     root -l -q tree_omega_skim.root ${ROOT_ANALYSIS_HOME}/scripts/Load_DSelector.C
-    [0] omega_Tree->Process(gSystem->ExpandPathName("${WORKSHOP}/session3b/DSelector_p3pi_workshop.C+"))
+    [0] omega_Tree->Process(gSystem->ExpandPathName("${WORKSHOP}/session5a/DSelector_p3pi_workshop.C+"))
 
 Finally, we need to convert the tree passing all of our cuts to a format suitable for AmpTools. To do this you can
 issue the following command
@@ -64,7 +63,7 @@ We can look at some of the results for the full 1M event data set:
 
     cd $WORKSHOP/session5a/sim_1M_omega/histograms/
     root -l *.root
-    cd ../..
+    cd $WORKSHOP/session5a/
 
 This includes a sample of 187.5 million events from sim1 with the omega signal removed. It is clear from these plots that the ammount of background
 that would enter the fit is small. For this reason, we won't account for it in our fit (DONT DO THIS IN YOUR ANALYSIS).
@@ -86,7 +85,7 @@ test:
 
 # Make some utility scripts
     echo '{ TBrowser g; }' > ! tbr.C
-    echo '{ omega_Tree->Process(gSystem->ExpandPathName("${WORKSHOP}/session3b/DSelector_p3pi_workshop.C+"));}' > ! RunDSelector.C
+    echo '{ omega_Tree->Process(gSystem->ExpandPathName("${WORKSHOP}/session5a/DSelector_p3pi_workshop.C+"));}' > ! RunDSelector.C
 
 # Run the code
     gen_omega_3pi -c ${WORKSHOP}/session5a/gen_omega_3pi.cfg -o AmpToolsFormatThrown.root -hd HDDMFormatThrown.hddm -n 25 -r 10000
@@ -96,15 +95,14 @@ test:
     hdview2 hdgeant_smeared.hddm
     hd_root hdgeant_smeared.hddm -PPLUGINS=danarest,monitoring_hists -PTHREAD_TIMEOUT_FIRST_EVENT=300 -PTHREAD_TIMEOUT=300
     hd_root -PPLUGINS=omega_ref dana_rest.hddm
-    mv tree_omega.root tree_omega_skim.root
     root -l -q tree_omega_skim.root ${ROOT_ANALYSIS_HOME}/scripts/Load_DSelector.C RunDSelector.C
-    tree_to_amptools tree_omega.root omega_Tree
+    tree_to_amptools tree_p3pi_omega.root omega_Tree
     fit -c fit_omega_3pi.cfg
 
 # Open a browser
-    cd  $WORKSHOP/session5a/sim_1M_omega/histograms/
+    cd $WORKSHOP/session5a/sim_1M_omega/histograms/
     root -l *.root
-    cd ../..
+    cd $WORKSHOP/session5a/
 
 # Remove the scripts
     rm tbr.C
