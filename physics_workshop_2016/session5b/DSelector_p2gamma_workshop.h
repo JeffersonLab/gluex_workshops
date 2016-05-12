@@ -10,6 +10,7 @@
 #include "TH1I.h"
 #include "TH2I.h"
 #include "TF1.h"
+#include "TRandom3.h"
 
 class DSelector_p2gamma_workshop : public DSelector
 {
