@@ -1,0 +1,32 @@
+Session3a Commands:
+
+View TTree:
+root -l tree_omega_sim1_10000_0.root
+TBrowser b;
+.q #quit root
+
+
+Figure out the name of the TTree in the ROOT file:
+root -l $DATA/session3/tree_omega_sim1_10000_0.root
+gDirectory->ls();
+.q #quit root
+
+
+Make DSelector:
+MakeDSelector #no arguments: prints usage instructions
+MakeDSelector $DATA/session3/tree_omega_sim1_10000_0.root omega_skim_Tree session3a
+
+
+Run DSelector:
+root -l -b $DATA/session3/tree_omega_sim1_10000_0.root
+.x $ROOT_ANALYSIS_HOME/scripts/Load_DSelector.C
+omega_skim_Tree->Process("DSelector_session3a.C+");
+.q #quit root
+
+
+Run PROOF-Lite:
+root -l
+.x $ROOT_ANALYSIS_HOME/scripts/Load_DSelector.C
+DPROOFLiteManager::Process_Tree("$DATA/session3/tree_omega_sim1_10000_0.root", "omega_skim_Tree", "DSelector_session3a.C+", "my_outfile.root", 2); //2: 2 threads
+.q #quit root
+
