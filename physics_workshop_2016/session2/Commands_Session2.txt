@@ -1,0 +1,23 @@
+Session2 Commands:
+
+Make Monitoring Histograms (any time):
+hd_root $DATA/session2/dana_rest_omega.hddm -PPLUGINS=monitoring_hists -PEVENTS_TO_KEEP=10000
+
+
+Any Time: Browse Histograms
+root -l hd_root.root
+
+
+Slide 11: Make Plugin
+cd $HALLD_MY
+MakeReactionPlugin.pl session2
+cd session2
+scons install
+
+
+Post-slide-11: Run plugin
+hd_root $DATA/session2/dana_rest_omega.hddm -PPLUGINS=monitoring_hists,session2 -PEVENTS_TO_KEEP=10000
+
+
+NOTE: To run multi-threaded, with e.g. 6 threads, add "-PNTHREADS=6" to the command line.  
+
