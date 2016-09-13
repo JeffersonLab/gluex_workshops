@@ -100,7 +100,7 @@ Bool_t DSelector_omega_solutions::Process(Long64_t locEntry)
 		//Multiple combos: Contain maps within a set (easier, faster to search)
 	set<map<Particle_t, set<Int_t> > > locUsedSoFar_MissingMass;
 	set<set<Int_t> > locUsedSoFar_Pi0Mass;
-
+	set<map<Particle_t, set<Int_t> > > locUsedSoFar_OmegaMass;
 	//INSERT USER ANALYSIS UNIQUENESS TRACKING HERE
 
 	/************************************************* LOOP OVER COMBOS *************************************************/
