@@ -6,7 +6,6 @@ should be stored here for version control and sharing amongst participants durin
 
 The tasks for the workfest are broken into 2 teams:
 
-R&D Team (team_rd)
-Validation Team (team_validation)
+R&D Team (team_rd) and Validation Team (team_validation)
 
 Please create directories as necessary to organize your scripts for a given tasks.
