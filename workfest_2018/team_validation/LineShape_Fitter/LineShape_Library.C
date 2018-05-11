@@ -114,9 +114,9 @@ mDau2=other.mDau2;
     double norm=((RooAbsReal&) ((*res[i])[RESNORM])).getVal();
     if(((RooAbsReal&) ((*res[i])[RESSHAPE])).getVal()==POLYNOMIAL)
     {
-      for(int j=0;j<res[i]->getSize()-PARAM_START;j++)
+      for(int j=RESSIZE;j<res[i]->getSize();j++)
       {
-        incoherent_sum+=sqrt(norm)*((RooAbsReal&) ((*res[i])[j+PARAM_START])).getVal()*pow(m,j);
+        incoherent_sum+=sqrt(norm)*((RooAbsReal&) ((*res[i])[j])).getVal()*pow(m,j);
         //sumsq+=((RooAbsReal&) ((*res[i])[PARAM_START])).getVal()*m+((RooAbsReal&) ((*res[i])[PARAM_START+1])).getVal();
       }
     }
@@ -187,15 +187,10 @@ double LineShape_Library::Gamma(const double& m, const double& gamma0, const dou
   
   return gammaM;
 }
-void LineShape_Library::CreateComponent(TString name,int shape,double size,double L, double mass, double width,bool isNorm)
+void LineShape_Library::CreateComponent(TString name,int shape,double size,double L=0, double mass=0, double width=0,bool isNorm=0)
 {
-  switch(shape)
-  {
-    case 0:cout<<"Building POLY"<<std::endl;break;
-
-    case 1:
-          
-          RooRealVar* A_Particle_Norm=new RooRealVar(name+"_Norm",name+"_Norm",1);
+  RooRealVar* A_Particle_Shape=new RooRealVar(name+"_Shape",name+"_Shape",shape);
+   RooRealVar* A_Particle_Norm=new RooRealVar(name+"_Norm",name+"_Norm",1);
           A_Particle_Norm->setError(.1);
           A_Particle_Norm->setMin(0);
           A_Particle_Norm->setMax(1E7);
@@ -205,7 +200,26 @@ void LineShape_Library::CreateComponent(TString name,int shape,double size,doubl
             A_Particle_Norm->setConstant(true);
           }
 
-           RooRealVar* A_Particle_Shape=new RooRealVar(name+"_Shape",name+"_Shape",shape);
+  RooArgList* A_Particle=new RooArgList(*A_Particle_Shape,*A_Particle_Norm,name);
+  TString string_name( A_Particle->GetName() );
+  RooListProxy* tempProxy= new RooListProxy(string_name,string_name,this);
+
+  
+  switch(shape)
+  {
+    case POLYNOMIAL:for(int i=0;i<size+1;i++)
+                        {
+                          TString intname;
+                          intname.Form ("%i", i);
+                           RooRealVar* A_Particle_coef=new RooRealVar(name+"_c"+intname,name+"_c"+intname,0);//from example fit?
+                            A_Particle_coef->setError(1);
+                             A_Particle_coef->setConstant(false);
+                             A_Particle->add(*A_Particle_coef);
+                        } break;
+
+    case 1:
+
+          
 
           RooRealVar* A_Particle_Size=new RooRealVar(name+"_Size",name+"Size",size);
 
@@ -213,7 +227,7 @@ void LineShape_Library::CreateComponent(TString name,int shape,double size,doubl
  
           RooRealVar* A_Particle_mass=new RooRealVar(name+"_Mass", name+"_Mass",mass);//from example fit?
           A_Particle_mass->setError(A_Particle_mass->getVal()/10.);
-          A_Particle_mass->setMin(0);
+          A_Particle_mass->setMin(mDau1+mDau2);
           A_Particle_mass->setMax(100);
           A_Particle_mass->setConstant(false);
 
@@ -231,18 +245,17 @@ void LineShape_Library::CreateComponent(TString name,int shape,double size,doubl
             phase->setConstant(true);
           }
 
-           RooArgList* A_Particle=new RooArgList(*A_Particle_Shape,*A_Particle_Norm,*A_Particle_Size,name);
+          A_Particle->add(*A_Particle_Size);
           A_Particle->add(*A_Particle_L);
           A_Particle->add(*A_Particle_mass);
           A_Particle->add(*A_Particle_width);
           A_Particle->add(*phase);
           
-          TString string_name( A_Particle->GetName() );
-    
-          RooListProxy* tempProxy= new RooListProxy(string_name,string_name,this);
-             
-             TIterator* coefIter = A_Particle->createIterator() ;
-            RooAbsArg* coef;
+         // res.push_back(A_Particle);
+          break;
+  }
+  TIterator* coefIter = A_Particle->createIterator() ;
+   RooAbsArg* coef;
 
     //std::cout<<counter<<std::endl;
     while((coef = (RooAbsArg*)coefIter->Next())) {
@@ -256,12 +269,91 @@ void LineShape_Library::CreateComponent(TString name,int shape,double size,doubl
     //tempPara.x=*tempProxy;
     //tempPara.name=string_name;
     res.push_back(tempProxy);
-          
-         // res.push_back(A_Particle);
-          break;
-  }
 
 }
+
+RooListProxy* LineShape_Library::GetComponent(TString name)
+{
+  for(uint i=0; i<res.size();i++)
+  {
+    if(res[i]->GetName() == name)
+    {
+      return res[i];
+    }
+    
+  }
+    return 0;
+}
+
+RooRealVar* LineShape_Library::GetParameter(RooListProxy* resonance, TString name)
+{
+    return ( (RooRealVar*) resonance->find(name));
+}
+ RooRealVar* LineShape_Library::GetParameterFromComponent(TString compname,TString paramname)
+ {
+  for(uint i=0; i<res.size();i++)
+  {
+    if(res[i]->GetName() == compname)
+    {
+      return ( (RooRealVar*) res[i]->find(paramname)); 
+    } 
+  }
+    return 0;
+ }
+
+ void LineShape_Library::ReplaceResList(std::vector<RooListProxy*> newres)
+ {
+   cout<<"replacing"<<endl;
+   cout<<"start: "<<res.size()<<" and "<<newres.size()<<std::endl;
+   this->res.clear();
+   this->res=newres;
+   cout<<"end: "<<this->res.size()<<std::endl;
+   return;
+ }
+
+double LineShape_Library::GetIntegral(TString resname,double int_min=0, double int_max=0)
+  {
+    double Normy_SUM=0.0;
+    std::vector<double> saved_normies;
+    for(uint i=0;i<res.size();i++)
+    {
+      RooRealVar* normy=GetParameterFromComponent(res[i]->GetName(),TString(res[i]->GetName())+"_Norm");
+      Normy_SUM+=normy->getVal();
+
+      saved_normies.push_back(normy->getVal());
+
+      if(res[i]->GetName() == resname)
+        continue;
+
+      if(normy)
+      {
+        normy->setVal(0);
+      }
+    }
+
+     RooRealVar* depvar = ( (RooRealVar*) &fitted_values[0]);
+      if(int_min==int_max)
+      {
+  
+      depvar->setRange("sigintegration_bounds",depvar->getMin(),depvar->getMax());
+     }
+      else
+      {
+      depvar->setRange("sigintegration_bounds",int_min,int_max);
+      }
+       RooRealVar* single_normy=GetParameterFromComponent(resname,TString(resname)+"_Norm");
+      RooAbsReal* total=this->createIntegral(fitted_values[0],fitted_values[0],"sigintegration_bounds");
+
+      for(uint i=0;i<res.size();i++)
+    {
+      RooRealVar* normy=GetParameterFromComponent(res[i]->GetName(),TString(res[i]->GetName())+"_Norm");
+      normy->setVal(saved_normies[i]);
+    }
+
+      return (single_normy->getVal()/Normy_SUM)*total->getVal();
+
+  }
+ 
 /*
  Double_t LineShape_Library::analyticalIntegral(Int_t code, const char* rangeName) const
 {

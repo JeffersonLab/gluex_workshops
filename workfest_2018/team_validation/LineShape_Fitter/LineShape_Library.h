@@ -28,7 +28,7 @@ public:
   LineShape_Library() {} ; 
   LineShape_Library(const char *name, const char *title,RooArgList& _values, std::vector<RooArgList*> _res, Particle_t Dau1, Particle_t Dau2);
   LineShape_Library(const char *name, const char *title,RooArgList& _values, Particle_t Dau1, Particle_t Dau2);
-  LineShape_Library(const LineShape_Library& other, const char* name=0) ;
+  LineShape_Library(const LineShape_Library& other, const char* name=0);
   virtual TObject* clone(const char* newname) const { return new LineShape_Library(*this,newname); }
   inline virtual ~LineShape_Library() { }
 
@@ -42,7 +42,12 @@ public:
 
   void CreateComponent(TString name,int shape,double size,double L, double mass, double width,bool isNorm);
 
+  RooListProxy* GetComponent(TString name);
+  RooRealVar* GetParameter(RooListProxy* resonance, TString name);
+  RooRealVar* GetParameterFromComponent(TString compname,TString paramname);
 
+  void ReplaceResList(std::vector<RooListProxy*> newres);
+  double GetIntegral(TString resname, double int_min, double int_max);
 
 
 

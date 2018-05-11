@@ -57,7 +57,7 @@ RooArgList* A_Particle=new RooArgList(*A_Particle_Shape,*A_Particle_Norm,*A_Part
   A_Particle->add(phase1);
 
 //---------------------------------------------------------------------------------------------------------
-  RooRealVar* A2_Particle_Norm=new RooRealVar("_Norm","_Norm",1);
+  RooRealVar* A2_Particle_Norm=new RooRealVar("_Norm","_Norm",5);
   RooRealVar* A2_Particle_Shape=new RooRealVar("_Shape","_Shape",BREITWIGNER);
   RooRealVar* A2_Particle_Size=new RooRealVar("_Size","Size",5.3);
   RooRealVar* A2_Particle_L=new RooRealVar("_L","L",1);
@@ -69,7 +69,7 @@ RooArgList* A_Particle=new RooArgList(*A_Particle_Shape,*A_Particle_Norm,*A_Part
   RooRealVar width2("width", "width", .2,0,10);//from example fit?
   width.setError(1);
 
-  RooRealVar phase2("phase2", "phase2", TMath::Pi(),-TMath::Pi(),TMath::Pi());//from example fit?
+  RooRealVar phase2("phase2", "phase2", 0,-TMath::Pi(),TMath::Pi());//from example fit?
   width.setError(1);
 
   RooArgList* A2_Particle=new RooArgList(*A2_Particle_Shape,*A2_Particle_Norm,*A2_Particle_Size,*A2_Particle_L);
@@ -136,6 +136,7 @@ RooArgList* A_Particle=new RooArgList(*A_Particle_Shape,*A_Particle_Norm,*A_Part
 LineShape_Library sig("sig", "sig", BValues,PiPlus,PiMinus);
   
   sig.CreateComponent("rho",BREITWIGNER,5.3,1, .77, .15,true);
+  //sig.CreateComponent("omega",POLYNOMIAL,2,false);
   sig.CreateComponent("omega",BREITWIGNER,5.3,1, 1.1, .2,false);
   
 
@@ -146,14 +147,17 @@ LineShape_Library sig("sig", "sig", BValues,PiPlus,PiMinus);
   RooAddPdf model_new("model_new", "G+poly", RooArgList(sig), RooArgList(nevents));
 
 
+  model_new.fitTo(DATA,RooFit::Extended(),RooFit::SumW2Error(kFALSE));
+  double omega_yield=nevents.getVal()*sig.GetIntegral("omega");
+  double rho_yield=nevents.getVal()*sig.GetIntegral("rho");
+  std::cout<<"yield: "<<omega_yield<<endl;
+  std::cout<<"yield: "<<rho_yield<<endl;
+  std::cout<<"sum: "<<omega_yield+rho_yield<<endl;
+  std::cout<<"ratio: "<<rho_yield/omega_yield<<endl;
+
+
   RooPlot * frame_KKMass = x.frame(rangeMin,rangeMax,100);
   DATA.plotOn(frame_KKMass); 
-
-
-
-
-  model_new.fitTo(DATA,RooFit::Extended(),RooFit::SumW2Error(kFALSE));
-
 
   
   model_new.plotOn(frame_KKMass,RooFit::Components(sig),RooFit::LineColor(kRed));//,RooFit::Weight(y.getVal());
