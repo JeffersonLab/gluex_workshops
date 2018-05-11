@@ -2,8 +2,9 @@
 
 ##########################################################################################################################
 #
-# 2015/07/24 Paul Mattione
-# Heavily based off of work by Kei Moriya at:
+# 2018/05/11 Justin Stevens
+# Heavily based off of work by Paul Mattione and Kei Moriya at:
+# https://halldsvn.jlab.org/repos/trunk/home/pmatt/jobs/analysis/swif_gluex_analysis.py
 # https://halldsvn.jlab.org/repos/trunk/scripts/monitoring/hdswif/hdswif.py
 #
 # SWIF DOCUMENTATION:
@@ -40,8 +41,8 @@ TRACK      = "analysis"		   # https://scicomp.jlab.org/docs/batch_job_tracks
 
 # RESOURCES
 NCORES     = "8"               # Number of CPU cores
-DISK       = "60GB"            # Max Disk usage
-RAM        = "8000MB"            # Max RAM usage
+DISK       = "10GB"            # Max Disk usage
+RAM        = "10000MB"            # Max RAM usage
 TIMELIMIT  = "300minutes"      # Max walltime
 OS         = "centos7"        # Specify CentOS65 machines
 
@@ -56,10 +57,10 @@ DATA_SOURCE_BASE_DIR  = "/cache/halld/offline_monitoring/"
 # OUTPUT DATA LOCATION
 DATA_OUTPUT_BASE_DIR    = "/volatile/halld/home/%s/workfest/data/"%(os.environ['USER'])   ## CHANGE IF YOU WANT TO
 
-# JOB EXECUTION
-SCRIPTFILE        = "/work/halld2/home/jrsteven/workfest/batch/script.sh"
-ENVFILE           = "/work/halld2/home/jrsteven/workfest/setup.csh"
-CONFIG_FILE_PATH  = "/work/halld2/home/jrsteven/workfest/builds/gluex_workshops/workfest_2018/analysis_workfest.conf"
+# JOB EXECUTION (SET WITH YOUR OWN PATH)
+SCRIPTFILE        = "/work/halld2/home/%s/workfest/builds/gluex_workshops/workfest_2018/batch/script.csh"
+ENVFILE           = "/work/halld2/home/%s/workfest/builds/gluex_workshops/workfest_2018/setup.csh"
+CONFIG_FILE_PATH  = "/work/halld2/home/%s/workfest/builds/gluex_workshops/workfest_2018/analysis_workfest.conf"
 TREE_NAMES        = "eta__eta_gg__M17_B4,eta__eta_pi0pi0pi0__M17_B4,eta__eta_pi0pi0pi0__M17_M7_B4,etapr__etapr_pi0pi0eta__eta_gg__M35_B4,etapr__etapr_pi0pi0eta__eta_gg__M35_M17_B4,etapr__etapr_pimpipeta__eta_gg__M35_B4,etapr__etapr_pimpipeta__eta_gg__M35_M17_B4,etapr__etapr_pimpipg__M35_B4,kmkp__B4,pi0g__B4,pi0g__M7_B4,pi0pimmisspip__U1_B4,pi0pimpip__B4,pi0pimpip__M7_B4,pi0pimpipmissprot__U1_B4,pi0pimpip__pi0_gmissg__U1_B4,pi0pipmisspim__U1_B4,pimmisspip__U1_B4,pimpimpipmisspip__U1_B4,pimpip__B4,pimpipmissprot__U1_B4,pimpippimpipmissprot__U1_B4,pipmisspim__U1_B4,pippimpipmisspim__U1_B4,trackeff"
 
 ####################################################### FIND FILES #######################################################
