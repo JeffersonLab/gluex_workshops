@@ -1,0 +1,5 @@
+# http://www.thegeekstuff.com/2009/06/15-practical-crontab-examples/
+#-----------------------------------------------------------------------------
+# Min    Hour    Day    Month    Weekday    Command
+#-----------------------------------------------------------------------------
+   0      8      */3      *         *       /bin/bash -c /group/halld/Software/scripts/monitoring/recon_test/cron_exec.sh
