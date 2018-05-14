@@ -41,7 +41,10 @@ public:
   double GetSumOfShapesSquared(double m) const;
 
   void CreateComponent(TString name,int shape,double size,double L, double mass, double width,bool isNorm);
+  void AddComponent(RooListProxy* toAdd);
 
+
+  LineShape_Library GetSingleComponent_PDF(TString name);
   RooListProxy* GetComponent(TString name);
   RooRealVar* GetParameter(RooListProxy* resonance, TString name);
   RooRealVar* GetParameterFromComponent(TString compname,TString paramname);
@@ -55,6 +58,8 @@ protected:
 
 std::vector<RooListProxy*> res;
 RooListProxy fitted_values;
+Particle_t dau1;
+Particle_t dau2;
 double mDau1;
 double mDau2;
   

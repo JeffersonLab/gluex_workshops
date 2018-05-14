@@ -56,7 +56,8 @@ TIterator* coefIter = _values.createIterator();
     counter++;
     
   }
-
+  dau1=Dau1;
+  dau2=Dau2;
   mDau1=ParticleMass(Dau1);
   mDau2=ParticleMass(Dau2);
   delete coefIter;
@@ -75,6 +76,8 @@ TIterator* coefIter = _values.createIterator();
     }
     fitted_values.add(*coef);    
   }
+  dau1=Dau1;
+  dau2=Dau2;
   mDau1=ParticleMass(Dau1);
   mDau2=ParticleMass(Dau2);
  }
@@ -86,6 +89,8 @@ TIterator* coefIter = _values.createIterator();
  { 
 fitted_values=other.fitted_values;   
 res=other.res; 
+dau1=other.dau1;
+dau2=other.dau2;
 mDau1=other.mDau1;
 mDau2=other.mDau2;  
  } 
@@ -138,7 +143,7 @@ mDau2=other.mDau2;
       if(norm<0)
         norm=0;
 
-      TComplex exp_phase(cos(rel_phase),sin(rel_phase));
+      TComplex exp_phase(-1*cos(rel_phase),sin(rel_phase));
       sumsq+=sqrt(norm)*R(m, fitted_mass, fitted_width, q, q0, res_L, res_size)*exp_phase;
       //sumsq=BW(m, m0_rho, gamma0, q, q0, 1, size);
     }
@@ -146,6 +151,7 @@ mDau2=other.mDau2;
 
    return sumsq.Rho2()+incoherent_sum;
  }
+ 
 
  double LineShape_Library::Bprime(const int& L,const double& q, const double& q0, const double& d) const
 {
@@ -169,10 +175,16 @@ TComplex LineShape_Library::R(const double& m, const double& m0, const double& g
   
   //TComplex BWTerm = BW(m,m0,gamma0,q,q0,LKs,d);
   //std::cout<<"Computing term: "<<BPrime1<<" | "<<pow1<<" | "<<BW(m,m0,gamma0,q,q0,LKs,d).Rho()<<std::endl;
-  TComplex Rnum=BPrime1*pow1*BW(m,m0,gamma0,q,q0,LKs,d);
+  TComplex Rnum=BPrime1*pow1*BWJackson(m,m0,gamma0,q,q0,LKs,d);
   return Rnum;
 }
-
+/*TComplex RooAllAmplitude::BWJackson(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& L, const double& d) const
+{
+  double gamma = Gamma(m,gamma0,q,q0,L,m0,d);
+  TComplex num(m0*gamma,0);
+  TComplex denom((m0+m)*(m0-m),-m0*gamma);
+  return (num/denom);  
+}*/
 TComplex LineShape_Library::BW(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& L, const double& d) const
 {
   
@@ -193,7 +205,7 @@ void LineShape_Library::CreateComponent(TString name,int shape,double size,doubl
    RooRealVar* A_Particle_Norm=new RooRealVar(name+"_Norm",name+"_Norm",1);
           A_Particle_Norm->setError(.1);
           A_Particle_Norm->setMin(0);
-          A_Particle_Norm->setMax(1E7);
+          A_Particle_Norm->setMax(1E4);
           A_Particle_Norm->setConstant(false);
           if(isNorm)
           {
@@ -271,7 +283,10 @@ void LineShape_Library::CreateComponent(TString name,int shape,double size,doubl
     res.push_back(tempProxy);
 
 }
-
+void LineShape_Library::AddComponent(RooListProxy* toAdd)
+{
+  this->res.push_back(toAdd);
+}
 RooListProxy* LineShape_Library::GetComponent(TString name)
 {
   for(uint i=0; i<res.size();i++)
@@ -354,6 +369,24 @@ double LineShape_Library::GetIntegral(TString resname,double int_min=0, double i
 
   }
  
+
+ LineShape_Library LineShape_Library::GetSingleComponent_PDF(TString name)
+ {
+  LineShape_Library tempComp("tempsig", "tempsig", this->fitted_values,this->dau1,this->dau2);
+  //cout<<"old component: "<<this->GetComponent(name)<<endl;
+  RooListProxy* tempProxy = new RooListProxy(*this->GetComponent(name));
+  tempProxy->setName(name);
+  //cout<<"new size: "<<tempProxy->getSize()<<endl;
+  //cout<<"ex. name: "<<tempProxy->at(0)->GetName()<<endl;
+  tempComp.AddComponent(tempProxy);
+  //std::cout<<tempComp.GetComponent(name)<<std::endl;
+  //cout<<((RooRealVar* )tempComp.GetParameterFromComponent(name,TString(name)+"_Norm"))->getVal()<<std::endl;
+  
+  //tempComp.Norm(((RooRealVar* )tempComp.GetParameterFromComponent(name,TString(name)+"_Norm"))->getVal());
+  //cout<<"Norm is: "<<tempComp.getNorm()<<endl;
+  return tempComp;
+  
+ }
 /*
  Double_t LineShape_Library::analyticalIntegral(Int_t code, const char* rangeName) const
 {
