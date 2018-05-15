@@ -6,8 +6,8 @@ Setup_Script()
 {
 	# PWD, STATUS OF MOUNTED DISKS
 	echo "pwd =" $PWD
-	echo "df -h:"
-	df -h
+	#echo "df -h:"
+	#df -h
 
 	# ENVIRONMENT
 	source $ENVIRONMENT
@@ -16,14 +16,17 @@ Setup_Script()
 	perl -e "print qq(@INC)"
 	echo ""
 
-	# COPY INPUT FILE TO WORKING DIRECTORY
-	# This step is necessary since the cache files will be created as soft links in the current directory, and we want to avoid large I/O processes.
-	# We first copy the input file to the current directory, then remove the link.
-	echo "LOCAL FILES PRIOR TO INPUT COPY"
-	ls -l
-	cp $INPUTFILE ./tmp_file
-	rm -f $INPUTFILE
-	mv tmp_file $INPUTFILE
+    if [ "$INTERACTIVE" -ne "1" ]; then
+	    # COPY INPUT FILE TO WORKING DIRECTORY
+	    # This step is necessary since the cache files will be created as soft links in the current directory, and we want to avoid large I/O processes.
+	    # We first copy the input file to the current directory, then remove the link.
+	    echo "LOCAL FILES PRIOR TO INPUT COPY"
+	    ls -l
+	    cp $INPUTFILE ./tmp_file
+	    rm -f $INPUTFILE
+	    mv tmp_file $INPUTFILE
+    fi
+
 	echo "LOCAL FILES AFTER INPUT COPY"
 	ls -l
 }
@@ -37,7 +40,9 @@ Save_OutputFiles()
 	ls -l
 
 	# REMOVE INPUT FILE: so that it's easier to determine which remaining files are skims
-	rm -f $INPUTFILE
+    if [ "$INTERACTIVE" -ne "1" ]; then
+	    rm -f $INPUTFILE
+    fi
 
 	# BUILD TAPEDIR, IF $OUTDIR_LARGE STARTS WITH "/cache/"
 	# AND CACHE_PIN_DAYS WAS GIVEN AND GREATER THAN 0  && [ "$CACHE_PIN_DAYS" -gt "0" ]
@@ -168,7 +173,11 @@ Create_SQLite()
 Run_Script()
 {
 	Setup_Script
-	Create_SQLite
+    if [ "$INTERACTIVE" -eq "1" ]; then
+        export JANA_CALIB_URL=mysql://ccdb_user@hallddb.jlab.org/ccdb
+    else
+	    Create_SQLite
+    fi
 
 	# RUN JANA
 	hd_root $INPUTFILE --config=$CONFIG_FILE
@@ -198,6 +207,11 @@ FILE_NUMBER=$7
 CACHE_PIN_DAYS=$8
 WEBDIR_SMALL=$9
 WEBDIR_LARGE=${10}
+INTERACTIVE=${11}
+
+if [ -z $INTERACTIVE ]; then
+    INTERACTIVE=0
+fi
 
 # PRINT INPUTS
 echo "HOSTNAME          = $HOSTNAME"
@@ -211,6 +225,11 @@ echo "FILE_NUMBER       = $FILE_NUMBER"
 echo "CACHE_PIN_DAYS    = $CACHE_PIN_DAYS"
 echo "WEBDIR_SMALL      = $WEBDIR_SMALL"
 echo "WEBDIR_LARGE      = $WEBDIR_LARGE"
+echo "INTERACTIVE       = $INTERACTIVE"
+
+if [ "$INTERACTIVE" -ne "1" ]; then
+    exit 0
+fi
 
 # RUN
 Run_Script
