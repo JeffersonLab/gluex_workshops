@@ -147,6 +147,28 @@ mDau2=other.mDau2;
       sumsq+=sqrt(norm)*R(m, fitted_mass, fitted_width, q, q0, res_L, res_size)*exp_phase;
       //sumsq=BW(m, m0_rho, gamma0, q, q0, 1, size);
     }
+    else if(((RooAbsReal&) ((*res[i])[RESSHAPE])).getVal()==JBREITWIGNER)
+    {
+      
+      double res_size= ((RooAbsReal&) ((*res[i])[RESSIZE])).getVal();
+      double res_L= ((RooAbsReal&) ((*res[i])[RESL])).getVal();
+      double fitted_mass= ((RooAbsReal&) ((*res[i])[RESMASS])).getVal();
+      double fitted_width= ((RooAbsReal&) ((*res[i])[RESWIDTH])).getVal();
+      double rel_phase=((RooAbsReal&) ((*res[i])[RESRELPHASE])).getVal();
+
+
+      //double q=sqrt(std::max(m*m-4*m0_pi*m0_pi,.0001))/2;
+      //double q0=sqrt(fitted_mass*fitted_mass-4*m0_pi*m0_pi)/2;
+      double q  = 0.5*sqrt( std::max((m+mDau1+mDau2)*(m+mDau1-mDau2)*(m-mDau1+mDau2)*(m-mDau1-mDau2),.0001))/m;
+      double q0= 0.5*sqrt( std::max((fitted_mass+mDau1+mDau2)*(fitted_mass+mDau1-mDau2)*(fitted_mass-mDau1+mDau2)*(fitted_mass-mDau1-mDau2),.0001))/fitted_mass;
+
+      if(norm<0)
+        norm=0;
+
+      TComplex exp_phase(-1*cos(rel_phase),sin(rel_phase));
+      sumsq+=sqrt(norm)*RJackson(m, fitted_mass, fitted_width, q, q0, res_L, res_size)*exp_phase;
+      //sumsq=BW(m, m0_rho, gamma0, q, q0, 1, size);
+    }
   }
 
    return sumsq.Rho2()+incoherent_sum;
@@ -175,16 +197,26 @@ TComplex LineShape_Library::R(const double& m, const double& m0, const double& g
   
   //TComplex BWTerm = BW(m,m0,gamma0,q,q0,LKs,d);
   //std::cout<<"Computing term: "<<BPrime1<<" | "<<pow1<<" | "<<BW(m,m0,gamma0,q,q0,LKs,d).Rho()<<std::endl;
-  TComplex Rnum=BPrime1*pow1*BWJackson(m,m0,gamma0,q,q0,LKs,d);
+  TComplex Rnum=BPrime1*pow1*BW(m,m0,gamma0,q,q0,LKs,d);
   return Rnum;
 }
-/*TComplex RooAllAmplitude::BWJackson(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& L, const double& d) const
+TComplex LineShape_Library::RJackson(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& LKs, const double& d) const
+{
+  //std::cout<<"q0: "<<q0<<" q: "<<q<<" LKS: "<<LKs<<std::endl;
+  double q_term=1/(q*q);
+  
+  //TComplex BWTerm = BW(m,m0,gamma0,q,q0,LKs,d);
+  //std::cout<<"Computing term: "<<BPrime1<<" | "<<pow1<<" | "<<BW(m,m0,gamma0,q,q0,LKs,d).Rho()<<std::endl;
+  TComplex Rnum=q_term*BWJackson(m,m0,gamma0,q,q0,LKs,d);
+  return Rnum;
+}
+TComplex LineShape_Library::BWJackson(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& L, const double& d) const
 {
   double gamma = Gamma(m,gamma0,q,q0,L,m0,d);
-  TComplex num(m0*gamma,0);
-  TComplex denom((m0+m)*(m0-m),-m0*gamma);
+  TComplex num(m*gamma,0);
+  TComplex denom((m0+m)*(m0-m),-m*gamma);
   return (num/denom);  
-}*/
+}
 TComplex LineShape_Library::BW(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& L, const double& d) const
 {
   
@@ -229,7 +261,7 @@ void LineShape_Library::CreateComponent(TString name,int shape,double size,doubl
                              A_Particle->add(*A_Particle_coef);
                         } break;
 
-    case 1:
+    case BREITWIGNER: case JBREITWIGNER:
 
           
 

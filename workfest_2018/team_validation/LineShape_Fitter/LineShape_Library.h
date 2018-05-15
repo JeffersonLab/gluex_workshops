@@ -20,7 +20,7 @@
 #include "RooRealVar.h"
 #include "particleType.h"
  
-enum {POLYNOMIAL=0, BREITWIGNER};
+enum {POLYNOMIAL=0, BREITWIGNER, JBREITWIGNER};
 enum {RESSHAPE=0,RESNORM,RESSIZE,RESL,RESMASS,RESWIDTH,RESRELPHASE,PARAM_START};
 
 class LineShape_Library : public RooAbsPdf {
@@ -35,8 +35,12 @@ public:
   //virtual Int_t getAnalyticalIntegral( RooArgSet& allVars,  RooArgSet& analVars, const char* rangeName=0 ) const;
   //virtual Double_t analyticalIntegral( Int_t code, const char* rangeName=0 ) const;
   double Bprime(const int& L,const double& q, const double& q0, const double& d) const;
+  
   TComplex R(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& LKs, const double& d) const;
   TComplex BW(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& L, const double& d) const;
+  TComplex RJackson(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& LKs, const double& d) const;
+  TComplex BWJackson(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& L, const double& d) const;
+  
   double Gamma(const double& m, const double& gamma0, const double& q, const double& q0, const int& L, const double& m0, const double& d) const;
   double GetSumOfShapesSquared(double m) const;
 
