@@ -92,7 +92,18 @@ Int_t MakeDeltappHists(TString str_infile, TString str_outfile) {
 	TH1F* h_massdist_outoftime = new TH1F("h_massdist_outoftime","Pi^{+} Proton Mass Spectrum",NBINS_INVMASS,1.,4.5);
 	TH1F* h_massdist_accidsub = new TH1F("h_massdist_accidsub","Pi^{+} Proton Mass Spectrum",NBINS_INVMASS,1.,4.5);
 
+    TH2F* h_proton_p_theta_intime = new TH2F("h_proton_p_theta_intime","Proton Momentum v. Theta; #theta (degress); p (GeV/c)", 70, 0, 140, 50, 0, 10);
+    TH2F* h_proton_p_theta_outoftime = new TH2F("h_proton_p_theta_outoftime","Proton Momentum v. Theta; #theta (degress); p (GeV/c)", 70, 0, 140, 50, 0, 10);
+    TH2F* h_proton_p_theta_accidsub = new TH2F("h_proton_p_theta_accidsub","Proton Momentum v. Theta; #theta (degress); p (GeV/c)", 70, 0, 140, 50, 0, 10);
+
+    TH2F* h_pip_p_theta_intime = new TH2F("h_pip_p_theta_intime","Pi^{+} Momentum v. Theta; #theta (degress); p (GeV/c)", 70, 0, 140, 50, 0, 10);
+    TH2F* h_pip_p_theta_outoftime = new TH2F("h_pip_p_theta_outoftime","Pi^{+} Momentum v. Theta; #theta (degress); p (GeV/c)", 70, 0, 140, 50, 0, 10);
+    TH2F* h_pip_p_theta_accidsub = new TH2F("h_pip_p_theta_accidsub","Pi^{+} Momentum v. Theta; #theta (degress); p (GeV/c)", 70, 0, 140, 50, 0, 10);
 	
+    TH2F* h_pim_p_theta_intime = new TH2F("h_pim_p_theta_intime","Pi^{-} Momentum v. Theta; #theta (degress); p (GeV/c)", 70, 0, 140, 50, 0, 10);
+    TH2F* h_pim_p_theta_outoftime = new TH2F("h_pim_p_theta_outoftime","Pi^{-} Momentum v. Theta; #theta (degress); p (GeV/c)", 70, 0, 140, 50, 0, 10);
+    TH2F* h_pim_p_theta_accidsub = new TH2F("h_pim_p_theta_accidsub","Pi^{-} Momentum v. Theta; #theta (degress); p (GeV/c)", 70, 0, 140, 50, 0, 10);
+
 	
 	Long64_t nentries = t_in->GetEntries();
 	cout << "Number of entries to get through: " << nentries << endl;
@@ -113,9 +124,19 @@ Int_t MakeDeltappHists(TString str_infile, TString str_outfile) {
 	
 		if(fabs(rf_deltaT)<RF_PERIOD*0.5) {
 			h_massdist_intime->Fill(pipl_proton_mass);
+            if(pipl_proton_mass < 1.3) {
+                h_proton_p_theta_intime->Fill(p4_Proton.Vect().Theta()*180./TMath::Pi(), p4_Proton.Vect().Mag());
+                h_pip_p_theta_intime->Fill(p4_PiPlus.Vect().Theta()*180./TMath::Pi(), p4_PiPlus.Vect().Mag());
+                h_pim_p_theta_intime->Fill(p4_PiMinus.Vect().Theta()*180./TMath::Pi(), p4_PiMinus.Vect().Mag());
+            }
 		}
 		if(fabs(rf_deltaT)>RF_PERIOD*0.5) {
 			h_massdist_outoftime->Fill(pipl_proton_mass);
+            if(pipl_proton_mass < 1.3) {
+                h_proton_p_theta_outoftime->Fill(p4_Proton.Vect().Theta()*180./TMath::Pi(), p4_Proton.Vect().Mag());
+                h_pip_p_theta_outoftime->Fill(p4_PiPlus.Vect().Theta()*180./TMath::Pi(), p4_PiPlus.Vect().Mag());
+                h_pim_p_theta_outoftime->Fill(p4_PiMinus.Vect().Theta()*180./TMath::Pi(), p4_PiMinus.Vect().Mag());
+            }
 		}
 	
 	}
@@ -130,11 +151,30 @@ Int_t MakeDeltappHists(TString str_infile, TString str_outfile) {
 	h_massdist_accidsub->GetXaxis()->SetTitle("#pi^{+} proton inv. mass (GeV)");
 	h_massdist_accidsub->GetYaxis()->SetTitle("Counts");
 	
+    h_proton_p_theta_intime->Sumw2();
+    h_proton_p_theta_outoftime->Sumw2();
+    h_proton_p_theta_accidsub->Add(h_proton_p_theta_intime,h_proton_p_theta_outoftime,1,-1.*Delta_t_scalefactor);
+    h_pip_p_theta_intime->Sumw2();
+    h_pip_p_theta_outoftime->Sumw2();
+    h_pip_p_theta_accidsub->Add(h_pip_p_theta_intime,h_pip_p_theta_outoftime,1,-1.*Delta_t_scalefactor);
+    h_pim_p_theta_intime->Sumw2();
+    h_pim_p_theta_outoftime->Sumw2();
+    h_pim_p_theta_accidsub->Add(h_pim_p_theta_intime,h_pim_p_theta_outoftime,1,-1.*Delta_t_scalefactor);
+
 	TFile* outfile = new TFile( str_outfile, "RECREATE" );
 	outfile->cd();
 	h_massdist_intime->Write();
 	h_massdist_outoftime->Write();
 	h_massdist_accidsub->Write();
+    h_proton_p_theta_intime->Write();
+    h_proton_p_theta_outoftime->Write();
+    h_proton_p_theta_accidsub->Write();
+    h_pip_p_theta_intime->Write();
+    h_pip_p_theta_outoftime->Write();
+    h_pip_p_theta_accidsub->Write();
+    h_pim_p_theta_intime->Write();
+    h_pim_p_theta_outoftime->Write();
+    h_pim_p_theta_accidsub->Write();
 	outfile->Close();
 	
 	cout << "Done with histogram generation" << endl;
@@ -471,6 +511,7 @@ vector<Double_t> GetBWYieldPlusPoly(TH1F* hist,TString fname="",Int_t POLY_ORDER
 Int_t FitInvHist(TString str_infile, TString png_out_tag) {
 
 	TFile* f_in = new TFile(str_infile);	
+    
 
 	vector<Double_t> fit_results = GetBWYieldPlusPoly((TH1F*)f_in->Get("h_massdist_accidsub"),png_out_tag,POLY_ORDER);	
 	cout << "Yield of total histogram: " << fit_results[0] << " +/- " << fit_results[1] << " with chi2/ndf: " << fit_results[2] << endl;
@@ -478,6 +519,23 @@ Int_t FitInvHist(TString str_infile, TString png_out_tag) {
     ofstream outf("data.txt");
     outf <<  fit_results[0] << endl;
     outf.close();
+
+
+	TCanvas* c1 = new TCanvas ("c1","c1",800,600);
+    TH1F *h_proton_p_theta_accidsub = (TH1F*)f_in->Get("h_proton_p_theta_accidsub");
+    TH1F *h_pip_p_theta_accidsub = (TH1F*)f_in->Get("h_pip_p_theta_accidsub");
+    TH1F *h_pim_p_theta_accidsub = (TH1F*)f_in->Get("h_pim_p_theta_accidsub");
+
+    h_proton_p_theta_accidsub->Rebin2D();
+    h_proton_p_theta_accidsub->Draw("COLZ");
+    c1->Print("deltapi_proton_p_theta.png");
+    h_pip_p_theta_accidsub->Rebin2D();
+    h_pip_p_theta_accidsub->Draw("COLZ");
+    c1->Print("deltapi_pip_p_theta.png");
+    h_pim_p_theta_accidsub->Rebin2D();
+    h_pim_p_theta_accidsub->Draw("COLZ");
+    c1->Print("deltapi_pim_p_theta.png");
+    delete c1;
 	
 	return 0;
 }
