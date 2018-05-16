@@ -21,19 +21,24 @@ void genData(){
   double g=2;
   double val;
   
-  RooRealVar x("x","mass",rangeMin,rangeMax,"GeV");
+  RooRealVar x("m","mass",rangeMin,rangeMax,"GeV");
   RooRealVar y("y","",0,1000000);
-  RooDataSet DATA("test_data","test_data",RooArgSet(x)); 
+  //RooDataSet DATA("test_data","test_data",RooArgSet(x)); 
 
 
   RooArgList BValues;
   BValues.add(x);
  //tt->SetBranchAddress("PipPim_FM_combos", &KpKm_Mass_combos, &b_KpKm_Mass_combos);
 
+    TFile f("FullSet.root") ;
+    f.cd();
+
+  RooDataSet* DATA=((RooDataSet*) gDirectory->Get("MassData"));
+
 
     //RooRealVar KpKm("KpKm_MM_combos","KK_mass",KpKm_Mass_combos[combo]);
     //RooDataSet* data_KKMass = new RooDataSet("KK_mass","KK_mass",RooArgSet(*KKMass,*cut_binning,*Weight,*KinFit_CL));   
-  int count=0;
+ /* int count=0;
 
   LineShape_Library testsig("testsig", "testsig", BValues,PiPlus,PiMinus);
 
@@ -42,23 +47,23 @@ void genData(){
   //sig.CreateComponent("omega",POLYNOMIAL,2,false);
   testsig.CreateComponent("omega",JBREITWIGNER,5.3,1, 1.1, .2,false);
   
-  testsig.GetParameterFromComponent("omega","omega_Mass")->setVal(1.3);
-  testsig.GetParameterFromComponent("omega","omega_Mass")->setConstant(true);
+  testsig.GetParameterFromComponent("omega","Mass")->setVal(1.3);
+  testsig.GetParameterFromComponent("omega","Mass")->setConstant(true);
 
-  testsig.GetParameterFromComponent("omega","omega_Norm")->setVal(5);
-  testsig.GetParameterFromComponent("omega","omega_Norm")->setConstant(true);
+  testsig.GetParameterFromComponent("omega","Norm")->setVal(5);
+  testsig.GetParameterFromComponent("omega","Norm")->setConstant(true);
 
-  testsig.GetParameterFromComponent("omega","omega_Width")->setVal(.5);
-  testsig.GetParameterFromComponent("omega","omega_Width")->setConstant(true);
+  testsig.GetParameterFromComponent("omega","Width")->setVal(.5);
+  testsig.GetParameterFromComponent("omega","Width")->setConstant(true);
 
-  testsig.GetParameterFromComponent("omega","omega_RelativePhase")->setVal(TMath::Pi());
-  testsig.GetParameterFromComponent("omega","omega_RelativePhase")->setConstant(true);
+  testsig.GetParameterFromComponent("omega","RelativePhase")->setVal(TMath::Pi());
+  testsig.GetParameterFromComponent("omega","RelativePhase")->setConstant(true);
 
-  testsig.GetParameterFromComponent("rho","rho_Mass")->setVal(.77);
-  testsig.GetParameterFromComponent("rho","rho_Mass")->setConstant(true);
+  testsig.GetParameterFromComponent("rho","Mass")->setVal(.77);
+  testsig.GetParameterFromComponent("rho","Mass")->setConstant(true);
 
-  testsig.GetParameterFromComponent("rho","rho_Width")->setVal(.15);
-  testsig.GetParameterFromComponent("rho","rho_Width")->setConstant(true);
+  testsig.GetParameterFromComponent("rho","Width")->setVal(.15);
+  testsig.GetParameterFromComponent("rho","Width")->setConstant(true);
 
 
 
@@ -115,26 +120,34 @@ void genData(){
   hist->Draw("HISTP");
   
   hist->SaveAs("inputInterference.C");
+*/
+
+char ecut[80];
+  sprintf(ecut,"E>%f && E<%f",8.,8.2);
+
+  const RooArgSet vars=(*(DATA->get(0)));
+  RooDataSet *subset=new RooDataSet("binned","binned",DATA,vars,
+  				    ecut);
 
 LineShape_Library sig("sig", "sig", BValues,PiPlus,PiMinus);
   
-  sig.CreateComponent("rho",BREITWIGNER,5.3,1, .77, .15,true);
+  sig.CreateComponent("rho",JBREITWIGNER,5.3,1, .77, .15,true);
   //sig.CreateComponent("omega",POLYNOMIAL,2,false);
-  sig.CreateComponent("omega",JBREITWIGNER,5.3,1, 1.1, .2,false);
+  sig.CreateComponent("omega",JBREITWIGNER,5.3,1,.782, .008,false);
   
-  sig.GetParameterFromComponent("omega","omega_Mass")->setVal(1.2);
-  sig.GetParameterFromComponent("omega","omega_Mass")->setConstant(true);
+  /*sig.GetParameterFromComponent("omega","Mass")->setVal(1.2);
+  sig.GetParameterFromComponent("omega","Mass")->setConstant(true);*/
 
-  sig.GetParameterFromComponent("omega","omega_Norm")->setVal(5);
+  sig.GetParameterFromComponent("omega","Norm")->setVal(1);
   //sig.GetParameterFromComponent("omega","omega_Norm")->setConstant(true);
 
-  sig.GetParameterFromComponent("omega","omega_Width")->setVal(.3);
-  sig.GetParameterFromComponent("omega","omega_Width")->setConstant(true);
+  //sig.GetParameterFromComponent("omega","Width")->setVal(.3);
+  //sig.GetParameterFromComponent("omega","Width")->setConstant(true);
 
-  sig.GetParameterFromComponent("rho","rho_Mass")->setVal(.77);
+  sig.GetParameterFromComponent("rho","Mass")->setVal(.77);
   //sig.GetParameterFromComponent("rho","rho_Mass")->setConstant(true);
 
-  sig.GetParameterFromComponent("rho","rho_Width")->setVal(.15);
+  sig.GetParameterFromComponent("rho","Width")->setVal(.15);
   //sig.GetParameterFromComponent("rho","rho_Width")->setConstant(true);
 
 
@@ -144,7 +157,7 @@ LineShape_Library sig("sig", "sig", BValues,PiPlus,PiMinus);
 
   RooAddPdf model_new("model_new", "G+poly", RooArgList(sig), RooArgList(nevents));
 
-  model_new.fitTo(DATA,RooFit::Extended(),RooFit::SumW2Error(kFALSE));
+  model_new.fitTo(*subset,RooFit::Extended(),RooFit::SumW2Error(kFALSE));
   double omega_yield=nevents.getVal()*sig.GetIntegral("omega");
   double rho_yield=nevents.getVal()*sig.GetIntegral("rho");
   std::cout<<"omega yield: "<<omega_yield<<endl;
@@ -153,7 +166,7 @@ LineShape_Library sig("sig", "sig", BValues,PiPlus,PiMinus);
   std::cout<<"ratio: "<<rho_yield/omega_yield<<endl;
 
   RooPlot * frame_KKMass = x.frame(rangeMin,rangeMax,100);
-  DATA.plotOn(frame_KKMass); 
+  DATA->plotOn(frame_KKMass); 
   (sig).plotOn(frame_KKMass,RooFit::LineColor(kBlue));
 
 

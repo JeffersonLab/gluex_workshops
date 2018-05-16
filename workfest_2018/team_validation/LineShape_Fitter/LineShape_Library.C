@@ -342,7 +342,7 @@ RooRealVar* LineShape_Library::GetParameter(RooListProxy* resonance, TString nam
   {
     if(res[i]->GetName() == compname)
     {
-      return ( (RooRealVar*) res[i]->find(paramname)); 
+      return ( (RooRealVar*) res[i]->find(compname+"_"+paramname)); 
     } 
   }
     return 0;
@@ -364,7 +364,7 @@ double LineShape_Library::GetIntegral(TString resname,double int_min=0, double i
     std::vector<double> saved_normies;
     for(uint i=0;i<res.size();i++)
     {
-      RooRealVar* normy=GetParameterFromComponent(res[i]->GetName(),TString(res[i]->GetName())+"_Norm");
+      RooRealVar* normy=GetParameterFromComponent(res[i]->GetName(),"Norm");
       Normy_SUM+=normy->getVal();
 
       saved_normies.push_back(normy->getVal());
@@ -388,12 +388,12 @@ double LineShape_Library::GetIntegral(TString resname,double int_min=0, double i
       {
       depvar->setRange("sigintegration_bounds",int_min,int_max);
       }
-       RooRealVar* single_normy=GetParameterFromComponent(resname,TString(resname)+"_Norm");
+       RooRealVar* single_normy=GetParameterFromComponent(resname,"Norm");
       RooAbsReal* total=this->createIntegral(fitted_values[0],fitted_values[0],"sigintegration_bounds");
 
       for(uint i=0;i<res.size();i++)
     {
-      RooRealVar* normy=GetParameterFromComponent(res[i]->GetName(),TString(res[i]->GetName())+"_Norm");
+      RooRealVar* normy=GetParameterFromComponent(res[i]->GetName(),+"Norm");
       normy->setVal(saved_normies[i]);
     }
 
