@@ -20,7 +20,7 @@
 #include "RooRealVar.h"
 #include "particleType.h"
  
-enum {POLYNOMIAL=0, BREITWIGNER, JBREITWIGNER};
+enum {POLYNOMIAL=0, BREITWIGNER, JBREITWIGNER,NONRESONANT};
 enum {RESSHAPE=0,RESNORM,RESSIZE,RESL,RESMASS,RESWIDTH,RESRELPHASE,PARAM_START};
 
 class LineShape_Library : public RooAbsPdf {
@@ -37,6 +37,7 @@ public:
   double Bprime(const int& L,const double& q, const double& q0, const double& d) const;
   
   TComplex R(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& LKs, const double& d) const;
+  TComplex NR_R(const double& m, const double& fittedm, const double& q, const double& q0, const double& res_L, const double& d, const double& alpha) const;
   TComplex BW(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& L, const double& d) const;
   TComplex RJackson(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& LKs, const double& d) const;
   TComplex BWJackson(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& L, const double& d) const;

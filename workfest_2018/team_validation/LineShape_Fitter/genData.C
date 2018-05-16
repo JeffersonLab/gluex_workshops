@@ -23,7 +23,7 @@ void genData(){
   
   RooRealVar x("m","mass",rangeMin,rangeMax,"GeV");
   RooRealVar y("y","",0,1000000);
-  //RooDataSet DATA("test_data","test_data",RooArgSet(x)); 
+  RooDataSet DATA("test_data","test_data",RooArgSet(x)); 
 
 
   RooArgList BValues;
@@ -33,12 +33,10 @@ void genData(){
     TFile f("FullSet.root") ;
     f.cd();
 
-  RooDataSet* DATA=((RooDataSet*) gDirectory->Get("MassData"));
-
 
     //RooRealVar KpKm("KpKm_MM_combos","KK_mass",KpKm_Mass_combos[combo]);
     //RooDataSet* data_KKMass = new RooDataSet("KK_mass","KK_mass",RooArgSet(*KKMass,*cut_binning,*Weight,*KinFit_CL));   
- /* int count=0;
+  int count=0;
 
   LineShape_Library testsig("testsig", "testsig", BValues,PiPlus,PiMinus);
 
@@ -120,14 +118,7 @@ void genData(){
   hist->Draw("HISTP");
   
   hist->SaveAs("inputInterference.C");
-*/
 
-char ecut[80];
-  sprintf(ecut,"E>%f && E<%f",8.,8.2);
-
-  const RooArgSet vars=(*(DATA->get(0)));
-  RooDataSet *subset=new RooDataSet("binned","binned",DATA,vars,
-  				    ecut);
 
 LineShape_Library sig("sig", "sig", BValues,PiPlus,PiMinus);
   
@@ -157,7 +148,7 @@ LineShape_Library sig("sig", "sig", BValues,PiPlus,PiMinus);
 
   RooAddPdf model_new("model_new", "G+poly", RooArgList(sig), RooArgList(nevents));
 
-  model_new.fitTo(*subset,RooFit::Extended(),RooFit::SumW2Error(kFALSE));
+  model_new.fitTo(DATA,RooFit::Extended(),RooFit::SumW2Error(kFALSE));
   double omega_yield=nevents.getVal()*sig.GetIntegral("omega");
   double rho_yield=nevents.getVal()*sig.GetIntegral("rho");
   std::cout<<"omega yield: "<<omega_yield<<endl;
@@ -166,7 +157,7 @@ LineShape_Library sig("sig", "sig", BValues,PiPlus,PiMinus);
   std::cout<<"ratio: "<<rho_yield/omega_yield<<endl;
 
   RooPlot * frame_KKMass = x.frame(rangeMin,rangeMax,100);
-  DATA->plotOn(frame_KKMass); 
+  DATA.plotOn(frame_KKMass); 
   (sig).plotOn(frame_KKMass,RooFit::LineColor(kBlue));
 
 

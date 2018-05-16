@@ -1,0 +1,31 @@
+#!/bin/tcsh
+
+#Replaces all occurences of a string in filenames (local directory only) and inside text with new string
+
+#sed -i -e 's/[KK_ma\s\s]/_KK_ma\s\s_/g' sWeight_data.C
+#sed -i -e 's/[pol1_ma\s\s]/_pol1_ma\s\s_/g' sWeight_data.C
+#sed -i -e 's/[\sig]/_\sig_/g' sWeight_data.C
+#echo "Done"
+#!/bin/tcsh
+
+#Replaces all occurences of a string in filenames (local directory only) and inside text with new string
+
+set oldstring1 = "\[m\]"
+set newstring1 = "_mass_"
+
+set oldstring2 = "\[pol1_mass\]"
+set newstring2 = "_pol1_mass_"
+
+set oldstring3 = "\[sig\]"
+set newstring3 = "_sig_"
+
+perl -p -i -e "s/${oldstring1}/${newstring1}/g" ./Fit_out/*.C
+perl -p -i -e "s/${oldstring2}/${newstring2}/g" ./Fit_out/*.C
+perl -p -i -e "s/${oldstring3}/${newstring3}/g" ./Fit_out/*.C
+
+perl -p -i -e "s/${oldstring1}/${newstring1}/g" ./rootFit_out/*.C
+perl -p -i -e "s/${oldstring2}/${newstring2}/g" ./rootFit_out/*.C
+perl -p -i -e "s/${oldstring3}/${newstring3}/g" ./rootFit_out/*.C
+
+
+echo "Done"

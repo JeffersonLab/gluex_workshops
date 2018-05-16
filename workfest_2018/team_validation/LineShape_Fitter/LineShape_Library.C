@@ -169,6 +169,29 @@ mDau2=other.mDau2;
       sumsq+=sqrt(norm)*RJackson(m, fitted_mass, fitted_width, q, q0, res_L, res_size)*exp_phase;
       //sumsq=BW(m, m0_rho, gamma0, q, q0, 1, size);
     }
+    else if(((RooAbsReal&) ((*res[i])[RESSHAPE])).getVal()==NONRESONANT)
+    {
+      
+      double res_size= ((RooAbsReal&) ((*res[i])[RESSIZE])).getVal();
+      double res_L= ((RooAbsReal&) ((*res[i])[RESL])).getVal();
+      double alpha= ((RooAbsReal&) ((*res[i])[RESMASS])).getVal();
+      double fitted_mass= 1.6;
+      
+      //double rel_phase=((RooAbsReal&) ((*res[i])[RESRELPHASE])).getVal();
+
+
+      //double q=sqrt(std::max(m*m-4*m0_pi*m0_pi,.0001))/2;
+      //double q0=sqrt(fitted_mass*fitted_mass-4*m0_pi*m0_pi)/2;
+      double q  = 0.5*sqrt( std::max((m+mDau1+mDau2)*(m+mDau1-mDau2)*(m-mDau1+mDau2)*(m-mDau1-mDau2),.0001))/m;
+      double q0= 0.5*sqrt( std::max((fitted_mass+mDau1+mDau2)*(fitted_mass+mDau1-mDau2)*(fitted_mass-mDau1+mDau2)*(fitted_mass-mDau1-mDau2),.0001))/fitted_mass;
+
+      if(norm<0)
+        norm=0;
+
+      //TComplex exp_phase(-1*cos(rel_phase),sin(rel_phase));
+     incoherent_sum+=sqrt(norm)*NR_R(m, fitted_mass, q, q0,res_L, res_size,alpha).Re();//*exp_phase;
+      //sumsq=BW(m, m0_rho, gamma0, q, q0, 1, size);
+    }
   }
 
    return sumsq.Rho2()+incoherent_sum;
@@ -198,6 +221,20 @@ TComplex LineShape_Library::R(const double& m, const double& m0, const double& g
   //TComplex BWTerm = BW(m,m0,gamma0,q,q0,LKs,d);
   //std::cout<<"Computing term: "<<BPrime1<<" | "<<pow1<<" | "<<BW(m,m0,gamma0,q,q0,LKs,d).Rho()<<std::endl;
   TComplex Rnum=BPrime1*pow1*BW(m,m0,gamma0,q,q0,LKs,d);
+  return Rnum;
+}
+TComplex LineShape_Library::NR_R(const double& m, const double& fittedm, const double& q, const double& q0, const double& res_L, const double& d, const double& alpha) const
+{
+  double BPrime = Bprime(res_L,q,q0,d);
+  //std::cout<<BPrime1<<"  "<<BPrime2<<std::endl;                                                                                                                                                             
+  //std::cout<<Lchain<<"  "<<q<<"  "<<q0<<"  "<<d<<"  "<<BPrime2<<std::endl;                                                                                                                  
+  //std::cout<<mmChain<<"  "<<mChain<<"  "<<alpha<<std::endl;
+  //std::cout<<pow(mmChain,2)-pow(mChain,2)<<std::endl;
+  //std::cout<<exp(-(pow(mmChain,2)-pow(mChain,2))*alpha )<<std::endl;
+  //std::cout<<"---------------------------------------------------"<<std::endl;
+     
+  TComplex Rnum=pow((q/q0),res_L)*BPrime*exp(-1*fabs(alpha)*(pow(m,2)-pow(1.5,2)));
+
   return Rnum;
 }
 TComplex LineShape_Library::RJackson(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& LKs, const double& d) const
@@ -262,7 +299,7 @@ void LineShape_Library::CreateComponent(TString name,int shape,double size,doubl
                         } break;
 
     case BREITWIGNER: case JBREITWIGNER:
-
+        {
           
 
           RooRealVar* A_Particle_Size=new RooRealVar(name+"_Size",name+"Size",size);
@@ -296,7 +333,24 @@ void LineShape_Library::CreateComponent(TString name,int shape,double size,doubl
           A_Particle->add(*phase);
           
          // res.push_back(A_Particle);
-          break;
+        }break;
+
+          case NONRESONANT: 
+          RooRealVar* A_Particle_Size=new RooRealVar(name+"_Size",name+"Size",size);
+          RooRealVar* A_Particle_L=new RooRealVar(name+"_L",name+"L",L); 
+
+          RooRealVar* A_Particle_alpha=new RooRealVar(name+"_Alpha", name+"_Alpha", mass);//from example fit?
+          A_Particle_alpha->setError(A_Particle_alpha->getVal()/10.);
+          A_Particle_alpha->setMin(-100);
+          A_Particle_alpha->setMax(100);
+          A_Particle_alpha->setConstant(false);
+
+          A_Particle->add(*A_Particle_Size);
+          A_Particle->add(*A_Particle_L);
+          A_Particle->add(*A_Particle_alpha);
+
+            
+            break;
   }
   TIterator* coefIter = A_Particle->createIterator() ;
    RooAbsArg* coef;
