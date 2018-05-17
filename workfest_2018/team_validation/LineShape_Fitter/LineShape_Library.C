@@ -233,7 +233,7 @@ TComplex LineShape_Library::NR_R(const double& m, const double& fittedm, const d
   //std::cout<<exp(-(pow(mmChain,2)-pow(mChain,2))*alpha )<<std::endl;
   //std::cout<<"---------------------------------------------------"<<std::endl;
      
-  TComplex Rnum=pow((q/q0),res_L)*BPrime*exp(-1*fabs(alpha)*(pow(m,2)-pow(1.5,2)));
+  TComplex Rnum=pow((q/q0),2*res_L+1)*BPrime*exp(-1*fabs(alpha)*(pow(m,2)-pow(1.5,2)));
 
   return Rnum;
 }
