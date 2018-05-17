@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://halldweb.jlab.org/dist/version2.xsl"?>
+<gversions file="version_workfest2018_baseline.xml" date="2018-05-10">
+<package name="jana" version="0.7.9p1" dirtag="ccdb166"/>
+<package name="sim-recon" version="workfest2018_baseline"/>
+<package name="hdds" version="workfest2018_baseline"/>
+<package name="cernlib" version="2005" word_length="64-bit"/>
+<package name="xerces-c" version="3.1.4"/>
+<package name="root" version="6.08.06"/>
+<package name="ccdb" version="1.06.06"/>
+<package name="evio" version="4.4.6"/>
+<package name="rcdb" version="0.03"/>
+<package name="geant4" version="10.02.p02"/>
+<package name="hdgeant4" version="1.6.1" dirtag="wf18b"/>
+<package name="hd_utilities" version="1.13"/>
+<package name="gluex_root_analysis" version="workfest2018_baseline"/>
+<package name="amptools" version="0.9.3"/>
+<package name="sqlitecpp" version="2.2.0" dirtag="bs130"/>
+<package name="sqlite" version="3.13.0" year="2016" dirtag="bs130"/>
+</gversions>
