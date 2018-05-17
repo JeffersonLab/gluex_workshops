@@ -136,6 +136,9 @@ void DEventWriterROOT_someTest::Fill_CustomBranches_DataTree(DTreeFillData* locT
     double currentCharge;
     Particle_t currentPID;
     int nChargedParticles,nNeutralParticles;
+
+    
+
    
     //----------------------------------------------------------------------------
     for(int iPC=0;iPC<nParticleCombos;iPC++){
@@ -150,21 +153,21 @@ void DEventWriterROOT_someTest::Fill_CustomBranches_DataTree(DTreeFillData* locT
         const DParticleComboStep* locParticleComboStep = locParticleCombos[iPC]->Get_ParticleComboStep(0);
         const DKinematicData* beamPhoton = locParticleComboStep->Get_InitialParticle_Measured();
         
-        map<DKinFitPullType, double> someBeamMap = getPulls(beamPhoton);
-        
-        //Check for final state particles only:
         if(kfitType == d_P4Fit || kfitType == d_P4AndVertexFit){
-            locTreeFillData->Fill_Array<Double_t>("ComboBeam__Px_Pull", someBeamMap.find(d_PxPull)->second,iPC);
-            locTreeFillData->Fill_Array<Double_t>("ComboBeam__Py_Pull", someBeamMap.find(d_PyPull)->second,iPC);
-            locTreeFillData->Fill_Array<Double_t>("ComboBeam__Pz_Pull", someBeamMap.find(d_PzPull)->second,iPC);
-        }
+          map<DKinFitPullType, double> someBeamMap = getPulls(beamPhoton);
+          locTreeFillData->Fill_Array<Double_t>("ComboBeam__Px_Pull", someBeamMap.find(d_PxPull)->second,iPC);
+          locTreeFillData->Fill_Array<Double_t>("ComboBeam__Py_Pull", someBeamMap.find(d_PyPull)->second,iPC);
+          locTreeFillData->Fill_Array<Double_t>("ComboBeam__Pz_Pull", someBeamMap.find(d_PzPull)->second,iPC); 
+          someBeamMap.clear();
+	    }
         
+        /*  Neutrals do not like vertex-fits yet!!!!!!
         if(kfitType == d_VertexFit || kfitType == d_P4AndVertexFit){
             locTreeFillData->Fill_Array<Double_t>("ComboBeam__Vx_Pull", someBeamMap.find(d_XxPull)->second,iPC);
             locTreeFillData->Fill_Array<Double_t>("ComboBeam__Vy_Pull", someBeamMap.find(d_XyPull)->second,iPC);
             locTreeFillData->Fill_Array<Double_t>("ComboBeam__Vz_Pull", someBeamMap.find(d_XzPull)->second,iPC);
         }
-        someBeamMap.clear();
+        */
         //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         
     
@@ -175,28 +178,32 @@ void DEventWriterROOT_someTest::Fill_CustomBranches_DataTree(DTreeFillData* locT
         
         //----------------------------------------------------------------------------
         for(int iFP=0;iFP<nMeasuredFinalParticles;iFP++){
-            map<DKinFitPullType, double> someMap = getPulls(finalParticlesMeasured.at(iFP));
-            currentCharge = finalParticlesMeasured.at(iFP)->charge();
+			currentCharge = finalParticlesMeasured.at(iFP)->charge();
             currentPID = finalParticlesMeasured.at(iFP)->PID();
             
-            string branchName = assignName(currentPID,assignMap);
-            assignMap[currentPID]--;
-            if(branchName != "nada"){
+            //Neutrals do NOT like the vertex!!!!!!!
+			if(kfitType == d_P4Fit || ((kfitType == d_P4AndVertexFit || kfitType == d_VertexFit) && currentCharge != 0)){
+			
+              map<DKinFitPullType, double> someMap = getPulls(finalParticlesMeasured.at(iFP));
+              string branchName = assignName(currentPID,assignMap);
+              assignMap[currentPID]--;
+              if(branchName != "nada"){
         
-              //Check for final state particles only:
-              if(kfitType == d_P4Fit || kfitType == d_P4AndVertexFit){
-                locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Px_Pull"), someMap.find(d_PxPull)->second,iPC);
-                locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Py_Pull"), someMap.find(d_PyPull)->second,iPC);
-                locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Pz_Pull"), someMap.find(d_PzPull)->second,iPC);
-              }
+                //Check for final state particles only:
+                if(kfitType == d_P4Fit || kfitType == d_P4AndVertexFit){
+                  locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Px_Pull"), someMap.find(d_PxPull)->second,iPC);
+                  locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Py_Pull"), someMap.find(d_PyPull)->second,iPC);
+                  locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Pz_Pull"), someMap.find(d_PzPull)->second,iPC);
+                }
             
-              if((kfitType == d_VertexFit || kfitType == d_P4AndVertexFit) && currentCharge != 0){
-                locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Vx_Pull"), someMap.find(d_XxPull)->second,iPC);
-                locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Vy_Pull"), someMap.find(d_XyPull)->second,iPC);
-                locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Vz_Pull"), someMap.find(d_XzPull)->second,iPC);
+                if(kfitType == d_VertexFit || kfitType == d_P4AndVertexFit){
+                  locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Vx_Pull"), someMap.find(d_XxPull)->second,iPC);
+                  locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Vy_Pull"), someMap.find(d_XyPull)->second,iPC);
+                  locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Vz_Pull"), someMap.find(d_XzPull)->second,iPC);
+                }
               }
-            }
-            someMap.clear();
+              someMap.clear();
+		  }
         }
         //----------------------------------------------------------------------------
         //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -351,7 +358,13 @@ void DEventWriterROOT_someTest::Get_PullsFromFit(const DParticleCombo* particleC
 //===================================================================
 
 map<DKinFitPullType, double> DEventWriterROOT_someTest::getPulls(const DKinematicData* data) const{
-    return myPullsMap.find(data)->second;
+	map<DKinFitPullType, double> myMap;
+	
+    if(data != NULL){
+		myMap = myPullsMap.find(data)->second;
+	}
+	
+	return myMap;
 }
 //*************************************************************************************************************************************
 

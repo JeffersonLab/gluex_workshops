@@ -44,7 +44,7 @@ jerror_t DEventProcessor_ReactionFilter::brun(jana::JEventLoop* locEventLoop, in
 {
 	// This is called whenever the run number changes
 
-	return NOERROR;
+       return NOERROR;
 }
 
 //------------------
