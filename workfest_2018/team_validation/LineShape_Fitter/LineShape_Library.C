@@ -16,7 +16,7 @@
 
 ClassImp(LineShape_Library) 
 
- LineShape_Library::LineShape_Library(const char *name, const char *title, RooArgList& _values, std::vector<RooArgList*> _res, Particle_t Dau1, Particle_t Dau2) :
+ LineShape_Library::LineShape_Library(const char *name, const char *title, RooRealVar* totalNorm, RooArgList& _values, std::vector<RooArgList*> _res, Particle_t Dau1, Particle_t Dau2) :
    RooAbsPdf(name,title),
    fitted_values("fitted_values","fitted_values",this)
  { 
@@ -56,13 +56,15 @@ TIterator* coefIter = _values.createIterator();
     counter++;
     
   }
-
+  dau1=Dau1;
+  dau2=Dau2;
   mDau1=ParticleMass(Dau1);
   mDau2=ParticleMass(Dau2);
+  TotalNorm=totalNorm;
   delete coefIter;
   delete coef;
  } 
-LineShape_Library::LineShape_Library(const char *name, const char *title, RooArgList& _values, Particle_t Dau1, Particle_t Dau2) :
+LineShape_Library::LineShape_Library(const char *name, const char *title, RooRealVar* totalNorm, RooArgList& _values, Particle_t Dau1, Particle_t Dau2) :
    RooAbsPdf(name,title),
    fitted_values("fitted_values","fitted_values",this)
  { 
@@ -75,8 +77,11 @@ TIterator* coefIter = _values.createIterator();
     }
     fitted_values.add(*coef);    
   }
+  dau1=Dau1;
+  dau2=Dau2;
   mDau1=ParticleMass(Dau1);
   mDau2=ParticleMass(Dau2);
+  TotalNorm=totalNorm;
  }
 
  LineShape_Library::LineShape_Library(const LineShape_Library& other, const char* name) :  
@@ -86,8 +91,11 @@ TIterator* coefIter = _values.createIterator();
  { 
 fitted_values=other.fitted_values;   
 res=other.res; 
+dau1=other.dau1;
+dau2=other.dau2;
 mDau1=other.mDau1;
 mDau2=other.mDau2;  
+TotalNorm=other.TotalNorm;
  } 
 
 
@@ -138,14 +146,60 @@ mDau2=other.mDau2;
       if(norm<0)
         norm=0;
 
-      TComplex exp_phase(cos(rel_phase),sin(rel_phase));
+      TComplex exp_phase(-1*cos(rel_phase),sin(rel_phase));
       sumsq+=sqrt(norm)*R(m, fitted_mass, fitted_width, q, q0, res_L, res_size)*exp_phase;
+      //sumsq=BW(m, m0_rho, gamma0, q, q0, 1, size);
+    }
+    else if(((RooAbsReal&) ((*res[i])[RESSHAPE])).getVal()==JBREITWIGNER)
+    {
+      
+      double res_size= ((RooAbsReal&) ((*res[i])[RESSIZE])).getVal();
+      double res_L= ((RooAbsReal&) ((*res[i])[RESL])).getVal();
+      double fitted_mass= ((RooAbsReal&) ((*res[i])[RESMASS])).getVal();
+      double fitted_width= ((RooAbsReal&) ((*res[i])[RESWIDTH])).getVal();
+      double rel_phase=((RooAbsReal&) ((*res[i])[RESRELPHASE])).getVal();
+
+
+      //double q=sqrt(std::max(m*m-4*m0_pi*m0_pi,.0001))/2;
+      //double q0=sqrt(fitted_mass*fitted_mass-4*m0_pi*m0_pi)/2;
+      double q  = 0.5*sqrt( std::max((m+mDau1+mDau2)*(m+mDau1-mDau2)*(m-mDau1+mDau2)*(m-mDau1-mDau2),.0001))/m;
+      double q0= 0.5*sqrt( std::max((fitted_mass+mDau1+mDau2)*(fitted_mass+mDau1-mDau2)*(fitted_mass-mDau1+mDau2)*(fitted_mass-mDau1-mDau2),.0001))/fitted_mass;
+
+      if(norm<0)
+        norm=0;
+
+      TComplex exp_phase(-1*cos(rel_phase),sin(rel_phase));
+      sumsq+=sqrt(norm)*RJackson(m, fitted_mass, fitted_width, q, q0, res_L, res_size)*exp_phase;
+      //sumsq=BW(m, m0_rho, gamma0, q, q0, 1, size);
+    }
+    else if(((RooAbsReal&) ((*res[i])[RESSHAPE])).getVal()==NONRESONANT)
+    {
+      
+      double res_size= ((RooAbsReal&) ((*res[i])[RESSIZE])).getVal();
+      double res_L= ((RooAbsReal&) ((*res[i])[RESL])).getVal();
+      double alpha= ((RooAbsReal&) ((*res[i])[RESMASS])).getVal();
+      double fitted_mass= 1.6;
+      
+      //double rel_phase=((RooAbsReal&) ((*res[i])[RESRELPHASE])).getVal();
+
+
+      //double q=sqrt(std::max(m*m-4*m0_pi*m0_pi,.0001))/2;
+      //double q0=sqrt(fitted_mass*fitted_mass-4*m0_pi*m0_pi)/2;
+      double q  = 0.5*sqrt( std::max((m+mDau1+mDau2)*(m+mDau1-mDau2)*(m-mDau1+mDau2)*(m-mDau1-mDau2),.0001))/m;
+      double q0= 0.5*sqrt( std::max((fitted_mass+mDau1+mDau2)*(fitted_mass+mDau1-mDau2)*(fitted_mass-mDau1+mDau2)*(fitted_mass-mDau1-mDau2),.0001))/fitted_mass;
+
+      if(norm<0)
+        norm=0;
+
+      //TComplex exp_phase(-1*cos(rel_phase),sin(rel_phase));
+     incoherent_sum+=sqrt(norm)*NR_R(m, fitted_mass, q, q0,res_L, res_size,alpha).Re();//*exp_phase;
       //sumsq=BW(m, m0_rho, gamma0, q, q0, 1, size);
     }
   }
 
    return sumsq.Rho2()+incoherent_sum;
  }
+ 
 
  double LineShape_Library::Bprime(const int& L,const double& q, const double& q0, const double& d) const
 {
@@ -172,7 +226,37 @@ TComplex LineShape_Library::R(const double& m, const double& m0, const double& g
   TComplex Rnum=BPrime1*pow1*BW(m,m0,gamma0,q,q0,LKs,d);
   return Rnum;
 }
+TComplex LineShape_Library::NR_R(const double& m, const double& fittedm, const double& q, const double& q0, const double& res_L, const double& d, const double& alpha) const
+{
+  double BPrime = Bprime(res_L,q,q0,d);
+  //std::cout<<BPrime1<<"  "<<BPrime2<<std::endl;                                                                                                                                                             
+  //std::cout<<Lchain<<"  "<<q<<"  "<<q0<<"  "<<d<<"  "<<BPrime2<<std::endl;                                                                                                                  
+  //std::cout<<mmChain<<"  "<<mChain<<"  "<<alpha<<std::endl;
+  //std::cout<<pow(mmChain,2)-pow(mChain,2)<<std::endl;
+  //std::cout<<exp(-(pow(mmChain,2)-pow(mChain,2))*alpha )<<std::endl;
+  //std::cout<<"---------------------------------------------------"<<std::endl;
+     
+  TComplex Rnum=pow((q/q0),2*res_L+1)*BPrime*exp(-1*fabs(alpha)*(pow(m,2)-pow(1.5,2)));
 
+  return Rnum;
+}
+TComplex LineShape_Library::RJackson(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& LKs, const double& d) const
+{
+  //std::cout<<"q0: "<<q0<<" q: "<<q<<" LKS: "<<LKs<<std::endl;
+  double q_term=1/(q*q);
+  
+  //TComplex BWTerm = BW(m,m0,gamma0,q,q0,LKs,d);
+  //std::cout<<"Computing term: "<<BPrime1<<" | "<<pow1<<" | "<<BW(m,m0,gamma0,q,q0,LKs,d).Rho()<<std::endl;
+  TComplex Rnum=q_term*BWJackson(m,m0,gamma0,q,q0,LKs,d);
+  return Rnum;
+}
+TComplex LineShape_Library::BWJackson(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& L, const double& d) const
+{
+  double gamma = Gamma(m,gamma0,q,q0,L,m0,d);
+  TComplex num(m*gamma,0);
+  TComplex denom((m0+m)*(m0-m),-m*gamma);
+  return (num/denom);  
+}
 TComplex LineShape_Library::BW(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& L, const double& d) const
 {
   
@@ -193,7 +277,7 @@ void LineShape_Library::CreateComponent(TString name,int shape,double size,doubl
    RooRealVar* A_Particle_Norm=new RooRealVar(name+"_Norm",name+"_Norm",1);
           A_Particle_Norm->setError(.1);
           A_Particle_Norm->setMin(0);
-          A_Particle_Norm->setMax(1E7);
+          A_Particle_Norm->setMax(1E4);
           A_Particle_Norm->setConstant(false);
           if(isNorm)
           {
@@ -217,8 +301,8 @@ void LineShape_Library::CreateComponent(TString name,int shape,double size,doubl
                              A_Particle->add(*A_Particle_coef);
                         } break;
 
-    case 1:
-
+    case BREITWIGNER: case JBREITWIGNER:
+        {
           
 
           RooRealVar* A_Particle_Size=new RooRealVar(name+"_Size",name+"Size",size);
@@ -252,7 +336,24 @@ void LineShape_Library::CreateComponent(TString name,int shape,double size,doubl
           A_Particle->add(*phase);
           
          // res.push_back(A_Particle);
-          break;
+        }break;
+
+          case NONRESONANT: 
+          RooRealVar* A_Particle_Size=new RooRealVar(name+"_Size",name+"Size",size);
+          RooRealVar* A_Particle_L=new RooRealVar(name+"_L",name+"L",L); 
+
+          RooRealVar* A_Particle_alpha=new RooRealVar(name+"_Alpha", name+"_Alpha", mass);//from example fit?
+          A_Particle_alpha->setError(A_Particle_alpha->getVal()/10.);
+          A_Particle_alpha->setMin(-100);
+          A_Particle_alpha->setMax(100);
+          A_Particle_alpha->setConstant(false);
+
+          A_Particle->add(*A_Particle_Size);
+          A_Particle->add(*A_Particle_L);
+          A_Particle->add(*A_Particle_alpha);
+
+            
+            break;
   }
   TIterator* coefIter = A_Particle->createIterator() ;
    RooAbsArg* coef;
@@ -271,7 +372,10 @@ void LineShape_Library::CreateComponent(TString name,int shape,double size,doubl
     res.push_back(tempProxy);
 
 }
-
+void LineShape_Library::AddComponent(RooListProxy* toAdd)
+{
+  this->res.push_back(toAdd);
+}
 RooListProxy* LineShape_Library::GetComponent(TString name)
 {
   for(uint i=0; i<res.size();i++)
@@ -295,7 +399,7 @@ RooRealVar* LineShape_Library::GetParameter(RooListProxy* resonance, TString nam
   {
     if(res[i]->GetName() == compname)
     {
-      return ( (RooRealVar*) res[i]->find(paramname)); 
+      return ( (RooRealVar*) res[i]->find(compname+"_"+paramname)); 
     } 
   }
     return 0;
@@ -313,12 +417,11 @@ RooRealVar* LineShape_Library::GetParameter(RooListProxy* resonance, TString nam
 
 double LineShape_Library::GetIntegral(TString resname,double int_min=0, double int_max=0)
   {
-    double Normy_SUM=0.0;
+    double denom=DoNumericIntegral(int_min,int_max);
     std::vector<double> saved_normies;
     for(uint i=0;i<res.size();i++)
     {
-      RooRealVar* normy=GetParameterFromComponent(res[i]->GetName(),TString(res[i]->GetName())+"_Norm");
-      Normy_SUM+=normy->getVal();
+      RooRealVar* normy=GetParameterFromComponent(res[i]->GetName(),"Norm");
 
       saved_normies.push_back(normy->getVal());
 
@@ -331,29 +434,70 @@ double LineShape_Library::GetIntegral(TString resname,double int_min=0, double i
       }
     }
 
-     RooRealVar* depvar = ( (RooRealVar*) &fitted_values[0]);
-      if(int_min==int_max)
-      {
-  
-      depvar->setRange("sigintegration_bounds",depvar->getMin(),depvar->getMax());
-     }
-      else
-      {
-      depvar->setRange("sigintegration_bounds",int_min,int_max);
-      }
-       RooRealVar* single_normy=GetParameterFromComponent(resname,TString(resname)+"_Norm");
-      RooAbsReal* total=this->createIntegral(fitted_values[0],fitted_values[0],"sigintegration_bounds");
+    double numerator=DoNumericIntegral(int_min,int_max);
 
       for(uint i=0;i<res.size();i++)
     {
-      RooRealVar* normy=GetParameterFromComponent(res[i]->GetName(),TString(res[i]->GetName())+"_Norm");
+      RooRealVar* normy=GetParameterFromComponent(res[i]->GetName(),+"Norm");
       normy->setVal(saved_normies[i]);
     }
 
-      return (single_normy->getVal()/Normy_SUM)*total->getVal();
+      return numerator/denom;
 
   }
- 
+
+ LineShape_Library LineShape_Library::GetSingleComponent_PDF(TString name)
+ {
+  LineShape_Library tempComp("tempsig", "tempsig", this->TotalNorm,this->fitted_values,this->dau1,this->dau2);
+  //cout<<"old component: "<<this->GetComponent(name)<<endl;
+  RooListProxy* tempProxy = new RooListProxy(*this->GetComponent(name));
+  tempProxy->setName(name);
+  //cout<<"new size: "<<tempProxy->getSize()<<endl;
+  //cout<<"ex. name: "<<tempProxy->at(0)->GetName()<<endl;
+  tempComp.AddComponent(tempProxy);
+  //std::cout<<tempComp.GetComponent(name)<<std::endl;
+  //cout<<((RooRealVar* )tempComp.GetParameterFromComponent(name,TString(name)+"_Norm"))->getVal()<<std::endl;
+  
+  //tempComp.Norm(((RooRealVar* )tempComp.GetParameterFromComponent(name,TString(name)+"_Norm"))->getVal());
+  //cout<<"Norm is: "<<tempComp.getNorm()<<endl;
+  return tempComp;
+  
+ }
+ double LineShape_Library::DoNumericIntegral(double min=0,double max=0)///VERY SIMPLE FOR NOW
+ {
+
+   double sum=-9999999999.;
+
+   double intMin=min;
+   double intMax=max;
+
+  if(intMax==intMin)
+    {
+      intMin=( (RooRealVar*) &fitted_values[0])->getMin();
+      intMax=( (RooRealVar*) &fitted_values[0])->getMax();
+    }
+
+   int bins=50000;
+    double delta=(intMax-intMin)/bins;
+
+    for(int i=0;i<bins;i++)
+    {
+      double leftEdge=intMin+i*delta;
+      double rightEdge=(intMin+delta)+i*delta;
+
+      double val=(rightEdge+leftEdge)/2;
+
+      sum+= delta*GetSumOfShapesSquared(val);
+
+    }
+   
+  return sum;
+
+ }
+ double LineShape_Library::GetYield(TString resname,double int_min=0, double int_max=0)
+ {
+   return this->TotalNorm->getVal()*GetIntegral(resname,int_min,int_max);
+ }
 /*
  Double_t LineShape_Library::analyticalIntegral(Int_t code, const char* rangeName) const
 {
