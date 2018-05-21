@@ -168,7 +168,7 @@ Make_Plots()
 	chmod 644 ${OUTDIR_THIS}/*.png
 
 	# copy html
-	cp $MONITORING_HOME/recon_test/index.html ${OUTDIR_THIS}
+	#cp $MONITORING_HOME/recon_test/index.html ${OUTDIR_THIS}
 }
 
 ########################################################### CCDB SQLITE #########################################################
