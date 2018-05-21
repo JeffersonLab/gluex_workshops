@@ -43,20 +43,22 @@ void FitData()
 
     RooRealVar *m=new RooRealVar("m","",.3,3.,"GeV");
     
-   
+    RooRealVar nevents("nevt", "N_{evt}", 1e3,0,1e8);    
+    nevents.setError(10.0);
+     nevents.setConstant(false);
+
+
     RooArgList BValues;
      BValues.add(*m);
 
-    LineShape_Library sig("sig", "sig", BValues,PiPlus,PiMinus); 
+    LineShape_Library sig("sig", "sig", &nevents, BValues,PiPlus,PiMinus); 
      sig.CreateComponent("rho",JBREITWIGNER,5.3,1, .757, .15,true);
      sig.CreateComponent("omega",JBREITWIGNER,5.3,1, .783, .008,false); 
     sig.CreateComponent("sigma",NONRESONANT,5.3,1, 1);
 
 
   //sig.CreateComponent("bkgd",POLYNOMIAL,2);
-    RooRealVar nevents("nevt", "N_{evt}", 1e3,0,1e8);    
-    nevents.setError(10.0);
-     nevents.setConstant(false);
+    
      RooAddPdf model("model", "G+poly", RooArgList(sig), RooArgList(nevents));
     const RooArgSet vars= *loaded_RooDataSet->get(0);
 
@@ -92,9 +94,9 @@ void FitData()
    //model.paramOn(frame);
     frame->Draw();
 
-    double rho_yield=nevents.getVal()*sig.GetIntegral("rho",.5,1.1);
-    double omega_yield=nevents.getVal()*sig.GetIntegral("omega",.5,1.1);
-    double sigma_yield=nevents.getVal()*sig.GetIntegral("sigma",.5,1.1);
+    double rho_yield=sig.GetYield("rho",.5,1);// nevents.getVal()*sig.GetIntegral("rho",.5,1);
+    double omega_yield=0;//nevents.getVal()*sig.GetIntegral("omega",.5,1.1);
+    double sigma_yield=sig.GetYield("sigma",.5,1);
 
    // sig.GetSingleComponent_PDF("omega").plotOn(frame,RooFit::LineColor(kGreen),RooFit::Normalization(omega_yield,RooAbsReal::NumEvent));
     sig.GetSingleComponent_PDF("rho").plotOn(frame,RooFit::LineColor(kRed),RooFit::Normalization(rho_yield,RooAbsReal::NumEvent));
@@ -122,9 +124,9 @@ void FitData()
    //model.paramOn(frame);
     sbframe->Draw();
 
-    double sbrho_yield=nevents.getVal()*sig.GetIntegral("rho",.5,1.1);
-    double sbomega_yield=nevents.getVal()*sig.GetIntegral("omega");
-    double sbsigma_yield=nevents.getVal()*sig.GetIntegral("sigma",.5,1.1);
+    double sbrho_yield=sig.GetYield("rho",.5,1);
+    double sbomega_yield=0;//nevents.getVal()*sig.GetIntegral("omega");
+    double sbsigma_yield=sig.GetYield("sigma",.5,1);
 
    // sig.GetSingleComponent_PDF("omega").plotOn(frame,RooFit::LineColor(kGreen),RooFit::Normalization(omega_yield,RooAbsReal::NumEvent));
     sig.GetSingleComponent_PDF("rho").plotOn(sbframe,RooFit::LineColor(kRed),RooFit::Normalization(rho_yield,RooAbsReal::NumEvent));

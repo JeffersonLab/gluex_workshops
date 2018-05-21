@@ -16,7 +16,7 @@
 
 ClassImp(LineShape_Library) 
 
- LineShape_Library::LineShape_Library(const char *name, const char *title, RooArgList& _values, std::vector<RooArgList*> _res, Particle_t Dau1, Particle_t Dau2) :
+ LineShape_Library::LineShape_Library(const char *name, const char *title, RooRealVar* totalNorm, RooArgList& _values, std::vector<RooArgList*> _res, Particle_t Dau1, Particle_t Dau2) :
    RooAbsPdf(name,title),
    fitted_values("fitted_values","fitted_values",this)
  { 
@@ -60,10 +60,11 @@ TIterator* coefIter = _values.createIterator();
   dau2=Dau2;
   mDau1=ParticleMass(Dau1);
   mDau2=ParticleMass(Dau2);
+  TotalNorm=totalNorm;
   delete coefIter;
   delete coef;
  } 
-LineShape_Library::LineShape_Library(const char *name, const char *title, RooArgList& _values, Particle_t Dau1, Particle_t Dau2) :
+LineShape_Library::LineShape_Library(const char *name, const char *title, RooRealVar* totalNorm, RooArgList& _values, Particle_t Dau1, Particle_t Dau2) :
    RooAbsPdf(name,title),
    fitted_values("fitted_values","fitted_values",this)
  { 
@@ -80,6 +81,7 @@ TIterator* coefIter = _values.createIterator();
   dau2=Dau2;
   mDau1=ParticleMass(Dau1);
   mDau2=ParticleMass(Dau2);
+  TotalNorm=totalNorm;
  }
 
  LineShape_Library::LineShape_Library(const LineShape_Library& other, const char* name) :  
@@ -93,6 +95,7 @@ dau1=other.dau1;
 dau2=other.dau2;
 mDau1=other.mDau1;
 mDau2=other.mDau2;  
+TotalNorm=other.TotalNorm;
  } 
 
 
@@ -414,12 +417,11 @@ RooRealVar* LineShape_Library::GetParameter(RooListProxy* resonance, TString nam
 
 double LineShape_Library::GetIntegral(TString resname,double int_min=0, double int_max=0)
   {
-    double Normy_SUM=0.0;
+    double denom=DoNumericIntegral(int_min,int_max);
     std::vector<double> saved_normies;
     for(uint i=0;i<res.size();i++)
     {
       RooRealVar* normy=GetParameterFromComponent(res[i]->GetName(),"Norm");
-      Normy_SUM+=normy->getVal();
 
       saved_normies.push_back(normy->getVal());
 
@@ -432,18 +434,7 @@ double LineShape_Library::GetIntegral(TString resname,double int_min=0, double i
       }
     }
 
-     RooRealVar* depvar = ( (RooRealVar*) &fitted_values[0]);
-      if(int_min==int_max)
-      {
-  
-      depvar->setRange("sigintegration_bounds",depvar->getMin(),depvar->getMax());
-     }
-      else
-      {
-      depvar->setRange("sigintegration_bounds",int_min,int_max);
-      }
-       RooRealVar* single_normy=GetParameterFromComponent(resname,"Norm");
-      RooAbsReal* total=this->createIntegral(fitted_values[0],fitted_values[0],"sigintegration_bounds");
+    double numerator=DoNumericIntegral(int_min,int_max);
 
       for(uint i=0;i<res.size();i++)
     {
@@ -451,14 +442,13 @@ double LineShape_Library::GetIntegral(TString resname,double int_min=0, double i
       normy->setVal(saved_normies[i]);
     }
 
-      return (single_normy->getVal()/Normy_SUM)*total->getVal();
+      return numerator/denom;
 
   }
- 
 
  LineShape_Library LineShape_Library::GetSingleComponent_PDF(TString name)
  {
-  LineShape_Library tempComp("tempsig", "tempsig", this->fitted_values,this->dau1,this->dau2);
+  LineShape_Library tempComp("tempsig", "tempsig", this->TotalNorm,this->fitted_values,this->dau1,this->dau2);
   //cout<<"old component: "<<this->GetComponent(name)<<endl;
   RooListProxy* tempProxy = new RooListProxy(*this->GetComponent(name));
   tempProxy->setName(name);
@@ -472,6 +462,41 @@ double LineShape_Library::GetIntegral(TString resname,double int_min=0, double i
   //cout<<"Norm is: "<<tempComp.getNorm()<<endl;
   return tempComp;
   
+ }
+ double LineShape_Library::DoNumericIntegral(double min=0,double max=0)///VERY SIMPLE FOR NOW
+ {
+
+   double sum=-9999999999.;
+
+   double intMin=min;
+   double intMax=max;
+
+  if(intMax==intMin)
+    {
+      intMin=( (RooRealVar*) &fitted_values[0])->getMin();
+      intMax=( (RooRealVar*) &fitted_values[0])->getMax();
+    }
+
+   int bins=50000;
+    double delta=(intMax-intMin)/bins;
+
+    for(int i=0;i<bins;i++)
+    {
+      double leftEdge=intMin+i*delta;
+      double rightEdge=(intMin+delta)+i*delta;
+
+      double val=(rightEdge+leftEdge)/2;
+
+      sum+= delta*GetSumOfShapesSquared(val);
+
+    }
+   
+  return sum;
+
+ }
+ double LineShape_Library::GetYield(TString resname,double int_min=0, double int_max=0)
+ {
+   return this->TotalNorm->getVal()*GetIntegral(resname,int_min,int_max);
  }
 /*
  Double_t LineShape_Library::analyticalIntegral(Int_t code, const char* rangeName) const

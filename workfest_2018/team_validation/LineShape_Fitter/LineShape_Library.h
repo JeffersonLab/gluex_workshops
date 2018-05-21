@@ -26,8 +26,8 @@ enum {RESSHAPE=0,RESNORM,RESSIZE,RESL,RESMASS,RESWIDTH,RESRELPHASE,PARAM_START};
 class LineShape_Library : public RooAbsPdf {
 public:
   LineShape_Library() {} ; 
-  LineShape_Library(const char *name, const char *title,RooArgList& _values, std::vector<RooArgList*> _res, Particle_t Dau1, Particle_t Dau2);
-  LineShape_Library(const char *name, const char *title,RooArgList& _values, Particle_t Dau1, Particle_t Dau2);
+  LineShape_Library(const char *name, const char *title, RooRealVar* totalNorm,RooArgList& _values, std::vector<RooArgList*> _res, Particle_t Dau1, Particle_t Dau2);
+  LineShape_Library(const char *name, const char *title,RooRealVar* totalNorm, RooArgList& _values, Particle_t Dau1, Particle_t Dau2);
   LineShape_Library(const LineShape_Library& other, const char* name=0);
   virtual TObject* clone(const char* newname) const { return new LineShape_Library(*this,newname); }
   inline virtual ~LineShape_Library() { }
@@ -56,6 +56,8 @@ public:
 
   void ReplaceResList(std::vector<RooListProxy*> newres);
   double GetIntegral(TString resname, double int_min, double int_max);
+  double DoNumericIntegral(double min,double max);
+  double GetYield(TString resname,double int_min, double int_max);
 
 
 
@@ -67,6 +69,7 @@ Particle_t dau1;
 Particle_t dau2;
 double mDau1;
 double mDau2;
+RooRealVar* TotalNorm;
   
   Double_t evaluate() const ;
 
