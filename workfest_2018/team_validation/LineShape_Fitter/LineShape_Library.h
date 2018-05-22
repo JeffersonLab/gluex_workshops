@@ -55,7 +55,7 @@ public:
   RooRealVar* GetParameterFromComponent(TString compname,TString paramname);
 
   void ReplaceResList(std::vector<RooListProxy*> newres);
-  double GetIntegral(TString resname, double int_min, double int_max);
+  double GetIntegralOf(TString resname, double int_min, double int_max);
   double DoNumericIntegral(double min,double max);
   double GetYield(TString resname,double int_min, double int_max);
 

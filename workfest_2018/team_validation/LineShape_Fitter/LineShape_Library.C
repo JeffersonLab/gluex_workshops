@@ -124,7 +124,7 @@ TotalNorm=other.TotalNorm;
     {
       for(int j=RESSIZE;j<res[i]->getSize();j++)
       {
-        incoherent_sum+=sqrt(norm)*((RooAbsReal&) ((*res[i])[j])).getVal()*pow(m,j);
+        incoherent_sum+=pow(sqrt(norm)*((RooAbsReal&) ((*res[i])[j])).getVal()*pow(m,j),2);
         //sumsq+=((RooAbsReal&) ((*res[i])[PARAM_START])).getVal()*m+((RooAbsReal&) ((*res[i])[PARAM_START+1])).getVal();
       }
     }
@@ -178,7 +178,8 @@ TotalNorm=other.TotalNorm;
       double res_size= ((RooAbsReal&) ((*res[i])[RESSIZE])).getVal();
       double res_L= ((RooAbsReal&) ((*res[i])[RESL])).getVal();
       double alpha= ((RooAbsReal&) ((*res[i])[RESMASS])).getVal();
-      double fitted_mass= 1.6;
+      
+      double fitted_mass= ((RooAbsReal&) ((*res[i])[RESWIDTH])).getVal();;
       
       //double rel_phase=((RooAbsReal&) ((*res[i])[RESRELPHASE])).getVal();
 
@@ -192,7 +193,7 @@ TotalNorm=other.TotalNorm;
         norm=0;
 
       //TComplex exp_phase(-1*cos(rel_phase),sin(rel_phase));
-     incoherent_sum+=sqrt(norm)*NR_R(m, fitted_mass, q, q0,res_L, res_size,alpha).Re();//*exp_phase;
+     incoherent_sum+=pow(sqrt(norm)*NR_R(m, fitted_mass, q, q0,res_L, res_size,alpha).Re(),2);//*exp_phase;
       //sumsq=BW(m, m0_rho, gamma0, q, q0, 1, size);
     }
   }
@@ -236,7 +237,7 @@ TComplex LineShape_Library::NR_R(const double& m, const double& fittedm, const d
   //std::cout<<exp(-(pow(mmChain,2)-pow(mChain,2))*alpha )<<std::endl;
   //std::cout<<"---------------------------------------------------"<<std::endl;
      
-  TComplex Rnum=pow((q/q0),2*res_L+1)*BPrime*exp(-1*fabs(alpha)*(pow(m,2)-pow(1.5,2)));
+  TComplex Rnum=pow((q/q0),2*res_L+1)*BPrime*exp(-1*fabs(alpha)*(pow(m,2)-pow(fittedm,2)));
 
   return Rnum;
 }
@@ -348,9 +349,19 @@ void LineShape_Library::CreateComponent(TString name,int shape,double size,doubl
           A_Particle_alpha->setMax(100);
           A_Particle_alpha->setConstant(false);
 
+          double rangeMin=( (RooRealVar*) &fitted_values[0])->getMin();
+          double rangeMax=( (RooRealVar*) &fitted_values[0])->getMax();
+
+          RooRealVar* A_Particle_center=new RooRealVar(name+"_Center", name+"_Center", ((rangeMin+rangeMax)/2.));//from example fit?
+          A_Particle_center->setError(A_Particle_center->getVal()/10.);
+          A_Particle_center->setMin(mDau1+mDau2);
+          A_Particle_center->setMax(100);
+          A_Particle_center->setConstant(false);
+
           A_Particle->add(*A_Particle_Size);
           A_Particle->add(*A_Particle_L);
           A_Particle->add(*A_Particle_alpha);
+          A_Particle->add(*A_Particle_center);
 
             
             break;
@@ -407,26 +418,36 @@ RooRealVar* LineShape_Library::GetParameter(RooListProxy* resonance, TString nam
 
  void LineShape_Library::ReplaceResList(std::vector<RooListProxy*> newres)
  {
-   cout<<"replacing"<<endl;
-   cout<<"start: "<<res.size()<<" and "<<newres.size()<<std::endl;
+   //cout<<"replacing"<<endl;
+   //cout<<"start: "<<res.size()<<" and "<<newres.size()<<std::endl;
    this->res.clear();
    this->res=newres;
-   cout<<"end: "<<this->res.size()<<std::endl;
+   //cout<<"end: "<<this->res.size()<<std::endl;
    return;
  }
 
-double LineShape_Library::GetIntegral(TString resname,double int_min=0, double int_max=0)
+double LineShape_Library::GetIntegralOf(TString resname,double int_min=0, double int_max=0)
   {
-    double denom=DoNumericIntegral(int_min,int_max);
+    //std::cout<<"NAME: "<<resname<<endl;
+    double denom=DoNumericIntegral(0/*int_min*/,0/*int_max*/);
+ 
+    double total_normies=0;
+    double this_normy=0;
     std::vector<double> saved_normies;
     for(uint i=0;i<res.size();i++)
     {
       RooRealVar* normy=GetParameterFromComponent(res[i]->GetName(),"Norm");
-
+      total_normies+=normy->getVal();
       saved_normies.push_back(normy->getVal());
 
       if(res[i]->GetName() == resname)
-        continue;
+      {
+        this_normy=normy->getVal();
+        //normy->setVal(1);
+        
+         continue;
+      }
+       
 
       if(normy)
       {
@@ -441,8 +462,9 @@ double LineShape_Library::GetIntegral(TString resname,double int_min=0, double i
       RooRealVar* normy=GetParameterFromComponent(res[i]->GetName(),+"Norm");
       normy->setVal(saved_normies[i]);
     }
-
-      return numerator/denom;
+      //std::cout<<"part PDF int: "<<numerator<<endl;
+     //std::cout<<"whole PDF int: "<<denom<<endl;
+      return (numerator/denom);
 
   }
 
@@ -465,28 +487,31 @@ double LineShape_Library::GetIntegral(TString resname,double int_min=0, double i
  }
  double LineShape_Library::DoNumericIntegral(double min=0,double max=0)///VERY SIMPLE FOR NOW
  {
-
-   double sum=-9999999999.;
+   
+   double sum=0;
 
    double intMin=min;
    double intMax=max;
 
   if(intMax==intMin)
     {
+      //std::cout<<"FULL RANGE INT"<<std::endl;
       intMin=( (RooRealVar*) &fitted_values[0])->getMin();
       intMax=( (RooRealVar*) &fitted_values[0])->getMax();
     }
 
-   int bins=50000;
+    //cout<<"INTEGRATE: "<<intMin<<" to "<<intMax<<endl;
+   
+    int bins=50000;
     double delta=(intMax-intMin)/bins;
-
+    //cout<<"DELTA IS: "<<delta<<endl;
     for(int i=0;i<bins;i++)
     {
       double leftEdge=intMin+i*delta;
       double rightEdge=(intMin+delta)+i*delta;
 
-      double val=(rightEdge+leftEdge)/2;
-
+      double val=(rightEdge+leftEdge)/2.;
+     
       sum+= delta*GetSumOfShapesSquared(val);
 
     }
@@ -496,26 +521,5 @@ double LineShape_Library::GetIntegral(TString resname,double int_min=0, double i
  }
  double LineShape_Library::GetYield(TString resname,double int_min=0, double int_max=0)
  {
-   return this->TotalNorm->getVal()*GetIntegral(resname,int_min,int_max);
+   return this->TotalNorm->getVal()*GetIntegralOf(resname,int_min,int_max);
  }
-/*
- Double_t LineShape_Library::analyticalIntegral(Int_t code, const char* rangeName) const
-{
-  assert(code==1);
-  double tmin = m.min(rangeName);
-  double tmax = m.max(rangeName);
-  std::cout<<tmin<<"---->"<<tmax<<endl;
-  std::cout<<((A/2)*tmax*tmax+g*tmax)-((A/2)*tmin*tmin+g*tmin)<<endl;
-
-  return ((A/2)*tmax*tmax+g*tmax)-((A/2)*tmin*tmin+g*tmin);
-
-}
-
-Int_t LineShape_Library::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName) const
-{
-  if( matchArgs(allVars,analVars,m) )
-    return 1 ;
-  
-  return 0;
-}*/
-
