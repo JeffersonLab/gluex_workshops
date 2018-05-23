@@ -100,7 +100,7 @@ jerror_t DReaction_factory_p3pi_PiPlusMiss_P4Vpi0::evnt(JEventLoop* locEventLoop
 	locReaction->Add_AnalysisAction(new DCutAction_MaxTrackDOCA(locReaction, Proton, 1,"proton_DOCA"));
 	locReaction->Add_AnalysisAction(new DCutAction_MaxTrackDOCA(locReaction, PiPlus, 1,"PiPlus_DOCA"));
 	locReaction->Add_AnalysisAction(new DCutAction_MaxTrackDOCA(locReaction, PiMinus, 1,"PiMinus_DOCA"));
-	locReaction->Add_AnalysisAction(new DCutAction_MissingMassSquared(locReaction, false, -0.1,0.1,"MeasuredMMCut")); //cut at delta-t +/- 1.0 //false: measured data
+	locReaction->Add_AnalysisAction(new DCutAction_MissingMassSquared(locReaction, false, -0.1,0.15,"MeasuredMMCut")); //cut at delta-t +/- 1.0 //false: measured data
 	locReaction->Add_AnalysisAction(new DCutAction_MissingMass(locReaction, 0 , Proton, false, 0.2, 2, "MissingOmegaMass"));
 
 	//Temporary, probably
