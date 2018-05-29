@@ -6,10 +6,10 @@
 
 double getbincontent(TH1F* AccH, int bin);
 double getbinerror(TH1F* AccH, int bin);
-TGraphErrors* getAcceptance(int numBins,double minVal,double maxVal,LineShape_Library sig,RooAddPdf model,RooDataSet* MC, TFile* thrownTreeF);
+TGraphErrors* getAcceptance(TString FitTag,int numBins,double minVal,double maxVal,LineShape_Library sig,RooAddPdf model,RooDataSet* MC, TFile* thrownTreeF, TString addCuts);
 
 
-void FitData(TString FitTag)
+void FitData(TString FitTag, TString dataFilePath, TString mcDataFilePath, TString accDenomFilePath,TString addCuts)
 {
     int numBins=22;
     double minVal=7.;
@@ -19,31 +19,6 @@ void FitData(TString FitTag)
   
   //TH1F*  AccH= (TH1F*) acceptance_file->Get("Accepted");
 
-  double effArray[22]={
-0.151112,
-0.152873,
-0.161183,
-0.15471,
-0.164844,
-0.159575,
-0.157601,
-0.162276,
-0.157587,
-0.155876,
-0.172324,
-0.160799,
-0.146415,
-0.154183,
-0.150602,
-0.154085,
-0.15037,
-0.13963,
-0.149505,
-0.142958,
-0.136865,
-0.138488
- 
-};
 
 double effArray_err[22]=
 {
@@ -77,22 +52,31 @@ double effArray_err[22]=
      TGraphErrors hflux;
      TGraphErrors xsec;
 
-    TFile *f = new TFile("/w/halld-scifs17exp/halld2/home/tbritton/ANA/PipPim/Study_Fitting/RooDataSet.root","READ");
+    TGraphErrors* AccH;
+    //"/w/halld-scifs17exp/halld2/home/tbritton/ANA/PipPim/Study_Fitting/RooDataSet.root"
+    TFile *f = new TFile(dataFilePath,"READ");
     //TFile f("FullSet.root") ;
     //f.cd();
      RooDataSet* loaded_RooDataSet=(RooDataSet*) gDirectory->Get("DATA");
      loaded_RooDataSet->Print();
 
-     TFile *fmc = new TFile("/w/halld-scifs17exp/halld2/home/tbritton/ANA/PipPim/Study_Fitting/MCRooDataSet.root","READ");
-    //TFile f("FullSet.root") ;
-    //f.cd();
-     RooDataSet* MC_RooDataSet=(RooDataSet*) gDirectory->Get("DATA");
+    bool loaded_ACC=false;
 
+    TFile* AcceptanceF = new TFile(FitTag+"_Acceptance.root","READ");
+    
+    if(AcceptanceF)
+    {
+      AccH=(TGraphErrors*) gDirectory->Get("Acceptance");
+      if(AccH)
+      {
+        loaded_ACC=true;
+      }
+    }
 
      const RooArgSet Allvars= *loaded_RooDataSet->get(0);
-    RooDataSet * Promptsubset=new RooDataSet("binned","binned",loaded_RooDataSet,Allvars,"weight>0 && t<-0.1 && t>-.5");
+    RooDataSet * Promptsubset=new RooDataSet("binned","binned",loaded_RooDataSet,Allvars,"weight>0"+addCuts/* && t<-0.1 && t>-.5"*/);
 
-    RooDataSet * OOTsubset=new RooDataSet("binned","binned",loaded_RooDataSet,Allvars,"weight<0 && t<-0.1 && t>-.5");
+    RooDataSet * OOTsubset=new RooDataSet("binned","binned",loaded_RooDataSet,Allvars,"weight<0"+addCuts/* && t<-0.1 && t>-.5"*/);
 
     Promptsubset->Print();
     OOTsubset->Print();
@@ -134,9 +118,15 @@ double effArray_err[22]=
   TFile* flux_file = TFile::Open("flux_30730.root");
   TH1F*  FluxH= (TH1F*) flux_file->Get("PS_TaggedFlux");
 
-  TFile* thrownTreeF=TFile::Open("tree_thrown_gen_2pi_amp_030730.root");
-  TGraphErrors* AccH=getAcceptance(numBins,minVal,maxVal,sig,model,MC_RooDataSet, thrownTreeF);
-  AccH->Draw();
+if(!loaded_ACC)
+{//"/w/halld-scifs17exp/halld2/home/tbritton/ANA/PipPim/Study_Fitting/MCRooDataSet.root"
+  TFile *fmc = new TFile(mcDataFilePath,"READ");
+     RooDataSet* MC_RooDataSet=(RooDataSet*) gDirectory->Get("DATA");
+     
+    //  /"tree_thrown_gen_2pi_amp_030730.root"
+       TFile* thrownTreeF=TFile::Open(accDenomFilePath);
+  AccH=getAcceptance(FitTag,numBins,minVal,maxVal,sig,model,MC_RooDataSet, thrownTreeF, addCuts);
+}
   //TFile* acceptance_file = TFile::Open("workFestAccH.root");//("Edep_Acceptance_11366_v4.root");
 
 //RUNNING OVER BINS
@@ -145,9 +135,11 @@ TDirectory* BinFits=outFile->mkdir("Bin_Fits");
 BinFits->cd();
     for(int i=0;i<numBins;i++)
     {
-      double eff=1;
-      double eff_err=0;
-      AccH->GetPoint(i,eff,eff_err);
+      double effnum=1;
+      double eff_err=effArray_err[i];
+      double binx=1;
+      AccH->GetPoint(i,binx,effnum);
+      eff_err=AccH->GetErrorY(i);
       double flux=1;
       double flux_err=0;
       flux=getbincontent(FluxH,i+1);
@@ -239,10 +231,10 @@ BinFits->cd();
     hflux.SetPointError(i,((Emax-Emin)/2),flux_err);
 
       double conversion=pow(10,28)*pow(10,2);//convert from area to barns 10^28
-      double denom=flux*eff;
-      double denom_err=(flux*eff*sqrt(pow(flux_err/flux,2)+pow(effArray_err[i]/effArray[i],2)));
+      double denom=flux*effnum;
+      double denom_err=(denom*sqrt(pow(flux_err/flux,2)+pow(eff_err/effnum,2)));
 
-      double xsecnum=((yield)/(eff*flux*Constant_term))*conversion;
+      double xsecnum=((yield)/(denom*Constant_term))*conversion;
 
       double xsec_err=xsecnum*sqrt((pow(yielderr/yield,2)+pow(denom_err/denom,2)));
      xsec.SetPoint(i,(Emin+Emax)/2,xsecnum);
@@ -263,7 +255,7 @@ BinFits->cd();
     xsec.Draw("AP");
     //xsec.SaveAs("XSec.C");
     xsec.Write();
-    Acch->SetName("Acceptance");
+    AccH->SetName("Acceptance");
     AccH->Write();
     outFile->Write();
     outFile->Close();
@@ -279,7 +271,7 @@ double getbinerror(TH1F* AccH, int bin)
 {
   return AccH->GetBinError(bin);
 }
-TGraphErrors* getAcceptance(int numBins,double minVal,double maxVal,LineShape_Library sig, RooAddPdf model,RooDataSet* MC, TFile* thrownTreeF)
+TGraphErrors* getAcceptance(TString FitTag,int numBins,double minVal,double maxVal,LineShape_Library sig, RooAddPdf model,RooDataSet* MC, TFile* thrownTreeF, TString addCuts)
 {
   
   TH1F* denom=new TH1F("denom","denom",numBins,minVal,maxVal);
@@ -289,9 +281,9 @@ TGraphErrors* getAcceptance(int numBins,double minVal,double maxVal,LineShape_Li
   thrownT->Draw("ThrownBeam__P4->E()>>denom");
 
     const RooArgSet Allvars= *MC->get(0);
-    RooDataSet * Promptsubset=new RooDataSet("binned","binned",MC,Allvars,"weight>0 && t<-0.1 && t>-.5");
+    RooDataSet * Promptsubset=new RooDataSet("binned","binned",MC,Allvars,"weight>0"+addCuts/* && t<-0.1 && t>-.5"*/);
 
-    RooDataSet * OOTsubset=new RooDataSet("binned","binned",MC,Allvars,"weight<0 && t<-0.1 && t>-.5");
+    RooDataSet * OOTsubset=new RooDataSet("binned","binned",MC,Allvars,"weight<0"+addCuts/* && t<-0.1 && t>-.5"*/);
 
   TGraphErrors* eff = new TGraphErrors("Acceptance");
 const RooArgSet vars= *MC->get(0);
@@ -335,10 +327,14 @@ const RooArgSet vars= *MC->get(0);
     //CALCULATIONS==========================================================
     double yield=(rho_yield+OOTweight*sbrho_yield);
     double yielderr=sqrt(omega_yield+sigma_yield+sbomega_yield+sbsigma_yield);
+    double denomnum=denom->GetBinContent(i+1);
+    eff->SetPoint(i,(Emin+Emax)/2,yield/denomnum);
+    eff->SetPointError(i,(Emax-Emin)/2,(yield/denomnum)*sqrt(pow((yielderr/yield),2)+(1.0/(sqrt(denomnum)*denomnum))));
 
-    eff->SetPoint(i,(Emin+Emax)/2,yield/denom->GetBinContent(i+1));
-    eff->SetPointError(i,(Emax-Emin)/2,0);
-
+    TFile* newacc = new TFile(FitTag+"_Acceptance.root","recreate");
+    eff->SetName("Acceptance");
+    eff->Write();
+    newacc->Close();
 
     delete Promptsubsubset;
     delete OOTsubsubset;
