@@ -7,57 +7,35 @@
 double getbincontent(TH1F* AccH, int bin);
 double getbinerror(TH1F* AccH, int bin);
 TGraphErrors* getAcceptance(TString FitTag,int numBins,double minVal,double maxVal,LineShape_Library sig,RooAddPdf model,RooDataSet* MC, TFile* thrownTreeF, TString addCuts);
+std::vector<string> list_myfiles(const char *dirname, const char *ext=".root");
+RooDataSet* CollectDataSets(const char* dataFilePath);
 
-
-void FitData(TString FitTag, TString dataFilePath, TString mcDataFilePath, TString accDenomFilePath,TString addCuts)
+void FitData(TString FitTag, TString dataFilePath, TString mcDataFilePath, TString accDenomFilePath,TString fluxFilePath,TString addCuts)
 {
-    int numBins=22;
-    double minVal=7.;
-    double maxVal=11.4;
+    int numBins=43;//22
+    double minVal=3.;
+    double maxVal=11.6;//11.4
 
   const double Constant_term= /*binw**/1.29*pow(10,24);
   
   //TH1F*  AccH= (TH1F*) acceptance_file->Get("Accepted");
 
 
-double effArray_err[22]=
-{
-0.00200769,
-0.00197421,
-0.00211835,
-0.0012137,
-0.000992322,
-0.000923025,
-0.000801966,
-0.000739633,
-0.000633757,
-0.00128405,
-0.00156704,
-0.00161985,
-0.00147881,
-0.00115728,
-0.00110346,
-0.0013743,
-0.00137596,
-0.00158119,
-0.00158298,
-0.00150899,
-0.00135446,
-0.00093724
-};
-
-     TCanvas * can = new TCanvas( "canvas1" );
+     
     
      TGraphErrors hyield;
      TGraphErrors hflux;
      TGraphErrors xsec;
 
     TGraphErrors* AccH;
-    //"/w/halld-scifs17exp/halld2/home/tbritton/ANA/PipPim/Study_Fitting/RooDataSet.root"
-    TFile *f = new TFile(dataFilePath,"READ");
+    
+
+  
+
+   // TFile *f = new TFile(dataFilePath,"READ");
     //TFile f("FullSet.root") ;
     //f.cd();
-     RooDataSet* loaded_RooDataSet=(RooDataSet*) gDirectory->Get("DATA");
+     RooDataSet* loaded_RooDataSet=CollectDataSets(dataFilePath);//(RooDataSet*) gDirectory->Get("DATA");
      loaded_RooDataSet->Print();
 
     bool loaded_ACC=false;
@@ -66,7 +44,10 @@ double effArray_err[22]=
     
     if(AcceptanceF)
     {
+      AcceptanceF->cd();
+      gDirectory->ls();
       AccH=(TGraphErrors*) gDirectory->Get("Acceptance");
+      cout<<"LOADED AccH ADDRESS: "<<AccH<<endl;
       if(AccH)
       {
         loaded_ACC=true;
@@ -84,7 +65,7 @@ double effArray_err[22]=
 
     RooRealVar *m=new RooRealVar("mPipPim","",.3,3,"GeV");
     
-    RooRealVar nevents("nevt", "N_{evt}", 2e3,0,1e8);    
+    RooRealVar nevents("nevt", "N_{evt}", 1E2,0,20000);    
     nevents.setError(10.0);
      nevents.setConstant(false);
 
@@ -92,21 +73,24 @@ double effArray_err[22]=
     RooArgList BValues;
      BValues.add(*m);
 
-    LineShape_Library sig("sig", "sig", &nevents, BValues,PiPlus,PiMinus); 
+     LineShape_Library sig("sig", "sig", &nevents, BValues,PiPlus,PiMinus); 
      sig.CreateComponent("rho",JBREITWIGNER,5.3,1, .757, .15,true);
-    // sig.CreateComponent("omega",JBREITWIGNER,5.3,1, .783, .008,false); 
-    sig.CreateComponent("sigma",NONRESONANT,5.3,1, 1);
+     sig.CreateComponent("omega",JBREITWIGNER,5.3,1, .783, .008,false); 
+     sig.CreateComponent("sigma",NONRESONANT,5.3,1, 1,10,false);
 
+    sig.GetParameterFromComponent("omega","Norm")->setVal(0);
+    sig.GetParameterFromComponent("omega","Norm")->setError(.1);
     //sig.GetParameterFromComponent("rho","Mass")->setConstant(true);
     //sig.GetParameterFromComponent("rho","Width")->setConstant(true);
 
-    /*sig.GetParameterFromComponent("sigma","Alpha")->setVal(-.2);
+
+    sig.GetParameterFromComponent("sigma","Alpha")->setVal(-.2);
     sig.GetParameterFromComponent("sigma","Alpha")->setError(.02);
     sig.GetParameterFromComponent("sigma","Norm")->setVal(.8);
     sig.GetParameterFromComponent("sigma","Norm")->setError(.1);
 
-    sig.GetParameterFromComponent("sigma","Alpha")->setConstant(true);
-    sig.GetParameterFromComponent("sigma","Norm")->setConstant(true);*/
+    //sig.GetParameterFromComponent("sigma","Alpha")->setConstant(true);
+    //sig.GetParameterFromComponent("sigma","Norm")->setConstant(true);
     
 
 
@@ -115,33 +99,38 @@ double effArray_err[22]=
      RooAddPdf model("model", "G+poly", RooArgList(sig), RooArgList(nevents));
     const RooArgSet vars= *loaded_RooDataSet->get(0);
 
-  TFile* flux_file = TFile::Open("flux_30730.root");
-  TH1F*  FluxH= (TH1F*) flux_file->Get("PS_TaggedFlux");
+  TFile* flux_file = TFile::Open(fluxFilePath);
+  TH1F*  FluxH= (TH1F*) flux_file->Get("PS_TaggedFlux_Thomas");
 
+std::cout<<"IS LOADED? "<<loaded_ACC<<endl;
 if(!loaded_ACC)
 {//"/w/halld-scifs17exp/halld2/home/tbritton/ANA/PipPim/Study_Fitting/MCRooDataSet.root"
-  TFile *fmc = new TFile(mcDataFilePath,"READ");
-     RooDataSet* MC_RooDataSet=(RooDataSet*) gDirectory->Get("DATA");
+  //TFile *fmc = new TFile(mcDataFilePath,"READ");
+     RooDataSet* MC_RooDataSet=CollectDataSets(mcDataFilePath);//(RooDataSet*) gDirectory->Get("DATA");
      
     //  /"tree_thrown_gen_2pi_amp_030730.root"
        TFile* thrownTreeF=TFile::Open(accDenomFilePath);
+       cout<<"Acceptance address: "<<AccH<<endl;
   AccH=getAcceptance(FitTag,numBins,minVal,maxVal,sig,model,MC_RooDataSet, thrownTreeF, addCuts);
+  cout<<"Acceptance address: "<<AccH<<endl;
 }
   //TFile* acceptance_file = TFile::Open("workFestAccH.root");//("Edep_Acceptance_11366_v4.root");
 
 //RUNNING OVER BINS
+TCanvas * can = new TCanvas( "canvas1" );
 TFile* outFile=new TFile("Output_"+FitTag+".root","recreate");
 TDirectory* BinFits=outFile->mkdir("Bin_Fits");
 BinFits->cd();
     for(int i=0;i<numBins;i++)
     {
       double effnum=1;
-      double eff_err=effArray_err[i];
       double binx=1;
+      cout<<"AccH ADRESS: "<<AccH<<endl;
       AccH->GetPoint(i,binx,effnum);
-      eff_err=AccH->GetErrorY(i);
+      double eff_err=AccH->GetErrorY(i);
       double flux=1;
       double flux_err=0;
+      cout<<"FLUX ADDRESS: "<<FluxH<<endl;
       flux=getbincontent(FluxH,i+1);
       flux_err=getbinerror(FluxH,i+1);
 
@@ -172,10 +161,10 @@ BinFits->cd();
     frame->Draw();
 
     double rho_yield=sig.GetYield("rho",.5,1.);// nevents.getVal()*sig.GetIntegral("rho",.5,1);
-    double omega_yield=0;//sig.GetYield("omega",.5,1);
+    double omega_yield=sig.GetYield("omega",.5,1);
     double sigma_yield=sig.GetYield("sigma",.5,1.);
 
-    //sig.GetSingleComponent_PDF("omega").plotOn(frame,RooFit::LineColor(kGreen),RooFit::Normalization(omega_yield,RooAbsReal::NumEvent));
+    sig.GetSingleComponent_PDF("omega").plotOn(frame,RooFit::LineColor(kGreen),RooFit::Normalization(omega_yield,RooAbsReal::NumEvent));
     sig.GetSingleComponent_PDF("rho").plotOn(frame,RooFit::LineColor(kRed),RooFit::Normalization(rho_yield,RooAbsReal::NumEvent));
     sig.GetSingleComponent_PDF("sigma").plotOn(frame,RooFit::LineColor(kMagenta),RooFit::Normalization(sigma_yield,RooAbsReal::NumEvent));
     model.paramOn(frame);
@@ -203,12 +192,12 @@ BinFits->cd();
     sbframe->Draw();
 
     double sbrho_yield=sig.GetYield("rho",.5,1.);
-    double sbomega_yield=0;//sig.GetYield("omega",.5,1);
+    double sbomega_yield=sig.GetYield("omega",.5,1);
     double sbsigma_yield=sig.GetYield("sigma",.5,1.);
 
-    //sig.GetSingleComponent_PDF("omega").plotOn(sbframe,RooFit::LineColor(kGreen),RooFit::Normalization(omega_yield,RooAbsReal::NumEvent));
-    sig.GetSingleComponent_PDF("rho").plotOn(sbframe,RooFit::LineColor(kRed),RooFit::Normalization(rho_yield,RooAbsReal::NumEvent));
-    sig.GetSingleComponent_PDF("sigma").plotOn(sbframe,RooFit::LineColor(kMagenta),RooFit::Normalization(sigma_yield,RooAbsReal::NumEvent));
+    sig.GetSingleComponent_PDF("omega").plotOn(sbframe,RooFit::LineColor(kGreen),RooFit::Normalization(sbomega_yield,RooAbsReal::NumEvent));
+    sig.GetSingleComponent_PDF("rho").plotOn(sbframe,RooFit::LineColor(kRed),RooFit::Normalization(sbrho_yield,RooAbsReal::NumEvent));
+    sig.GetSingleComponent_PDF("sigma").plotOn(sbframe,RooFit::LineColor(kMagenta),RooFit::Normalization(sbsigma_yield,RooAbsReal::NumEvent));
     model.paramOn(sbframe);
     sbframe->Draw();
 
@@ -263,9 +252,9 @@ BinFits->cd();
 
 }
 
-double getbincontent(TH1F* AccH, int bin)
+double getbincontent(TH1F* hist, int bin)
 {
-  return AccH->GetBinContent(bin);
+  return hist->GetBinContent(bin);
 }
 double getbinerror(TH1F* AccH, int bin)
 {
@@ -273,7 +262,9 @@ double getbinerror(TH1F* AccH, int bin)
 }
 TGraphErrors* getAcceptance(TString FitTag,int numBins,double minVal,double maxVal,LineShape_Library sig, RooAddPdf model,RooDataSet* MC, TFile* thrownTreeF, TString addCuts)
 {
-  
+  sig.GetParameterFromComponent("omega","Norm")->setVal(0);
+  sig.GetParameterFromComponent("omega","Norm")->setConstant(true);
+
   TH1F* denom=new TH1F("denom","denom",numBins,minVal,maxVal);
   thrownTreeF->cd();
   TTree* thrownT=(TTree*) gDirectory->Get("Thrown_Tree");
@@ -286,7 +277,12 @@ TGraphErrors* getAcceptance(TString FitTag,int numBins,double minVal,double maxV
     RooDataSet * OOTsubset=new RooDataSet("binned","binned",MC,Allvars,"weight<0"+addCuts/* && t<-0.1 && t>-.5"*/);
 
   TGraphErrors* eff = new TGraphErrors("Acceptance");
-const RooArgSet vars= *MC->get(0);
+  const RooArgSet vars= *MC->get(0);
+  RooRealVar *MCm=new RooRealVar("mPipPim","",.3,3,"GeV");
+  TFile* newacc = new TFile(FitTag+"_Acceptance.root","recreate");
+  TDirectory* MCBinFits=newacc->mkdir("MCBin_Fits");
+  MCBinFits->cd();
+  TCanvas * MCcan = new TCanvas( "MCcanvas1" );
    for(int i=0;i<numBins;i++)
     {
       
@@ -310,8 +306,20 @@ const RooArgSet vars= *MC->get(0);
     double omega_yield=0;//sig.GetYield("omega",.5,1);
     double sigma_yield=sig.GetYield("sigma",.5,1.);
 
+    TString MCCutl=Form("%f",Emin);
+    TString MCCuth=Form("%f",Emax);
+    TString MCFile="MCBin_"+MCCutl.ReplaceAll(".","x")+"_"+MCCuth.ReplaceAll(".","x")+".C";
+  
+    RooPlot * MCframe = MCm->frame(.5,1,200);
+    Promptsubsubset->plotOn(MCframe);
+    model.plotOn(MCframe);
+    model.paramOn(MCframe);
+    sig.GetSingleComponent_PDF("rho").plotOn(MCframe,RooFit::LineColor(kRed),RooFit::Normalization(rho_yield,RooAbsReal::NumEvent));
+    sig.GetSingleComponent_PDF("sigma").plotOn(MCframe,RooFit::LineColor(kMagenta),RooFit::Normalization(sigma_yield,RooAbsReal::NumEvent));
     //sig.GetSingleComponent_PDF("omega").plotOn(frame,RooFit::LineColor(kGreen),RooFit::Normalization(omega_yield,RooAbsReal::NumEvent));
+    MCframe->Draw();
 
+    MCcan->Write(MCFile);
 
      //SB FIT================================================================
   
@@ -322,6 +330,19 @@ const RooArgSet vars= *MC->get(0);
     double sbomega_yield=0;//sig.GetYield("omega",.5,1);
     double sbsigma_yield=sig.GetYield("sigma",.5,1.);
 
+    TString MCsbCutl=Form("%f",Emin);
+    TString MCsbCuth=Form("%f",Emax);
+    TString MCsbFile="MCsbBin_"+MCsbCutl.ReplaceAll(".","x")+"_"+MCsbCuth.ReplaceAll(".","x")+".C";
+  
+    RooPlot * MCsbframe = MCm->frame(.5,1,200);
+    OOTsubsubset->plotOn(MCsbframe);
+    model.plotOn(MCsbframe);
+    model.paramOn(MCsbframe);
+    sig.GetSingleComponent_PDF("rho").plotOn(MCsbframe,RooFit::LineColor(kRed),RooFit::Normalization(sbrho_yield,RooAbsReal::NumEvent));
+    sig.GetSingleComponent_PDF("sigma").plotOn(MCsbframe,RooFit::LineColor(kMagenta),RooFit::Normalization(sbsigma_yield,RooAbsReal::NumEvent));
+    MCsbframe->Draw();
+
+    MCcan->Write(MCsbFile);
 
 
     //CALCULATIONS==========================================================
@@ -331,13 +352,61 @@ const RooArgSet vars= *MC->get(0);
     eff->SetPoint(i,(Emin+Emax)/2,yield/denomnum);
     eff->SetPointError(i,(Emax-Emin)/2,(yield/denomnum)*sqrt(pow((yielderr/yield),2)+(1.0/(sqrt(denomnum)*denomnum))));
 
-    TFile* newacc = new TFile(FitTag+"_Acceptance.root","recreate");
-    eff->SetName("Acceptance");
-    eff->Write();
-    newacc->Close();
+    
+    
 
     delete Promptsubsubset;
     delete OOTsubsubset;
     }
+    eff->SetName("Acceptance");
+    newacc->cd();
+    eff->Write();
+    newacc->Close();
+    std::cout<<"eff address: "<<eff<<endl;
     return eff;
+}
+std::vector<string> list_myfiles(const char *dirname, const char *ext=".root")
+{
+    std::vector<string> Files;
+    TSystemDirectory dir(dirname, dirname);
+     TList *files = dir.GetListOfFiles();
+     if (files)
+     {
+         TSystemFile *file;
+         TString fname;
+          TIter next(files);
+           while ((file=(TSystemFile*)next()))
+           {
+               fname = file->GetName();
+               if (!file->IsDirectory() && fname.EndsWith(ext))
+                {
+                    //cout << fname.Data() << endl;
+                    Files.push_back(fname.Data());
+                }
+            }
+        }
+        return Files;
+}
+RooDataSet* CollectDataSets(const char* dataPath){
+  std::vector<string> ourFiles=list_myfiles(dataPath,".root");
+    RooDataSet* FullSet = new RooDataSet();
+    for(int i=0;i<ourFiles.size();i++)
+    {
+      TString Filename=dataPath+TString(ourFiles[i]);
+      TFile f(Filename);
+      f.cd();
+      RooDataSet* fileSet = (RooDataSet*) gDirectory->Get("DATA");
+      if(i==0)
+      {
+        FullSet=fileSet;
+      }
+      else
+      {
+        if(fileSet)
+          {
+            FullSet->append(*fileSet);
+          }
+      }
+    }
+    return FullSet;
 }
