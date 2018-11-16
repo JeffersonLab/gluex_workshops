@@ -1,0 +1,21 @@
+Session2b Commands:
+
+
+Run mcthrown_tree plugin over REST data
+hd_root -PPLUGINS=mcthrown_tree dana_rest_gen_omega_3pi_030730_000.hddm
+
+
+Make thrown tree TSelector:
+root.exe $DATA/tree_thrown_gen_omega_3pi_030730.root
+Thrown_Tree->MakeSelector("mcthrown_selector","=legacy");
+.q #quit root
+
+
+Run TSelector to fill thrown histograms for efficiency:
+root.exe $DATA/tree_thrown_gen_omega_3pi_030730.root
+Thrown_Tree->Process("mcthrown_selector.C");
+.q #quit root
+
+
+Plot efficiency, flux normalized yield and "cross section"
+root.exe plotFluxNormalized.C

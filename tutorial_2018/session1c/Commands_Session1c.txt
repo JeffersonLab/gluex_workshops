@@ -1,0 +1,39 @@
+Session1c Commands:
+
+View TTree:
+root -l $DATA/tree_pi0pippim__B4_030730.root
+     TBrowser b;
+     .q #quit root
+
+
+Figure out the name of the TTree in the ROOT file:
+root -l $DATA/tree_pi0pippim__B4_030730.root
+     gDirectory->ls();
+     .q #quit root
+
+
+Make DSelector:
+MakeDSelector #no arguments: prints usage instructions
+MakeDSelector $DATA/tree_pi0pippim__B4_030730.root  pi0pippim__B4_Tree omega_3pi
+
+
+Run DSelector over data:
+root -l $DATA/tree_pi0pippim__B4_030730.root
+     .x $ROOT_ANALYSIS_HOME/scripts/Load_DSelector.C
+     pi0pippim__B4_Tree->Process("DSelector_omega_3pi.C+");
+     .q #quit root
+
+
+Run DSelector in PROOF-Lite over data:
+root -l
+     .x $ROOT_ANALYSIS_HOME/scripts/Load_DSelector.C
+     DPROOFLiteManager::Process_Tree("$DATA/tree_pi0pippim__B4_030730.root", "pi0pippim__B4_Tree", "DSelector_omega_3pi.C+", 2, "hist_omega_3pi.root"); // use 2 threads
+     .q #quit root
+
+
+Run DSelector in PROOF-Lite over MC:
+root -l
+     .x $ROOT_ANALYSIS_HOME/scripts/Load_DSelector.C
+     DPROOFLiteManager::Process_Tree("$DATA/tree_pi0pippim__B4_gen_omega_3pi_030730.root", "pi0pippim__B4_Tree", "DSelector_omega_3pi.C+", 2, "hist_omega_3pi_gen_omega_3pi.root"); // use 2 threads
+     .q #quit root
+
