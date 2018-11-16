@@ -1,0 +1,4 @@
+# Elton Smith. Updated June 14, 2018. Mod for Z2pi_trees
+# Use the script streamline2.csh to execute commands to process CPP MC through Amplitude Analysis
+#
+# Note: after the workshop all the ROOT TTree files for this excercise were moved to $DATA.  You can copy them to your local checkout of the tutorial excercises before runnign these scripts. (JRS 11/16/18)
