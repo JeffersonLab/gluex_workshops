@@ -1,0 +1,10 @@
+#cobrems.confuration file
+TEMPBEAMCONFIG
+#mass[GeV] width[GeV]
+0.547853 0.000
+#g_eta_gamma_gamma g_rho_eta_gamma g_omega_eta_gamma g_phi_eta_gamma (coupling constants that are used as model inputs)
+0.0429 0.81 0.29 0.38
+#Number of decay particles
+-1
+#EvtGen particle name
+eta
