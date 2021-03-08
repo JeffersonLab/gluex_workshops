@@ -1,0 +1,26 @@
+LIST
+C
+C ===    INPUT file for BGGEN
+C
+TRIG     TEMPTRIG    number of events to simulate
+C                    We expect 395kHz of hadronic rate at high luminosity
+C
+RUNNO    TEMPRUNNO  run number of generated events, default is two
+C
+C -- writing out events
+C        HDDM  simple  ntuple
+WROUT      1      0     0 
+
+NPRIEV   10           number of events to print
+EPHLIM   TEMPMINGENE TEMPMAXGENE       energy range in GeV
+
+RNDMSEQ    TEMPRAND            random number sequence   integer values
+
+EELEC     TEMPELECE           electron beam energy
+EPEAK     TEMPCOHERENT        coherent peak energy
+ZCOLLIM   7600.         distance to the collimator in cm
+DCOLLIM   TEMPCOLD   collimator diameter in m
+
+EPYTHMIN     5.         minimal energy for PYTHIA simulation
+
+STOP
