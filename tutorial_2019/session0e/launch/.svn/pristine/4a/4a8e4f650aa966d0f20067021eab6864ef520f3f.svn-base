@@ -1,0 +1,39 @@
+# Key/value pairs are separated by white space
+# Lines starting with # and empty lines are ignored
+# Only the first two values are evaluated, so for lines like:
+#     KEYVALUE VALUE1 VALUE2
+# VALUE2 is ignored
+# For files & directories: Must specify full path
+
+# SCICOMP JOB ACCOUNTING
+PROJECT                       gluex                 # http://scicomp.jlab.org/scicomp/#/projects
+TRACK                         reconstruction        # https://scicomp.jlab.org/docs/batch_job_tracks
+OS                            centos7
+
+# JOB RESOURCES
+NCORES                        24
+DISK                          30GB
+RAM                           20GB
+TIMELIMIT                     8hrs
+
+# WORKFLOW DEFINITION
+# RUNPERIOD, VERSION, & BATCH: Not needed by launch.py: Only used to replace variables in this config
+RUNPERIOD                     2017-01
+VERSION                       18
+BATCH                         01
+WORKFLOW                      offmon_[RUNPERIOD]_ver[VERSION]
+
+# JOB, SCRIPT CONTROL
+ENVFILE                       /home/gxproj1/env_monitoring_launch.sh
+SCRIPTFILE                    /home/gxproj1/monitoring/launch/script.sh
+RCDB_QUERY                    "@is_production and @status_approved"         # comment-out for all runs
+JANA_CONFIG                   /home/gxproj1/monitoring/launch/jana_offmon.config
+CACHE_PIN_DAYS                14                                            # max is 60, 0 or comment-out for none
+
+# FILE INPUT, OUTPUT BASE DIRECTORIES
+INDATA_TOPDIR     /mss/halld/RunPeriod-[RUNPERIOD]/rawdata/
+
+# FOR SMALL, MONITORING LAUNCHES
+OUTDIR_LARGE      /cache/halld/offline_monitoring/RunPeriod-[RUNPERIOD]/ver[VERSION]     # REST, skims, hists, trees
+OUTDIR_SMALL      /work/halld2/data_monitoring/RunPeriod-[RUNPERIOD]/mon_ver[VERSION]        # log files
+

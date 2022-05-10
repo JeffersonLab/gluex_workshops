@@ -1,0 +1,38 @@
+# Key/value pairs are separated by white space
+# Lines starting with # and empty lines are ignored
+# Only the first two values are evaluated, so for lines like:
+#     KEYVALUE VALUE1 VALUE2
+# VALUE2 is ignored
+# For files & directories: Must specify full path
+
+# SCICOMP JOB ACCOUNTING
+PROJECT                       gluex                 # http://scicomp.jlab.org/scicomp/#/projects
+TRACK                         analysis              # https://scicomp.jlab.org/docs/batch_job_tracks
+OS                            centos7
+
+# JOB RESOURCES
+NCORES                        1
+DISK                          50GB
+RAM                           2GB
+TIMELIMIT                     1hrs
+
+# WORKFLOW DEFINITION
+WORKFLOW                      analysis_2016-02_kmkp_ver01                           # MUST start with a letter!
+
+# JOB, SCRIPT CONTROL
+ENVFILE                       /home/pmatt/env_gluex_analysis.sh
+SCRIPTFILE                    /home/pmatt/builds/scripts/monitoring/root_analysis/script.sh
+#CACHE_PIN_DAYS               21                                                                           # max is 60, 0 or comment-out for none
+
+# ROOT CONFIG
+ROOT_SCRIPT                   /home/pmatt/builds/scripts/monitoring/root_analysis/Run_Selector.C
+TREE_NAME                     kmkp_Tree
+SELECTOR_NAME                 /home/pmatt/builds/home/analysis/pmatt/selectors_analysis/DSelector_2kp      # Leave .C off of the end!
+
+# FILE INPUT, OUTPUT BASE DIRECTORIES
+INDATA_TOPDIR     /cache/halld/home/pmatt/analysis_spring2016/ver05/tree_kmkp/
+
+# FILE OUTPUT
+OUTDIR_LARGE      /volatile/halld/home/pmatt/analysis/kmkp_ver01/     # REST, hist
+OUTDIR_SMALL      /volatile/halld/home/pmatt/analysis/kmkp_ver01/    # log
+

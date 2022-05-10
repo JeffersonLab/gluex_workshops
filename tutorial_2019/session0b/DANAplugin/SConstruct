@@ -1,0 +1,129 @@
+
+#
+#  Jan. 31, 2014  David Lawrence
+#
+# This SConstruct file can be copied into a directory containing
+# the source for a plugin and used to compile it. It will use and
+# install into the directory specified by the HALLD_MY environment
+# variable if defined. Otherwise, it will install in the HALLD_HOME
+# directory.
+#
+# This file should not need modification. It will be copied in by
+# the mkplugin or mkfactory_plugin scripts or you can just copy it
+# by hand.
+#
+# To use this, just type "scons install" to build and install.
+# Just type "scons" if you want to build, but not install it.
+#
+# > scons install
+#
+# Note that unlike the rest of the SBMS system, this does not
+# use a separate build directory and builds everything in the
+# source directory. This is due to technical details and will hopefully
+# be fixed in the future. For now it means, that you must be
+# diligent of building for multiple platforms using the same source.
+#
+
+import os
+import sys
+import subprocess
+import glob
+
+# Get HALLD_HOME environment variable, verifying it is set
+halld_home = os.getenv('HALLD_HOME')
+if(halld_home == None):
+	print 'HALLD_HOME environment variable not set!'
+	exit(-1)
+
+# Get HALLD_MY if it exists. Otherwise use HALLD_HOME
+halld_my = os.getenv('HALLD_MY', halld_home)
+
+# Add SBMS directory to PYTHONPATH
+sbmsdir = "%s/src/SBMS" % halld_home
+sys.path.append(sbmsdir)
+
+import sbms
+
+# Get command-line options
+SHOWBUILD = ARGUMENTS.get('SHOWBUILD', 0)
+
+# Get platform-specific name
+osname = os.getenv('BMS_OSNAME', 'build')
+
+# Get architecture name
+arch = subprocess.Popen(["uname"], stdout=subprocess.PIPE).communicate()[0].strip()
+
+# Setup initial environment
+installdir = "%s/%s" %(halld_my, osname)
+include = "%s/include" % (installdir)
+bin = "%s/bin" % (installdir)
+lib = "%s/lib" % (installdir)
+plugins = "%s/plugins" % (installdir)
+env = Environment(        ENV = os.environ,  # Bring in full environment, including PATH
+                      CPPPATH = [include],
+                      LIBPATH = ["%s/%s/lib" %(halld_home, osname)],  # n.b. add HALLD_HOME here and prepend HALLD_MY below
+                  variant_dir = ".%s" % (osname))
+
+# Only add HALLD_MY library search path if it already exists
+# since we'll get a warning otherwise
+if (os.path.exists(lib)): env.PrependUnique(lib)
+
+# These are SBMS-specific variables (i.e. not default scons ones)
+env.Replace(INSTALLDIR    = installdir,
+				OSNAME        = osname,
+				INCDIR        = include,
+				BINDIR        = bin,
+				LIBDIR        = lib,
+				PLUGINSDIR    = plugins,
+				ALL_SOURCES   = [],        # used so we can add generated sources
+				SHOWBUILD     = SHOWBUILD,
+		 COMMAND_LINE_TARGETS = COMMAND_LINE_TARGETS)
+
+# Use terse output unless otherwise specified
+if SHOWBUILD==0:
+	env.Replace(   CCCOMSTR       = "Compiling  [$SOURCE]",
+				  CXXCOMSTR       = "Compiling  [$SOURCE]",
+				  FORTRANPPCOMSTR = "Compiling  [$SOURCE]",
+				  FORTRANCOMSTR   = "Compiling  [$SOURCE]",
+				  SHCCCOMSTR      = "Compiling  [$SOURCE]",
+				  SHCXXCOMSTR     = "Compiling  [$SOURCE]",
+				  LINKCOMSTR      = "Linking    [$TARGET]",
+				  SHLINKCOMSTR    = "Linking    [$TARGET]",
+				  INSTALLSTR      = "Installing [$TARGET]",
+				  ARCOMSTR        = "Archiving  [$TARGET]",
+				  RANLIBCOMSTR    = "Ranlib     [$TARGET]")
+
+
+# Get compiler from environment variables (if set)
+env.Replace( CXX = os.getenv('CXX', 'g++'),
+             CC  = os.getenv('CC' , 'gcc'),
+             FC  = os.getenv('FC' , 'gfortran') )
+
+# Add local directory, directories from HALLD_MY and HALLD_HOME to include search path
+#env.PrependUnique(CPPPATH = ['#'])
+env.PrependUnique(CPPPATH = ['%s/src' % halld_my, '%s/src/libraries' % halld_my, '%s/src/libraries/include' % halld_my])
+env.PrependUnique(CPPPATH = ['%s/src' % halld_home, '%s/src/libraries' % halld_home, '%s/src/libraries/include' % halld_home])
+
+env.PrependUnique(CPPPATH = ['%s/%s/include' % (halld_my,osname)])
+env.PrependUnique(CPPPATH = ['%s/%s/include' % (halld_home,osname)])
+
+# Turn on debug symbols and warnings
+env.PrependUnique(      CFLAGS = ['-g', '-fPIC', '-Wall'])
+env.PrependUnique(    CXXFLAGS = ['-g', '-fPIC', '-Wall'])
+env.PrependUnique(FORTRANFLAGS = ['-g', '-fPIC', '-Wall'])
+
+env.PrependUnique(    CXXFLAGS = ['-std=c++11'])
+
+# Apply any platform/architecture specific settings
+sbms.ApplyPlatformSpecificSettings(env, arch)
+sbms.ApplyPlatformSpecificSettings(env, osname)
+
+# Make plugin from source in this directory
+sbms.AddDANA(env)
+sbms.AddROOT(env)
+sbms.plugin(env)
+
+# Make install target
+env.Alias('install', installdir)
+
+
