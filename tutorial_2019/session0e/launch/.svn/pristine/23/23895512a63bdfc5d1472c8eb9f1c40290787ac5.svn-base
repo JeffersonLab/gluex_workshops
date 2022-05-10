@@ -1,0 +1,13 @@
+PLUGINS danarest,monitoring_hists,occupancy_online,EPICS_dump,TS_scaler,TRIG_online,L1_online,PSPair_online,BCAL_inv_mass,FCAL_invmass,BCAL_Hadronic_Eff,BCAL_Eff,CDC_Efficiency,CDC_TimeToDistance,TrackingPulls,FCAL_Hadronic_Eff,FDC_Efficiency,SC_Eff,TOF_Eff,trackeff_missing,evio_writer,p2pi_hists,p3pi_hists,ppi0gamma_hists,coherent_peak_skim,PS_flux,omega_skim,randomtrigger_skim,TPOL_tree
+
+#Ncores if you want to use all of the hyperthreads available (only use if you have the whole node!)
+NTHREADS 16
+
+REST:DATAVERSIONSTRING recon_RunPeriod-2017-01_ver03
+JANA_CALIB_CONTEXT variation=default calibtime=2018-07-27-17-14-00     #calibtime=YYYY-MM-DD-hh-mm-ss (hr is 24-hr format)
+
+TRKFIT:HYPOTHESES 2,3,8,9,11,12,14,15    #GEANT PIDs for tracking: Add e+/- & pbar
+
+#Fail job if input file is truncated (default 0)
+EVIO:TREAT_TRUNCATED_AS_ERROR 1
+

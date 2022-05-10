@@ -1,0 +1,13 @@
+PLUGINS occupancy_online,highlevel_online,danarest,monitoring_hists,TAGH_online,TAGM_online,TAGM_clusters,TAGM_TW,BCAL_online,CDC_online,CDC_Efficiency,FCAL_online,FDC_online,FDC_Efficiency,ST_online_lowlevel,lowlevel_online,ST_online_tracking,TOF_online,PS_online,PSC_online,PSPair_online,PS_flux,TPOL_online,TOF_TDC_shift,BCAL_Eff,BCAL_Hadronic_Eff,BCAL_TDC_Timing,FCAL_Hadronic_Eff,p2pi_hists,p3pi_hists,ppi0gamma_hists,HLDetectorTiming,BCAL_inv_mass,TRIG_online,CDC_drift,RF_online,ST_online_efficiency,ST_Tresolution,CDC_expert_2,L1_online,FCAL_invmass,TrackingPulls,p4pi_hists,p2k_hists,CDC_TimeToDistance,TOF_calib,CDC_amp,CDC_dedx,BCAL_attenlength_gainratio,trackeff_missing,TPOL_tree
+
+#Ncores if you want to use all of the hyperthreads available (only use if you have the whole node!)
+NTHREADS 24
+
+REST:DATAVERSIONSTRING offmon_RunPeriod-2018-01_ver18
+JANA_CALIB_CONTEXT calibtime=2018-10-04-10-00-00   #calibtime=YYYY-MM-DD-hh-mm-ss (hr is 24-hr format)
+
+TRKFIT:HYPOTHESES 2,3,8,9,11,12,14,15    #GEANT PIDs for tracking: Add e+/- & pbar
+
+#Fail job if input file is truncated (default 0)
+EVIO:TREAT_TRUNCATED_AS_ERROR 1
+

@@ -1,0 +1,29 @@
+Session0g Commands:
+
+# Assumption for these excercises: you've already run your DSelector over both data and simulation samples to obtain your yields for each.  For our purposes these yields will be stored in the following histogram files
+## hist_omega__3pi.root 
+## hist_omega_3pi_gen_omega_3pi.root
+# For more information (and example code) on this see Session 1c of the 2018 tutorial https://halldweb.jlab.org/wiki/index.php/GlueX_Tutorial_2018 .
+
+####################################
+# Steps to complete for excercises #
+####################################
+
+# 1) Make flux histogram for runs of interest (30730 in this case)
+/group/halld/Software/hd_utilities/psflux/plot_flux_ccdb.py --begin-run=30730 --end-run=30730 --num-bins=600 --energy-min=6.0 --energy-max=12.0
+
+# 2) Run mcthrown_tree plugin over simulation REST file (done automatically by MCWrapper bot)
+hd_root -PPLUGINS=mcthrown_tree dana_rest_gen_omega_3pi_030730_000.hddm
+
+# 3) Make DSelector for thrown tree and modify it to :
+MakeDSelector /work/halld2/home/jrsteven/tutorial2019/data/tree_thrown_gen_omega_3pi_030730.root Thrown_Tree 3pi_thrown
+# In loop over events in this new DSelector_3pi_thrown.C, fill histograms of generated events in relevant kinematic variables (e.g. E_gamma and -t)
+
+# 4) Run DSelector over thrown tree to fill thrown histograms for efficiency denominator:
+root -l /work/halld2/home/jrsteven/tutorial2019/data/tree_thrown_gen_omega_3pi_030730.root
+.x $ROOT_ANALYSIS_HOME/scripts/Load_DSelector.C
+Thrown_Tree->Process("DSelector_3pi_thrown.C");
+
+# 5) Plot efficiency, flux normalized yield and "cross section"
+root -l plotFluxNormalized.C
+
