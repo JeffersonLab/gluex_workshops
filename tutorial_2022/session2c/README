@@ -1,0 +1,25 @@
+DSelector_etapi.C/h provide an implementation of a DSelector for the reaction 
+<img src="https://render.githubusercontent.com/render/math?math=\gamma p\rightarrow\pi^0\eta p \rightarrow 4\gamma p"> 
+
+To run the DSelector, runDSelector.C is used. Inside this macro, the physics analysis trees can be run over by Adding
+them to a TChain. Once in a chain, PROOF can be used to run the DSelector multi-threaded for quicker runtimes. PROOF 
+will output a root file of the reduced tree and a root file of the histograms made during the process. Once you are satisfied
+with the program inputs, you can simply run it by
+
+root -l -b -q runDSelector.C
+
+It is helpful to visualize the event selections to see what the effects are. DSelector_etapi makes various histograms
+including most of the relevant variables that are used in the event selection process. It is also quite simple to draw
+shaded boxes and functions to denote the selection regions. drawCuts.C is a macro that does this. It is another 
+argument-less macro and can be run simply as
+
+root -l -b -q drawCuts.C
+
+To prepare for amplitude fits, the reduced tree that is output from the DSelector scripts has to be reorganized and
+simplified abit. To do this, tree_to_amptools program have been developed. To run the program
+
+tree_to_amptools input_file_name input_tree_name
+
+where input_file_name is the root file that contains the reduced tree and input_tree_name is the name of the tree, i.e.
+
+tree_to_amptools output_tree.root pi0eta__B4_M17_M7_Tree
