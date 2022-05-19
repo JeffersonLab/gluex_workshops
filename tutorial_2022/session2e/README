@@ -1,0 +1,15 @@
+
+This directory contains two example AmpTools fits.  These fits contain a amplitude set that is appropriate
+for roughly measuring the a2 cross section in the eta pi0 channel.  The D wave amplitude set comes from
+the Tensor Meson Dominance model from JPAC that specifies which m projections of the D wave tend dominate
+natural and unnatural parity exchange.
+
+The dynamics of the D wave are described by a Breit Wigner consistent with the parametrization of the a2.
+The S-wave is modeled by a coarsely-bind piecewise complex function.  This is likely not ideal for the
+small data set used in this tutorial but is sufficient to illustrate the idea.
+
+1) Begin by creating a symbolic link from a work disk directory that holds the data files to be fit:
+
+ln -s /work/halld/home/shepherd/tutorial_2022/session2e/fsroot .
+
+2) ..
