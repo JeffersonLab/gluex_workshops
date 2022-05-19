@@ -1,0 +1,10 @@
+#beam configuration file
+cobrems.conf
+#mass[GeV] width[GeV]
+0.547853 0.000
+#g_eta_gamma_gamma g_rho_eta_gamma g_omega_eta_gamma g_phi_eta_gamma 
+0.0429 0.81 0.29 0.38
+#Number of decay particles
+3
+#GEANT ids of decay particles (1=gamma,7=pi0, 8=pi+, 9=pi-, 17=eta).
+7 8 9

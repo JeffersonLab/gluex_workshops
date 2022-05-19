@@ -1,0 +1,1 @@
+CREATE TABLE deltapp_test_data (id INT NOT NULL AUTO_INCREMENT, platform VARCHAR(100), date_generated DATE NOT NULL, run int NOT NULL, delta_yield REAL, delta_mass REAL, config TEXT, comment VARCHAR(255),  PRIMARY KEY(id));

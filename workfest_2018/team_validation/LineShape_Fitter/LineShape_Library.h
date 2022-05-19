@@ -16,18 +16,21 @@
 #include "RooArgList.h"
 #include "RooAbsCategory.h"
 #include "RooAbsPdf.h"
+#include "RooAddPdf.h"
 #include "RooListProxy.h"
 #include "RooRealVar.h"
 #include "particleType.h"
+#include <complex>
+#include "RooMath.h"
+#include "TColor.h"
  
-enum {POLYNOMIAL=0, BREITWIGNER, JBREITWIGNER,NONRESONANT};
-enum {RESSHAPE=0,RESNORM,RESSIZE,RESL,RESMASS,RESWIDTH,RESRELPHASE,PARAM_START};
+enum {POLYNOMIAL=0, BREITWIGNER, JBREITWIGNER,NONRESONANT, NONRESONANTG, VOIGTIAN};
 
 class LineShape_Library : public RooAbsPdf {
 public:
   LineShape_Library() {} ; 
-  LineShape_Library(const char *name, const char *title,RooArgList& _values, std::vector<RooArgList*> _res, Particle_t Dau1, Particle_t Dau2);
-  LineShape_Library(const char *name, const char *title,RooArgList& _values, Particle_t Dau1, Particle_t Dau2);
+  LineShape_Library(const char *name, const char *title, RooRealVar* totalNorm,RooArgList& _values, std::vector<RooArgList*> _res, Particle_t Dau1, Particle_t Dau2);
+  LineShape_Library(const char *name, const char *title,RooRealVar* totalNorm, RooArgList& _values, Particle_t Dau1, Particle_t Dau2);
   LineShape_Library(const LineShape_Library& other, const char* name=0);
   virtual TObject* clone(const char* newname) const { return new LineShape_Library(*this,newname); }
   inline virtual ~LineShape_Library() { }
@@ -38,35 +41,48 @@ public:
   
   TComplex R(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& LKs, const double& d) const;
   TComplex NR_R(const double& m, const double& fittedm, const double& q, const double& q0, const double& res_L, const double& d, const double& alpha) const;
+  TComplex NRG_R(const double& m, const double& turnOn, const double& c1, const double& c2) const;
   TComplex BW(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& L, const double& d) const;
   TComplex RJackson(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& LKs, const double& d) const;
   TComplex BWJackson(const double& m, const double& m0, const double& gamma0, const double& q, const double& q0, const int& L, const double& d) const;
+  double VOIGT(const double& m,const double& m0,const double& width, const double& sigma) const;
   
   double Gamma(const double& m, const double& gamma0, const double& q, const double& q0, const int& L, const double& m0, const double& d) const;
   double GetSumOfShapesSquared(double m) const;
 
   void CreateComponent(TString name,int shape,double size,double L, double mass, double width,bool isNorm);
-  void AddComponent(RooListProxy* toAdd);
+  void AddComponent(RooListProxy* toAdd , std::map<string,int > toAddMAp);
 
 
-  LineShape_Library GetSingleComponent_PDF(TString name);
+  void PlotComponent(TString name, RooPlot* frame,EColor color,double yield);
+
+  LineShape_Library* GetSingleComponent_PDF(TString name);
   RooListProxy* GetComponent(TString name);
+  std::map<string,int >  GetComponentResMap(TString name);
   RooRealVar* GetParameter(RooListProxy* resonance, TString name);
   RooRealVar* GetParameterFromComponent(TString compname,TString paramname);
+  RooAddPdf* GetComponentModel(TString name, double intval);
+  double GetTotalNorm();
 
   void ReplaceResList(std::vector<RooListProxy*> newres);
-  double GetIntegral(TString resname, double int_min, double int_max);
+  double GetIntegralOf(TString resname, double int_min, double int_max);
+  double DoNumericIntegral(double min,double max);
+  double GetYieldold(TString resname,double int_min, double int_max);
+  double GetYield(TString resname,double int_min, double int_max);
+  int findIndex(int i, string key) const;
 
 
 
 protected:
 
 std::vector<RooListProxy*> res;
+std::vector<std::map<string,int > >res_map;
 RooListProxy fitted_values;
 Particle_t dau1;
 Particle_t dau2;
 double mDau1;
 double mDau2;
+RooRealVar* TotalNorm;
   
   Double_t evaluate() const ;
 

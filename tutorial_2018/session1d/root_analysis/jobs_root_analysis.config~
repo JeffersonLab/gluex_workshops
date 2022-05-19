@@ -1,0 +1,39 @@
+# Key/value pairs are separated by white space
+# Lines starting with # and empty lines are ignored
+# Only the first two values are evaluated, so for lines like:
+#     KEYVALUE VALUE1 VALUE2
+# VALUE2 is ignored
+# For files & directories: Must specify full path
+
+# SCICOMP JOB ACCOUNTING
+PROJECT                       gluex                 # http://scicomp.jlab.org/scicomp/#/projects
+TRACK                         analysis              # https://scicomp.jlab.org/docs/batch_job_tracks
+OS                            centos7
+
+# JOB RESOURCES
+NCORES                        6
+DISK                          50GB
+RAM                           10GB
+TIMELIMIT                     1hrs
+
+# WORKFLOW DEFINITION
+RUNPERIOD                     2017-01
+WORKFLOW                      analysis_[RUNPERIOD]_omega_3pi                           # MUST start with a letter!
+
+# JOB, SCRIPT CONTROL
+ENVFILE                       /group/halld/Software/workshops/tutorial_2018/session1a/env_t18.sh
+SCRIPTFILE                    /group/halld/Software/workshops/tutorial_2018/session1d/root_analysis/script.sh
+#CACHE_PIN_DAYS               21                                                      # max is 60, 0 or comment-out for none
+
+# ROOT CONFIG
+ROOT_SCRIPT                   /group/halld/Software/workshops/tutorial_2018/session1d/root_analysis/script.sh
+TREE_NAME                     pi0pippim__B4_Tree
+SELECTOR_NAME                 /group/halld/Software/workshops/tutorial_2018/session1c/DSelector_omega_3pi      # Leave .C off of the end!
+
+# FILE INPUT, OUTPUT BASE DIRECTORIES
+INDATA_TOPDIR     /cache/halld/RunPeriod-2017-01/analysis/ver12/tree_pi0pippim__B4/merged/
+
+# FILE OUTPUT
+OUTDIR_LARGE      /volatile/halld/home/tutorial/RunPeriod-[RUNPERIOD]/DSelector/omega/     # REST, hist
+OUTDIR_SMALL      /volatile/halld/home/tutorial/RunPeriod-[RUNPERIOD]/DSelector/omega/     # log
+

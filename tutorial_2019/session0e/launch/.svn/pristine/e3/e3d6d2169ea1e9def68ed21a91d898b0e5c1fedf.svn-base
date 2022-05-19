@@ -1,0 +1,87 @@
+PLUGINS monitoring_hists,ReactionFilter
+
+#Ncores if you want to use all of the hyperthreads available (only use if you have the whole node!)
+NTHREADS 12
+
+#MONITOR:MEMORY_EVENTS 1100000
+
+#Limit number of neurals
+COMBO:MAX_NEUTRALS 15
+
+REST:DATAVERSIONSTRING recon_RunPeriod-2017-01_ver01
+ANALYSIS:DATAVERSIONSTRING analysis_RunPeriod-2017-01_ver05
+
+#JANA_CALIB_CONTEXT variation=default calibtime=2017-09-13-16-27-00     #calibtime=YYYY-MM-DD-hh-mm-ss (hr is 24-hr format)
+
+
+#EVENTS_TO_KEEP 50000
+
+# GEANT PIDS:
+# X/g          =  0, 1
+# e+/-         =  2, 3
+# pi0/+/-      =  7, 8, 9
+# K+/-/S/L     =  11, 12, 16, 10
+# eta/eta'     =  17, 35
+# omega/phi    =  33, 34
+
+# Etac         =  84
+# Jpsi/psi2s   =  83, 88
+# D0/D0bar/D+  =  89, 94, 90
+# Chic0/1/2    =  85, 86, 87
+# D*0/+        =  91, 92
+
+# p/pbar/n     =  14, 15, 13
+# Lamb/lbar    =  18, 26
+# Sig+/0/-     =  19, 20, 21
+# Xi0/-        =  22, 23
+# Omega-       =  24
+# Lambdac      =  93
+
+#F#: Kinfit enum value (0 is no fit, 1 is p4-only, 2 is vertex only, 4 is vertex-p4)
+
+#B#: # of ± Beam Bunches (e.g. 0 is center peak only, 2 is center ± 2)
+
+#T#: # of extra tracks
+
+#M#: PID # of particle to not constrain kinfit mass
+
+#Convention for final-state order: numerical, but baryons last
+
+Reaction1  1_14__1_1_14		        # 2g p
+Reaction1:Flags B4
+Reaction2  1_14__8_9_14		        # pi+ pi- p
+Reaction2:Flags B4
+Reaction3  1_14__7_8_9_14		# pi0 pi+ pi- p
+Reaction3:Flags B4
+Reaction4  1_14__7_7_7_14		# 3pi0 p
+Reaction4:Flags B4
+
+Reaction5  1_14__11_12_14		# K+ K- p
+Reaction5:Flags B4
+
+#Mahmoud
+Reaction6  1_14__1_1_8_8_9_9_14         # 2g 2pi+ 2pi- p
+Reaction7  1_14__1_1_8_8_9_13           # 2g 2pi+ pi- n
+Reaction8  1_14__8_9_17_14		# pi+ pi- eta p
+Reaction8:Flags B3
+Reaction9  1_14__1_8_9_14		# g pi+ pi- p
+Reaction9:Flags B3
+
+#Bradford
+Reaction10 1_14__1_1_11_12_14		# 2g K+ K- p
+
+#Ashley
+Reaction11          1_14__11_11_23
+Reaction11:Flags    M18_M23
+Reaction12          1_14__11_11_12_18
+Reaction12:Flags    M18
+Reaction13          1_14__7_9_11_11_18
+Reaction14          1_14__11_16_22
+Reaction14:Flags    M22
+Reaction15          1_14__8_11_16_23
+Reaction15:Flags    M23
+Reaction16          1_14__11_16_16_18
+
+#Peter
+Reaction17          1_14__11_11_16_24
+Reaction17:Decay1   18__9_m14

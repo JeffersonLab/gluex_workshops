@@ -1,0 +1,10 @@
+## Session 2b
+This part of the tutorial covers the generation of MC simulations necessary for amplitude fits.
+
+The presentation shows how to generate MC with MCWrapper (https://github.com/JeffersonLab/gluex_MCwrapper) a suite of scripts provided to ease MC production.
+
+The provided files can be used to generate MC locally. To generate 1,000,000 events for the run range 30274-31057, make the appropriate changes to the paths in MC.config and call
+```
+$MCWRAPPER_CENTRAL/gluex_MC.py MC.config 30274-31057 1000000
+```
+from the command line (requires GlueX software to be set up, see Session 2a).

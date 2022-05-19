@@ -1,0 +1,39 @@
+# Key/value pairs are separated by white space
+# Lines starting with # and empty lines are ignored
+# Only the first two values are evaluated, so for lines like:
+#     KEYVALUE VALUE1 VALUE2
+# VALUE2 is ignored
+# For files & directories: Must specify full path
+
+# SCICOMP JOB ACCOUNTING
+PROJECT                       gluex                 # http://scicomp.jlab.org/scicomp/#/projects
+TRACK                         debug #reconstruction        # https://scicomp.jlab.org/docs/batch_job_tracks
+OS                            centos7
+
+# JOB RESOURCES
+NCORES                        12
+DISK                          30GB
+RAM                           12GB
+TIMELIMIT                     2hrs
+
+# WORKFLOW DEFINITION
+# RUNPERIOD, VERSION, & BATCH: Not needed by launch.py: Only used to replace variables in this config
+RUNPERIOD                     2016-02
+VERSION                       99
+BATCH                         01
+WORKFLOW                      test_[RUNPERIOD]_ver[VERSION]_batch[BATCH]
+
+# JOB, SCRIPT CONTROL
+ENVFILE                       /home/gxproj5/env_monitoring_launch.sh
+SCRIPTFILE                    /home/gxproj5/monitoring/launch/script.sh
+RCDB_QUERY                    "@is_production and @status_approved"         # comment-out for all runs
+JANA_CONFIG                   /home/gxproj5/monitoring/launch/jana_test.config
+CACHE_PIN_DAYS                60                                            # max is 60, 0 or comment-out for none
+
+# FILE INPUT, OUTPUT BASE DIRECTORIES
+INDATA_TOPDIR     /cache/halld/RunPeriod-[RUNPERIOD]/rawdata/
+
+# FOR FULL RECON LAUNCHES
+OUTDIR_LARGE      /cache/halld/RunPeriod-[RUNPERIOD]/recon/ver[VERSION]                  # REST, skims, hists, trees
+OUTDIR_SMALL      /work/halld2/recon/RunPeriod-[RUNPERIOD]/ver[VERSION]                  # log files, IDXA
+

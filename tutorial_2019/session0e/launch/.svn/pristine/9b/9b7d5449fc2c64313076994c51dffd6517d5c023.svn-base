@@ -1,0 +1,9 @@
+PLUGINS monitoring_hists,trackeff_missing,2kp,2kpi0p,2kpi0xi,3kqlambda,B3pi,Bb2pi,Bpi0g,BTbcal_eta,cascade,cascade0,eta,etaeta_nas,eta_etapr_eeg,etaetaprm_nas,EtaPrm_MKamel,jpsi_robison,k02pilambda,k0kmpip,k0pi0sigmaplus,k0pilambda,k0pisigma0,k0sigma,k2pilambda,k2pisigma0,klambda,kpi0lambda,kpi0sigma0,kpisigmaplus,kpk0pixi,ksigma0,LambdaC,n3pi_hists,npiPlus_singlePi,p2gamma_hists,p2k0_hists,p2k2pi,p2pi2pi0_hists,p2pi_rho,p4gamma,p4pi_hists,PhiEta,phi_salgado,pi0omega_nas,ppbar_phelps
+
+#Ncores if you want to use all of the hyperthreads available (only use if you have the whole node!)
+NTHREADS 12
+
+REST:DATAVERSIONSTRING recon_RunPeriod-2016-02_ver01
+JANA_CALIB_CONTEXT variation=default calibtime=2016-07-22-20-00-00     #calibtime=YYYY-MM-DD-hh-mm-ss (hr is 24-hr format)
+
+TRKFIT:HYPOTHESES 2,3,8,9,11,12,14    #GEANT PIDs for tracking: Add e+/-

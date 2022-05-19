@@ -17,8 +17,6 @@
 
 #include "DFactoryGenerator_p3pi_PiMinusMiss_P4.h"
 
-//JZ decided to test git right here
-
 using namespace jana;
 using namespace std;
 
