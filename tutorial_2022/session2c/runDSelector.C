@@ -17,9 +17,11 @@ void runDSelector()
 
 	///// Load all the trees you want to run over
 	// - MC simulated flat in mass to determine the acceptance
-	//chain->Add("/work/halld/lng/tSlopeSampler/2017_130M/tree_builder/merged/tree_pi0eta__B4_M17_M7_merged*");
+	chain->Add("/work/halld/lng/tSlopeSampler/2017_130M/tree_builder/merged/tree_pi0eta__B4_M17_M7_merged*");
 	// - Data from the spring 2017 run period
-	chain->Add("/cache/halld/RunPeriod-2017-01/analysis/ver52/tree_pi0eta__B4_M17_M7/merged/tree_pi0eta__B4_M17_M7_03*");
+	//chain->Add("/cache/halld/RunPeriod-2017-01/analysis/ver52/tree_pi0eta__B4_M17_M7/merged/tree_pi0eta__B4_M17_M7_03*");
+	//chain->Add("D2017_signal/output_tree.root");
+	
 	//chain->Add("/work/halld2/home/lng/MC/malte_kmatrix/tree_pi0eta__B4_M7_M17_gen_amp*");
         
 	string options = "";

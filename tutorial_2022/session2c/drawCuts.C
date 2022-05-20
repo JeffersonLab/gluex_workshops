@@ -139,6 +139,13 @@ void drawCuts(){
 	box->DrawBox(1.4,0,h1->GetXaxis()->GetXmax(),h1->GetMaximum()*1.05);	
 	c->SaveAs(("plots/"+hname+".pdf").c_str());
 
+	hname="Metapi_sig";
+	f->GetObject(hname.c_str(),h1);
+	h1->Draw(drawOptions.c_str());
+	h1->SetMinimum(0);
+	box->DrawBox(1.04,0,1.56,h1->GetMaximum()*1.05);	
+	c->SaveAs(("plots/"+hname+".pdf").c_str());
+
 	float pi0Mean=0.135881;
 	float pi0Std=0.0076;
 	hname="Mpi0";
@@ -177,7 +184,7 @@ void drawCuts(){
 	c->SaveAs(("plots/"+hname+".pdf").c_str());
 
 	/// PLOT ALL EXTRA HISTOGRAMS THAT ARE 1-DIMENSIONAL
-	vector<string> hnames={"Metapi_sig","Metapi_sig_zoom","Metap","combosRemaining"};
+	vector<string> hnames={"Metapi_sig_zoom","Metap","combosRemaining"};
 	for (auto name: hnames){
 		f->GetObject(name.c_str(),h1);
 		h1->Draw(drawOptions.c_str());

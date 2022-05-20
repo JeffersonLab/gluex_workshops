@@ -63,10 +63,9 @@ class DSelector_etapi : public DSelector
 		TH1F* dHist_Metap;
 		TH1F* dHist_protonZ;
 		TH1F* dHist_t;
-		TH2F* dHist_cosThetaVsMpi0eta;
+		TH2F* dHist_cosThetaVsMetapi0;
 		TH1F* dHist_Metapi_tot;
 		TH1F* dHist_Metapi_sig;
-		TH1F* dHist_Metapi_sig_zoomed;
 		TH1F* dHist_Metapi_bkg;
 		TH1F* dHist_Meta;
 		TH1F* dHist_Mpi0;

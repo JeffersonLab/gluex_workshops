@@ -12,8 +12,11 @@ void DSelector_etapi::Init(TTree *locTree)
 	//USERS: SET OUTPUT FILE NAME //can be overriden by user in PROOF
 	dOutputFileName = "output_dselector.root"; //"" for none
 	dOutputTreeFileName = "output_tree.root"; //"" for none
+
+	// AmpTools tree output - step 1
+	// Creating a flat tree
 	dFlatTreeFileName = "output_flat.root"; //output flat tree (one combo per tree entry), "" for none
-	dFlatTreeName = ""; //if blank, default name will be chosen
+	dFlatTreeName = "kin"; //if blank, default name will be chosen
 	//dSaveDefaultFlatBranches = true; // False: don't save default branches, reduce disk footprint.
 	//dSaveTLorentzVectorsAsFundamentaFlatTree = false; // Default (or false): save particles as TLorentzVector objects. True: save as four doubles instead.
 
@@ -27,6 +30,15 @@ void DSelector_etapi::Init(TTree *locTree)
 
 	Get_ComboWrappers();
 	dPreviousRunNumber = 0;
+
+	// AmpTools tree output - step 2
+	// Creating new branches in the flat tree
+ 	SetupAmpTools_FlatTree(); // sets most of the branches necesary for AmpTools PWA
+ 	dFlatTreeInterface->Create_Branch_Fundamental<Float_t>("Target_Mass"); 
+ 	dFlatTreeInterface->Create_Branch_FundamentalArray<Int_t>("PID_FinalState","NumFinalState");
+ 	dFlatTreeInterface->Create_Branch_Fundamental<Int_t>("pol_angle");
+ 	dFlatTreeInterface->Create_Branch_Fundamental<Float_t>("mandel_t"); 
+ 	dFlatTreeInterface->Create_Branch_Fundamental<Float_t>("Weight"); 
 
 	/*********************************** EXAMPLE USER INITIALIZATION: ANALYSIS ACTIONS **********************************/
 
@@ -84,10 +96,9 @@ void DSelector_etapi::Init(TTree *locTree)
 	// Best practices is to include the bin width in the axis labels
 	//dHist_MissingMassSquared = new TH1I("MissingMassSquared", ";Missing Mass Squared (GeV/c^{2})^{2}", 200, -0.2, 0.2);
 	dHist_BeamEnergy = new TH1F("BeamEnergy", ";Beam Energy (GeV);Entries / 0.1 GeV", 90, 3.0, 12.0);
-	dHist_Metapi_tot = new TH1F("Metapi_tot",";M(4#gamma) (GeV);Entries / 0.04 GeV",50,0.5,2.5);
-	dHist_Metapi_sig = new TH1F("Metapi_sig",";M(4#gamma) (GeV);Entries / 0.04 GeV",50,0.5,2.5);
-	dHist_Metapi_sig_zoomed = new TH1F("Metapi_sig_zoom",";M(4#gamma) (GeV);Entries / 0.04 GeV",13,1.04,1.56); // zooms into the a2(1320) mass region
-	dHist_Metapi_bkg = new TH1F("Metapi_bkg",";M(4#gamma) (GeV);Entries / 0.04 GeV",50,0.5,2.5);
+	dHist_Metapi_tot = new TH1F("Metapi_tot",";M(4#gamma) (GeV);Entries / 0.02 GeV",100,0.5,2.5);
+	dHist_Metapi_sig = new TH1F("Metapi_sig",";M(4#gamma) (GeV);Entries / 0.02 GeV",100,0.5,2.5);
+	dHist_Metapi_bkg = new TH1F("Metapi_bkg",";M(4#gamma) (GeV);Entries / 0.02 GeV",100,0.5,2.5);
 	dHist_Mpi0p = new TH1F("Mpi0p",";M(#gamma_{1}#gamma_{2}p) (GeV);Entries / 0.04 GeV",100,0,4);
 	dHist_Metap = new TH1F("Metap",";M(#gamma_{3}#gamma_{4}p) (GeV);Entries / 0.04 GeV",100,0,4);
 	dHist_Meta = new TH1F("Meta",";M(#gamma_{3}#gamma_{4}) (GeV);Entries / 0.05 GeV",100,0.3,0.8);
@@ -101,7 +112,7 @@ void DSelector_etapi::Init(TTree *locTree)
 	dHist_dEdx_momentum = new TH2F("dEdx_momentum",";Proton Momentum Entries / 0.04 GeV/c;dEdx_{CDC} Entries / 3E-7 GeV/cm",100,0,4,100,0,0.00003);
 	dHist_protonZ = new TH1F("proton_z",";Proton z (cm);Entries / 1 cm", 50, 40,90); 
 	dHist_combosRemaining = new TH1F("combosRemaining",";# Combos / Event Passed Selections",7,0,7);
-	dHist_cosThetaVsMpi0eta = new TH2F("cosThetaVsMpi0eta",";M(#eta#pi^{0}) Entries / 0.02 GeV;cos_{hel}(#theta) #eta Entries / 0.04",100,0.5,2.5,50,-1,1);
+	dHist_cosThetaVsMetapi0 = new TH2F("cosThetaVsMetapi0",";M(#eta#pi^{0}) Entries / 0.02 GeV;cos_{hel}(#theta) #eta Entries / 0.04",100,0.5,2.5,50,-1,1);
 
 	/************************** EXAMPLE USER INITIALIZATION: CUSTOM OUTPUT BRANCHES - MAIN TREE *************************/
 
@@ -266,6 +277,9 @@ Bool_t DSelector_etapi::Process(Long64_t locEntry)
 		//Step 2
 		TLorentzVector locPhoton3P4 = dPhoton3Wrapper->Get_P4();
 		TLorentzVector locPhoton4P4 = dPhoton4Wrapper->Get_P4();
+		//Construct Intermediate Resonances
+		TLorentzVector locEtaP4=locPhoton3P4+locPhoton4P4;
+		TLorentzVector locPi0P4=locPhoton1P4+locPhoton2P4;
 
 		// Get Measured P4's:
 		//Step 0
@@ -308,8 +322,8 @@ Bool_t DSelector_etapi::Process(Long64_t locEntry)
 		// A hidden step here that required fitting M(pi0) and M(eta) to extract 
 		// 	the peak and widths and associated weightings. Take these number
 		// 	as given for now
-		float Mpi0=(locPhoton1P4+locPhoton2P4).M();
-		float Meta=(locPhoton3P4+locPhoton4P4).M();
+		float Mpi0=locPi0P4.M();
+		float Meta=locEtaP4.M();
 		float pi0Mean=0.135881;
 		float etaMean=0.548625;
 		float pi0Std=0.0076;
@@ -317,8 +331,9 @@ Bool_t DSelector_etapi::Process(Long64_t locEntry)
 		float pi0_sbweight;
 		float eta_sbweight;
 		// The signal regions are both +/- 3 sigmas around the peak the left and right sidebands 
-		// 	are both 2 sigmas wide a 1 sigma "skip" region is included between the signal
-		// 	and sideband regions
+		// 	which are some N sigmas wide with some M sigma skip region included 
+		// 	between the signal and sideband regions. The weight = the ratio the lengths
+		// 	spanned by the signal to that of the sideband times -1.
 		if (Mpi0 > pi0Mean-3*pi0Std && Mpi0 < pi0Mean+3*pi0Std){ pi0_sbweight=1; }
 		else if (Mpi0 > pi0Mean+4*pi0Std && Mpi0 < pi0Mean+5.5*pi0Std){ pi0_sbweight=-2.0; }
 		else if (Mpi0 > pi0Mean-5.5*pi0Std && Mpi0 < pi0Mean-4*pi0Std){ pi0_sbweight=-2.0; }
@@ -327,19 +342,29 @@ Bool_t DSelector_etapi::Process(Long64_t locEntry)
 		else if (Meta > etaMean+4*etaStd && Meta < etaMean+6*etaStd){ eta_sbweight=-1.5; }
 		else if (Meta > etaMean-6*etaStd && Meta < etaMean-4*etaStd){ eta_sbweight=-1.5; }
 		else { eta_sbweight=0; }
-		//if ( abs(Mpi0-0.135)<0.025){ pi0_sbweight=1; }
-		//else if ( abs(Mpi0-0.135+0.05)<0.025 ){ pi0_sbweight=-0.5; }
-		//else if ( abs(Mpi0-0.135-0.05)<0.025 ){ pi0_sbweight=-0.5; }
-		//else { pi0_sbweight=0; }
-		//if ( abs(Meta-0.548)<0.05 ){ eta_sbweight=1; }
-		//else if ( abs(Meta-0.548+0.15)<0.05 ){ eta_sbweight=-0.5; }
-		//else if ( abs(Meta-0.548-0.15)<0.05 ){ eta_sbweight=-0.5; }
-		//else { eta_sbweight=0; }
 		float sbweight=pi0_sbweight*eta_sbweight;
 		float weight=sbweight*locHistAccidWeightFactor;
 		// Reject combinations with zero weights. Zero weights take up space and do nothing. 
 		// 	Worse, it might cause the amptools unbinned likelihood fits to break
 		bool bWeight=(weight==0) ? false : true; 
+
+		// AMPTOOLS REQUIRES 4 TREES (data, bkgnd, accmc, genmc)
+		//    data = selected trees of DATA where signal region has been selected, all weights = 1
+		//    bkgnd = selected trees of DATA where sidebands have been selected, all weights = -weight
+		//    accmc = selected trees of ACCEPTANCE MC where signal+sidebands have been selected, all weights = weight
+		//    genmc = thrown trees created during simulation process
+		bool signalRegion;
+		float branchWeight;
+		//---------CHOICE 1 FOR "data" RUN OVER SIGNAL/DATA-------------
+		//signalRegion=(pi0_sbweight==1)*(eta_sbweight==1)*(locHistAccidWeightFactor==1); // Keep combos ONLY in the signal region
+		//branchWeight=1;
+		//---------CHOICE 2 FOR "bkgnd" RUN OVER SIGNAL/DATA-------------
+		//signalRegion=!((pi0_sbweight==1)*(eta_sbweight==1)*(locHistAccidWeightFactor==1)); // Keep combos ONLY in the sideband region
+		//branchWeight=-weight;
+		//---------CHOICE 3 FOR "accmc" RUN OVER FLAT MC-------------
+		signalRegion=true; // Keep combos that exist in the signal AND sideband region
+		branchWeight=weight;
+		//----------------------
 
 		// Combine 4-vectors
 		TLorentzVector locMissingP4_Measured = locBeamP4_Measured + dTargetP4;
@@ -367,7 +392,7 @@ Bool_t DSelector_etapi::Process(Long64_t locEntry)
 		*/
 
 		// fill our weight branch that will be used for tree_to_amptools
-		dTreeInterface->Fill_Fundamental<Float_t>("DataWeight", weight, loc_i);
+		dTreeInterface->Fill_Fundamental<Float_t>("DataWeight", branchWeight, loc_i);
 
 		/**************************************** EXAMPLE: HISTOGRAM BEAM ENERGY *****************************************/
 
@@ -411,6 +436,7 @@ Bool_t DSelector_etapi::Process(Long64_t locEntry)
 		//// 1. NEUTRAL SHOWER RELATED (selecting good photons)
 		// Low energy photons are more likely to be spurious, require a minimum E
 		bool bPhotonE=(locPhoton1P4.E()>0.1)*(locPhoton2P4.E()>0.1)*(locPhoton3P4.E()>0.1)*(locPhoton4P4.E()>0.1); 
+		//bPhotonE=true; // Lawrence - testing something
 		// Working in degrees instead of radians, we remove photons near the beamline (<~2.5) and near the BCAL/FCAL transition (<~11.9, >~10.3)
 		float radToDeg=180/3.14159;
 		bool bPhotonTheta=
@@ -437,15 +463,18 @@ Bool_t DSelector_etapi::Process(Long64_t locEntry)
 		bool bUnusedEnergy=dComboWrapper->Get_Energy_UnusedShowers()<0.05;
 		// No missing particles are expected = no missing mass
 		bool bMMsq=abs(locMissingMassSquared)<0.05;
+		//bMMsq=true; // Lawrence - testing something
 		
 		//// 4. KINEMATICS RELATED (extra selections related to kinematics)
 		// Select on coherent peak for region of high polarization. The AMPTOOLS fit using Zlm amplitudes will use the polarization
 		// 	for extra separation power (will tell us something about the production mechanism)
 		bool bBeamEnergy=(locBeamP4.E()>8.2)*(locBeamP4.E()<8.8); 
 		float mandelstam_t=-(dTargetP4-locProtonP4).M2();		
-		float Mpi0p=(locPhoton1P4+locPhoton2P4+locProtonP4).M();
-		float Metap=(locPhoton3P4+locPhoton4P4+locProtonP4).M();
-		float Metapi0=(locPhoton1P4+locPhoton2P4+locPhoton3P4+locPhoton4P4).M();
+		float Mpi0p=(locPi0P4+locProtonP4).M();
+		float Metap=(locEtaP4+locProtonP4).M();
+		float Metapi0=(locPi0P4+locEtaP4).M();
+		bool bMetapi0 = (Metapi0>1.04)*(Metapi0<1.56); // Select the a2(1320) mass region
+		//bMetapi0=true; // Lawrence - testing something
 		// Meson production occurs with small-t whereas baryon production occurs with large-t. This analysis cares about mesons
 		bool bmandelstamt=(mandelstam_t<0.3)*(mandelstam_t>0.1); 
 		// There are a few baryon resonances, the Delta+(1232) being the largest. We can reject it 
@@ -457,12 +486,10 @@ Bool_t DSelector_etapi::Process(Long64_t locEntry)
 		// 	frame of the etapi system and requires a redefinition of the axes. 
 		// 	For this analysis, the helicity frame will be used as the amplitudes 
 		// 	that you will use are based on this frame
-		TLorentzVector pi0 = locPhoton1P4+locPhoton2P4;
-		TLorentzVector eta = locPhoton3P4+locPhoton4P4;
 		// First we need to boost to center of mass frame
 		TLorentzRotation cmRestBoost( -(locBeamP4+dTargetP4).BoostVector() );
-		TLorentzVector pi0_cm = cmRestBoost * pi0; 
-		TLorentzVector eta_cm = cmRestBoost * eta; 
+		TLorentzVector pi0_cm = cmRestBoost * locPi0P4; 
+		TLorentzVector eta_cm = cmRestBoost * locEtaP4; 
 		TLorentzVector beam_cm = cmRestBoost * locBeamP4;
 		TLorentzVector recoil_cm = cmRestBoost * locProtonP4;
    		TLorentzVector resonance = pi0_cm + eta_cm;
@@ -498,7 +525,7 @@ Bool_t DSelector_etapi::Process(Long64_t locEntry)
 		//	Since we have defined SELECTIONS we have to flip the boolean to get a CUT since the 
 		//	FLAG used asks if the combo should be cut
 		bool selection=bPhotonE*bPhotonTheta*bProtonMomentum*bProton_dEdx*bProtonZ*bChiSq*bUnusedEnergy*bMMsq*bBeamEnergy*
-				bmandelstamt*bMpi0p*bLowMassAltCombo;
+				bmandelstamt*bMpi0p*bLowMassAltCombo*bMetapi0*signalRegion;
 
 		// We generally do not want to apply a cut on a histogram we are trying to view. To this extent,
 		// 	we will just apply all other selections that are not used in the current plot
@@ -511,23 +538,31 @@ Bool_t DSelector_etapi::Process(Long64_t locEntry)
 			dComboWrapper->Set_IsComboCut(true);
 			continue;
 		}
-		if(bPhotonE*bPhotonTheta*bProtonMomentum*bProton_dEdx*bProtonZ*bChiSq*bUnusedEnergy*bBeamEnergy*bmandelstamt*bMpi0p*bLowMassAltCombo){
+		if(bPhotonE*bPhotonTheta*bProtonMomentum*bProton_dEdx*bProtonZ*bChiSq*bUnusedEnergy*bBeamEnergy*bmandelstamt*bMpi0p*bLowMassAltCombo*bMetapi0*signalRegion){
 			dHist_mmsq->Fill(locMissingMassSquared,weight);}
-		if(bPhotonE*bProtonMomentum*bProton_dEdx*bProtonZ*bChiSq*bUnusedEnergy*bMMsq*bBeamEnergy*bmandelstamt*bMpi0p*bLowMassAltCombo){
+		if(bPhotonE*bProtonMomentum*bProton_dEdx*bProtonZ*bChiSq*bUnusedEnergy*bMMsq*bBeamEnergy*bmandelstamt*bMpi0p*bLowMassAltCombo*bMetapi0*signalRegion){
 			dHist_photonThetaPi0->Fill(locPhoton1P4.Theta()*radToDeg,weight);
 			dHist_photonThetaPi0->Fill(locPhoton2P4.Theta()*radToDeg,weight);
 			dHist_photonThetaEta->Fill(locPhoton3P4.Theta()*radToDeg,weight);
 			dHist_photonThetaEta->Fill(locPhoton4P4.Theta()*radToDeg,weight);}
-		if(bPhotonE*bPhotonTheta*bProtonZ*bChiSq*bUnusedEnergy*bMMsq*bBeamEnergy*bmandelstamt*bMpi0p*bLowMassAltCombo){
+		if(bPhotonE*bPhotonTheta*bProtonZ*bChiSq*bUnusedEnergy*bMMsq*bBeamEnergy*bmandelstamt*bMpi0p*bLowMassAltCombo*bMetapi0*signalRegion){
 			dHist_dEdx_momentum->Fill(locProtonP4.Vect().Mag(),dProtonWrapper->Get_dEdx_CDC(),weight);}
-		if(bPhotonE*bPhotonTheta*bProtonMomentum*bProton_dEdx*bChiSq*bUnusedEnergy*bMMsq*bBeamEnergy*bmandelstamt*bMpi0p*bLowMassAltCombo){
+		if(bPhotonE*bPhotonTheta*bProtonMomentum*bProton_dEdx*bChiSq*bUnusedEnergy*bMMsq*bBeamEnergy*bmandelstamt*bMpi0p*bLowMassAltCombo*bMetapi0*signalRegion){
 			dHist_protonZ->Fill(locProtonX4.Z(),weight);}
-		if(bPhotonE*bPhotonTheta*bProtonMomentum*bProton_dEdx*bProtonZ*bChiSq*bUnusedEnergy*bMMsq*bBeamEnergy*bMpi0p*bLowMassAltCombo){
+		if(bPhotonE*bPhotonTheta*bProtonMomentum*bProton_dEdx*bProtonZ*bChiSq*bUnusedEnergy*bMMsq*bBeamEnergy*bMpi0p*bLowMassAltCombo*bMetapi0*signalRegion){
 			dHist_t->Fill(mandelstam_t,weight);}
-		if(bPhotonE*bPhotonTheta*bProtonMomentum*bProton_dEdx*bProtonZ*bChiSq*bUnusedEnergy*bMMsq*bBeamEnergy*bmandelstamt*bLowMassAltCombo){
+		if(bPhotonE*bPhotonTheta*bProtonMomentum*bProton_dEdx*bProtonZ*bChiSq*bUnusedEnergy*bMMsq*bBeamEnergy*bmandelstamt*bLowMassAltCombo*bMetapi0*signalRegion){
 			dHist_Mpi0p->Fill(Mpi0p,weight);}
-		if(bPhotonE*bPhotonTheta*bProtonMomentum*bProton_dEdx*bProtonZ*bUnusedEnergy*bMMsq*bBeamEnergy*bmandelstamt*bMpi0p*bLowMassAltCombo){
+		if(bPhotonE*bPhotonTheta*bProtonMomentum*bProton_dEdx*bProtonZ*bUnusedEnergy*bMMsq*bBeamEnergy*bmandelstamt*bMpi0p*bLowMassAltCombo*bMetapi0*signalRegion){
 			dHist_chiSq->Fill(dComboWrapper->Get_ChiSq_KinFit(""),weight);}
+		if(bPhotonE*bPhotonTheta*bProtonMomentum*bProton_dEdx*bProtonZ*bChiSq*bUnusedEnergy*bMMsq*bBeamEnergy*bmandelstamt*bMpi0p*bLowMassAltCombo*signalRegion){
+			dHist_Metapi_sig->Fill(Metapi0,weight);
+			dHist_cosThetaVsMetapi0->Fill(Metapi0,cosTheta,weight);
+			if ( (pi0_sbweight==1)*(eta_sbweight==1) )
+				dHist_Metapi_tot->Fill(Metapi0,locHistAccidWeightFactor);
+			else
+				dHist_Metapi_bkg->Fill(Metapi0,locHistAccidWeightFactor*sbweight);
+		}
 		if(!selection)
 		{
 			dComboWrapper->Set_IsComboCut(true);
@@ -536,15 +571,7 @@ Bool_t DSelector_etapi::Process(Long64_t locEntry)
 		++combos_remaining;
 		combo_weight+=weight;
 		dHist_rf->Fill(locDeltaT_RF);
-		dHist_Metapi_sig->Fill(Metapi0,weight);
 		dHist_Metap->Fill(Metap,weight);
-		dHist_cosThetaVsMpi0eta->Fill(Metapi0,cosTheta,weight);
-		if ( (pi0_sbweight==1)*(eta_sbweight==1) )
-			dHist_Metapi_tot->Fill(Metapi0,locHistAccidWeightFactor);
-		else
-			dHist_Metapi_bkg->Fill(Metapi0,locHistAccidWeightFactor*sbweight);
-		if ( (Metapi0<1.56)*(Metapi0>1.04) )
-			dHist_Metapi_sig_zoomed->Fill(Metapi0,weight);
 		// Since the sideband weights are dependent on the invariant mass distribution of the 
 		// 	pi0 and eta candidates we do now want to weight these histograms with 
 		// 	the sideband weights.  Resulting histogram would look very weird
@@ -570,8 +597,21 @@ Bool_t DSelector_etapi::Process(Long64_t locEntry)
 		}
 		*/
 
-		//FILL FLAT TREE
-		//Fill_FlatTree(); //for the active combo
+		// AmpTools tree output - step 3
+		// Filling the branches of the flat tree
+		vector<TLorentzVector> locFinalStateP4; // should be in the same order as PID_FinalState
+		locFinalStateP4.push_back(locProtonP4); 
+		locFinalStateP4.push_back(locPi0P4);
+		locFinalStateP4.push_back(locEtaP4);
+		dFlatTreeInterface->Fill_Fundamental<Float_t>("mandel_t", mandelstam_t);
+		dFlatTreeInterface->Fill_Fundamental<Float_t>("Weight", branchWeight);
+		dFlatTreeInterface->Fill_Fundamental<int>("pol_angle", locPolarizationAngle); // include so we can split on this branch later
+		dFlatTreeInterface->Fill_Fundamental<Float_t>("Target_Mass", 0.9382720); // Necesary for divideData.pl not for AmpTools itself (I think)
+		dFlatTreeInterface->Fill_Fundamental<int>("PID_FinalState", 2212, 0); // proton
+		dFlatTreeInterface->Fill_Fundamental<int>("PID_FinalState", 111, 1);  // Pi0
+		dFlatTreeInterface->Fill_Fundamental<int>("PID_FinalState", 221, 2);  // Eta
+		FillAmpTools_FlatTree(locBeamP4, locFinalStateP4);
+		Fill_FlatTree(); //for the active combo
 	} // end of combo loop
 
 	//FILL HISTOGRAMS: Num combos / events surviving actions
