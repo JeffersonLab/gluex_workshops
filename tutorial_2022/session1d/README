@@ -11,7 +11,7 @@ variables.  Here are some general instructions for reproducing those plots.
    kinematic variables.
 
 
-2) generate 10,000 events using gen_amp and write to an FSRoot compatibile file:
+2) generate 10,000 events using gen_amp and write to an FSRoot compatible file:
 
    gen_amp -o res.root -fsroot -c gen_res.cfg
 
@@ -19,5 +19,7 @@ variables.  Here are some general instructions for reproducing those plots.
 3) make a plot of various key kinematic variables:
 
    root -l plotAngles.C
+
+4) examine gen_interfere.cfg which produces plots for the interference of two resonances; repeat steps 2 and 3
 
 
