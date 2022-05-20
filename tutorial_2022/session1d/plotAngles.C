@@ -1,6 +1,6 @@
 
 {
-
+  
   TString f( "res.root" );
   TString tr( "nt" );
   
@@ -51,4 +51,6 @@
   
   can->cd( 8 );
   phiHelVsBigPhi->Draw();
+
+  can->Print( "plotAngles.pdf" );
 }
