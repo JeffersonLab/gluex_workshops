@@ -22,8 +22,11 @@ where val can be any number between 0.0 and 1.0. "name" is a string which specif
 After running this script, you will find four .png files: (where "name" takes the value that you just specified)
 
 Mx_p_vs_IM_pippimgg_rec_name.png
+
 Px_p_vs_Ex_rec_name.png
+
 Mx_p_vs_IM_pippimgg_fit_name.png
+
 Px_p_vs_Ex_fit_name.png
 
 The files "Mx_p_vs_IM_pippimgg" show the proton missing mass as a function of the three pion final state invariant mass. 
