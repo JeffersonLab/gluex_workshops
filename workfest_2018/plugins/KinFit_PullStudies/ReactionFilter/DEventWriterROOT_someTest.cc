@@ -170,6 +170,15 @@ void DEventWriterROOT_someTest::Fill_CustomBranches_DataTree(DTreeFillData* locT
         */
         //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         
+        //NOTE:
+        //***********************************************************************************
+        
+        //a) To run WITHOUT a crash, UNCOMMENT all lines labeled with: ==> NC <== and COMMENT all lines labeled with: ==> C <==
+        
+        //b) To run WITH a crash, UNCOMMENT all lines labeled with: ==> C <== and COMMENT all lines labeled with: ==> NC <==
+        
+        //***********************************************************************************
+        
     
         //Look at the decay products:
         //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -182,7 +191,8 @@ void DEventWriterROOT_someTest::Fill_CustomBranches_DataTree(DTreeFillData* locT
             currentPID = finalParticlesMeasured.at(iFP)->PID();
             
             //Neutrals do NOT like the vertex!!!!!!!
-			if(kfitType == d_P4Fit || ((kfitType == d_P4AndVertexFit || kfitType == d_VertexFit) && currentCharge != 0)){
+			if(kfitType == d_P4Fit || ((kfitType == d_P4AndVertexFit || kfitType == d_VertexFit) && currentCharge != 0)){ //==> NC <==
+            //if(kfitType == d_P4Fit || kfitType == d_P4AndVertexFit || kfitType == d_VertexFit){ //==> C <==
 			
               map<DKinFitPullType, double> someMap = getPulls(finalParticlesMeasured.at(iFP));
               string branchName = assignName(currentPID,assignMap);
@@ -196,7 +206,8 @@ void DEventWriterROOT_someTest::Fill_CustomBranches_DataTree(DTreeFillData* locT
                   locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Pz_Pull"), someMap.find(d_PzPull)->second,iPC);
                 }
             
-                if(kfitType == d_VertexFit || kfitType == d_P4AndVertexFit){
+                if(kfitType == d_VertexFit || kfitType == d_P4AndVertexFit){ //==> NC <==
+                //if(kfitType == d_VertexFit || (kfitType == d_P4AndVertexFit && currentCharge != 0) ){ //==> C <==
                   locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Vx_Pull"), someMap.find(d_XxPull)->second,iPC);
                   locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Vy_Pull"), someMap.find(d_XyPull)->second,iPC);
                   locTreeFillData->Fill_Array<Double_t>(Build_BranchName(branchName, "Vz_Pull"), someMap.find(d_XzPull)->second,iPC);
