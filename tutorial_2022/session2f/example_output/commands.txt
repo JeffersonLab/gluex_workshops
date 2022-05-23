@@ -1,0 +1,6 @@
+$HD_UTILITIES_HOME/psflux/plot_flux_ccdb.py --pol PARA --angle 0.0   --target-length 26.0 --energy-min 8.2 --energy-max 8.8 --begin-run 30274 --end-run 31057 --rest-ver 3
+$HD_UTILITIES_HOME/psflux/plot_flux_ccdb.py --pol PERP --angle 90.0  --target-length 26.0 --energy-min 8.2 --energy-max 8.8 --begin-run 30274 --end-run 31057 --rest-ver 3
+$HD_UTILITIES_HOME/psflux/plot_flux_ccdb.py --pol PARA --angle 135.0 --target-length 26.0 --energy-min 8.2 --energy-max 8.8 --begin-run 30274 --end-run 31057 --rest-ver 3
+$HD_UTILITIES_HOME/psflux/plot_flux_ccdb.py --pol PERP --angle 45.0  --target-length 26.0 --energy-min 8.2 --energy-max 8.8 --begin-run 30274 --end-run 31057 --rest-ver 3
+hadd flux_AllDiamondRuns_30274_31057.root flux_P???_*_30274_31057.root 
+root -b -q 'CalculateCrossSec.C("flux_AllDiamondRuns_30274_31057.root",29178,1416)'
