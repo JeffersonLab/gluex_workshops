@@ -3,6 +3,10 @@ This session was directed at Amplitude Analysis and likelihood fitting.  A few p
 to GlueX reactions of interest were shown in order to give a feeling for the key kinematic
 variables.  Here are some general instructions for reproducing those plots.
 
+0) Making the plots in Step 3 uses the FSRoot package.  You can get the package and read
+the Documentation on how to configure ROOT to load this package on startup by going
+to the GitHub repository:  https://github.com/remitche66/FSRoot
+
 1) examine and edit the AmpTools config file:  gen_res.cfg
 
    This is a simplified config file that is intended to generate a single resonance in a single
