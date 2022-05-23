@@ -7,18 +7,18 @@ void plotIndividualMC() {
 
 	// better with data
 	TFile *f = TFile::Open("hist_etapi_bggen.acc.root");
-	TFile *fdata = TFile::Open("hist_etapi_bggen.acc.root");
+	TFile *fdata = TFile::Open("hist_etapi_data.acc.root");
 	TFile *fDeltaPlusEta = TFile::Open("hist_etapi_DeltaPlusEta.acc.root");
 	TFile *fb1 = TFile::Open("hist_etapi_b1.acc.root");
 
-	TH2F *hPi0ProtonMass_data = (TH2F*)fdata->Get("hPi0ProtonMass_ThrownTopology_0");
-	TH2F *hEtaPiMass_data = (TH2F*)fdata->Get("hEtaPiMass_ThrownTopology_0");
+	TH2F *hPi0ProtonMass_data = (TH2F*)fdata->Get("hProtonPi0Mass_ThrownTopology_0");
+	TH2F *hEtaPiMass_data = (TH2F*)fdata->Get("hInvariantMass_ThrownTopology_0");
 
-	TH2F *hPi0ProtonMass_DeltaPlusEta = (TH2F*)fDeltaPlusEta->Get("hPi0ProtonMass_ThrownTopology_1");
-	TH2F *hPi0ProtonMass_bggen = (TH2F*)f->Get("hPi0ProtonMass_ThrownTopology_1");
+	TH2F *hPi0ProtonMass_DeltaPlusEta = (TH2F*)fDeltaPlusEta->Get("hProtonPi0Mass_ThrownTopology_1");
+	TH2F *hPi0ProtonMass_bggen = (TH2F*)f->Get("hProtonPi0Mass_ThrownTopology_1");
 	
-	TH2F *hEtaPiMass_b1 = (TH2F*)fb1->Get("hEtaPiMass_ThrownTopology_3");
-	TH2F *hEtaPiMass_bggen = (TH2F*)f->Get("hEtaPiMass_ThrownTopology_3");
+	TH2F *hEtaPiMass_b1 = (TH2F*)fb1->Get("hInvariantMass_ThrownTopology_3");
+	TH2F *hEtaPiMass_bggen = (TH2F*)f->Get("hInvariantMass_ThrownTopology_3");
 				
 	TCanvas *bb = new TCanvas("bb","bb",600,400);
 	bb->Divide(2,1);
