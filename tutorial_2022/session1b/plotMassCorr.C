@@ -8,8 +8,8 @@ void plotMassCorr() {
 	// better with data
 	TFile *f = TFile::Open("hist_etapi_bggen.acc.root");
 
-	int topologies[3] = {0,1,3};
-	for(int itop=0; itop<3; itop++) {
+	int topologies[5] = {0,1,2,3,4};
+	for(int itop=0; itop<5; itop++) {
 		TH2F *h2DInvariantMass = (TH2F*)f->Get(Form("h2DInvariantMass_ThrownTopology_%d",topologies[itop]));
 		TH2F *h2DInvariantMassMeasured = (TH2F*)f->Get(Form("h2DInvariantMassMeasured_ThrownTopology_%d",topologies[itop]));
 		TH2F *h2DInvariantMassShuffled = (TH2F*)f->Get(Form("h2DInvariantMassShuffled_ThrownTopology_%d",topologies[itop]));

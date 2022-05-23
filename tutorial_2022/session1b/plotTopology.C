@@ -34,7 +34,7 @@ void plotTopology() {
 		//hMassThrownTopology->Rebin(10);
 
 		TString locLegendTitle = hMassThrownTopology->GetTitle();
-		//locLegendTitle.ReplaceAll("Invariant Mass Topology:","");
+		locLegendTitle.ReplaceAll("Invariant Mass Topology:","");
 		//locLegendTitle.ReplaceAll("Kinematic Fit #Chi^{2}/NDF: Topology","");
 		//locLegendTitle.ReplaceAll("Unused shower energy: Topology","");
 		leg->AddEntry(hMassThrownTopology,locLegendTitle,"f");
