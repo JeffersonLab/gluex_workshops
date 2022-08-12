@@ -15,7 +15,7 @@ used in this tutorial but is sufficient to illustrate the idea.
 1) Begin by creating a symbolic link from a work disk directory that 
 holds the data files to be fit:
 
-ln -s /work/gluex_workshop_data/tutorial_2022/session2e/fsroot .
+ln -s /work/halld/gluex_workshop_data/tutorial_2022/session2e/fsroot .
 
 2) Do a fit with one polarization state:
 
