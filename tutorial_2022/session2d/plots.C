@@ -1,14 +1,14 @@
 // Basic pLots for flattened DATA trees:
-//TString FND("/work/gluex_workshop_data/tutorial_2022/session2d/flatten/sp2017/pol*/tree_pi0eta__B4_M17_M7_FLAT_*.root");
+//TString FND("/work/halld/gluex_workshop_data/tutorial_2022/session2d/flatten/sp2017/pol*/tree_pi0eta__B4_M17_M7_FLAT_*.root");
 
 // Basic plots for flattened and skimmed DATA trees:
-TString FND("/work/gluex_workshop_data/tutorial_2022/session2d/skim/tree_pi0eta__B4_M17_M7_DATA_sp17_*_GENERAL_SKIM.root");
+TString FND("/work/halld/gluex_workshop_data/tutorial_2022/session2d/skim/tree_pi0eta__B4_M17_M7_DATA_sp17_*_GENERAL_SKIM.root");
 
 // Basic plots for flattened MC trees:
-//TString FND("/work/gluex_workshop_data/tutorial_2022/session2d/flatten/flatMC/tree_pi0eta__B4_M17_M7_FLAT_MC.root");
+//TString FND("/work/halld/gluex_workshop_data/tutorial_2022/session2d/flatten/flatMC/tree_pi0eta__B4_M17_M7_FLAT_MC.root");
 
 // Basic plots for flattened BGGEN MC trees:
-//TString FND("/work/gluex_workshop_data/tutorial_2022/session2d/flatten/bggen/tree_pi0eta__B4_M17_M7_*.root");
+//TString FND("/work/halld/gluex_workshop_data/tutorial_2022/session2d/flatten/bggen/tree_pi0eta__B4_M17_M7_*.root");
 
 
 TString NT("ntFSGlueX_MODECODE");
