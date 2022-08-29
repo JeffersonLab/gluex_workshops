@@ -117,10 +117,10 @@ void plots(bool bggen=false){
   TLine* cutFidu1 = new TLine(2.5,0,2.5,hM8->GetMaximum());
   cutFidu1->SetLineColor(kRed);
   cutFidu1->Draw("same");
-  TLine* cutFidu2 = new TLine(10.9,0,10.9,hM8->GetMaximum());
+  TLine* cutFidu2 = new TLine(10.3,0,10.3,hM8->GetMaximum());
   cutFidu2->SetLineColor(kRed);
   cutFidu2->Draw("same");
-  TLine* cutFidu3 = new TLine(11.3,0,11.3,hM8->GetMaximum());
+  TLine* cutFidu3 = new TLine(11.9,0,11.9,hM8->GetMaximum());
   cutFidu3->SetLineColor(kRed);
   cutFidu3->Draw("same");
 
