@@ -242,7 +242,7 @@ void plots(bool bggen=false){
   c2->cd(3);
   TH2F* hMetapiVsGJCosTheta = FSModeHistogram::getTH2F(FND,NT,"m101_1","GJCOSTHETA([eta];[pi0];GLUEXBEAM):MASS([eta],[pi0])","(100,0.7,2.7,50,-1.,1.)","CUT(unusedTracks,unusedE,zProton,chi2,cet0103,e8288,photFiducialA,photFiducialB,photFiducialC,photFiducialD,delta,rejectOmega,protMom)*CUTWT(rf,eta,pi0)");
   hMetapiVsGJCosTheta->SetXTitle("M(#eta#pi^{0}) [GeV/c^{2}]");
-  hMetapiVsGJCosTheta->SetYTitle("Events");
+  hMetapiVsGJCosTheta->SetYTitle("cos#theta_{GJ}");
   hMetapiVsGJCosTheta->Draw("colz");
 
 
