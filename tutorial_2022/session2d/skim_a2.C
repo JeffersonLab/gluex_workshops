@@ -1,12 +1,12 @@
 // Flattened DATA trees separated by polarization orientation:
-TString FND0("/work/gluex_workshop_data/tutorial_2022/session2d/flatten/sp2017/pol0/tree_pi0eta__B4_M17_M7_FLAT_*.root");
-TString FND45("/work/gluex_workshop_data/tutorial_2022/session2d/flatten/sp2017/pol45/tree_pi0eta__B4_M17_M7_FLAT_*.root");
-TString FND90("/work/gluex_workshop_data/tutorial_2022/session2d/flatten/sp2017/pol90/tree_pi0eta__B4_M17_M7_FLAT_*.root");
-TString FND135("/work/gluex_workshop_data/tutorial_2022/session2d/flatten/sp2017/pol135/tree_pi0eta__B4_M17_M7_FLAT_*.root");
+TString FND0("/work/halld/gluex_workshop_data/tutorial_2022/session2d/flatten/sp2017/pol0/tree_pi0eta__B4_M17_M7_FLAT_*.root");
+TString FND45("/work/halld/gluex_workshop_data/tutorial_2022/session2d/flatten/sp2017/pol45/tree_pi0eta__B4_M17_M7_FLAT_*.root");
+TString FND90("/work/halld/gluex_workshop_data/tutorial_2022/session2d/flatten/sp2017/pol90/tree_pi0eta__B4_M17_M7_FLAT_*.root");
+TString FND135("/work/halld/gluex_workshop_data/tutorial_2022/session2d/flatten/sp2017/pol135/tree_pi0eta__B4_M17_M7_FLAT_*.root");
 
 // Flattened MC Trees (Note: Use phasespace distributed "flat" MC - no model!)
-TString FNMC("/work/gluex_workshop_data/tutorial_2022/session2d/flatten/flatMC/tree_pi0eta__B4_M17_M7_FLAT_MC.root");
-TString FNMCGen("/work/gluex_workshop_data/tutorial_2022/session2d/flatten/flatMC_gen/tree_pi0eta__B4_M17_M7_FLAT_MCGEN.root");
+TString FNMC("/work/halld/gluex_workshop_data/tutorial_2022/session2d/flatten/flatMC/tree_pi0eta__B4_M17_M7_FLAT_MC.root");
+TString FNMCGen("/work/halld/gluex_workshop_data/tutorial_2022/session2d/flatten/flatMC_gen/tree_pi0eta__B4_M17_M7_FLAT_MCGEN.root");
 
 TString NT("ntFSGlueX_MODECODE");
 
@@ -23,18 +23,11 @@ void setup(){
   FSCut::defineCut("cet0103","OR(abs(-1*MASS2(GLUEXTARGET,-[p+])-0.2)<0.1)"); // 0.1 < t < 0.3
   FSCut::defineCut("e8288","(EnPB>8.2&&EnPB<8.8)");                           // 8.2 < E_beam < 8.8
   FSCut::defineCut("chi2","Chi2DOF<3.3");                                     // Chi2/ndf < 3.3
-  FSCut::defineCut("photFiducialA","(acos(COSINE([eta]a))*180/3.141>2.5 && 
-                                     acos(COSINE([eta]a))*180/3.141<10.3) || (acos(COSINE([eta]a))*180/3.141>11.9)");
-  FSCut::defineCut("photFiducialB","(acos(COSINE([eta]b))*180/3.141>2.5 && 
-                                    acos(COSINE([eta]b))*180/3.141<10.3) || (acos(COSINE([eta]b))*180/3.141>11.9)");
-  FSCut::defineCut("photFiducialC","(acos(COSINE([pi0]a))*180/3.141>2.5 && 
-                                    acos(COSINE([pi0]a))*180/3.141<10.3) || (acos(COSINE([pi0]a))*180/3.141>11.9)");
-  FSCut::defineCut("photFiducialD","(acos(COSINE([pi0]b))*180/3.141>2.5 && 
-                                     acos(COSINE([pi0]b))*180/3.141<10.3) || (acos(COSINE([pi0]b))*180/3.141>11.9)");
-  FSCut::defineCut("rejectOmega","!((MASS([pi0]a,[eta]a)<0.15 && MASS([pi0]b,[eta]b)<0.15) || 
-                                    (MASS([pi0]a,[eta]b)<0.15 && MASS([pi0]b,[eta]a)<0.15) || 
-                                    (MASS([pi0]a,[eta]a)<0.12 && MASS([pi0]b,[eta]a)<0.12) || 
-                                    (MASS([pi0]a,[eta]b)<0.12 && MASS([pi0]b,[eta]b)<0.12))");
+  FSCut::defineCut("photFiducialA","(acos(COSINE([eta]a))*180/3.141>2.5 && acos(COSINE([eta]a))*180/3.141<10.3) || (acos(COSINE([eta]a))*180/3.141>11.9)");
+  FSCut::defineCut("photFiducialB","(acos(COSINE([eta]b))*180/3.141>2.5 && acos(COSINE([eta]b))*180/3.141<10.3) || (acos(COSINE([eta]b))*180/3.141>11.9)");
+  FSCut::defineCut("photFiducialC","(acos(COSINE([pi0]a))*180/3.141>2.5 && acos(COSINE([pi0]a))*180/3.141<10.3) || (acos(COSINE([pi0]a))*180/3.141>11.9)");
+  FSCut::defineCut("photFiducialD","(acos(COSINE([pi0]b))*180/3.141>2.5 && acos(COSINE([pi0]b))*180/3.141<10.3) || (acos(COSINE([pi0]b))*180/3.141>11.9)");
+  FSCut::defineCut("rejectOmega","!((MASS([pi0]a,[eta]a)<0.15 && MASS([pi0]b,[eta]b)<0.15) || (MASS([pi0]a,[eta]b)<0.15 && MASS([pi0]b,[eta]a)<0.15) || (MASS([pi0]a,[eta]a)<0.12 && MASS([pi0]b,[eta]a)<0.12) || (MASS([pi0]a,[eta]b)<0.12 && MASS([pi0]b,[eta]b)<0.12))");
   FSCut::defineCut("delta","MASS([p+],[pi0])>1.4");
 
   FSCut::defineCut("a2","MASS([eta],[pi0])>=1.04 && MASS([eta],[pi0])<=1.56");
