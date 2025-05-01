@@ -1,11 +1,13 @@
-# Session Title / Description
+# How to Fit With Amptools and Plot the Results Using Python
 
 ## :dart: Goals
-- [Goal 1: Brief description of what participants will achieve in this session]
-- [Goal 2: Another key learning outcome or skill to be developed]
-- [Goal 3: Optional additional goal]
+- Learn how to write a simple `.cfg` file to perform mass-independent fits
+- Use the `vecps_plotter` for a single bin fit result to gain intuition of the intensity model
+- Aggregate fit results across multiple bins with AmpTools + Python
+- Utilize Python to quickly plot fit results across $\omega\pi^0$ mass, and access other information.
 
 ## :clipboard: Prerequisites
+- [I'll need to have a simple python venv and instructions how to use it. Maybe make a global one in the parent dir?]
 - [List any prior knowledge, tools, or setup required for this session]
 - [Include links to any resources or instructions for setup]
 
@@ -21,5 +23,5 @@
 5. **Wrap-Up**: [Summary of what was covered and next steps]
 
 ## :link: Additional Resources
-- [Links to further reading, documentation, or related sessions]
+- [TODO: add link here to my analysis, and maybe some presentations to show what can be done with it. Hao also has some really nice studies.]
 - [Optional: FAQs or troubleshooting tips]
