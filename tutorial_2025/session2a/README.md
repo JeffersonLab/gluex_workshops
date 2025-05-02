@@ -3,7 +3,7 @@ This session is directed at getting familiar with using a generator ( In this ca
 # Getting Started 
 
 ## Items needed
-  * The plots made in step 'Make Plots' uses the FSRoot package. You can obtain and read the Documaentation on how to load this package in ROOT by going to the GitHub repository: https://github.com/remitche66/FSRoot
+  * The plots made in step `Make Plots` uses the FSRoot package. You can obtain and read the Documaentation on how to load this package in ROOT by going to the GitHub repository: https://github.com/remitche66/FSRoot
   * halld_sim compiled ( No need if working on the farm).
   * config file (see `genPS.cfg`).  
 
@@ -19,7 +19,7 @@ This session is directed at getting familiar with using a generator ( In this ca
    * Unless a beam config file is used, a local file will be produced within the coherent peak.
    * The values from the "uv & lv' flags indicate the particle index from the reaction name.
    * The `-f` flag skips the amplitude accept/reject process and generates phase space.
-   * Two output files will be created, `test.root` and `gen_amp_diagnostic.root`.
+   * Two output files will be created, `b1_omegapi_ps.root` and `gen_amp_diagnostic.root`.
 
    Getting more complex:
    There are more complex examples which are commented out in the first lines of the 'genPS.cfg' file for other specific analysis generation. For example the ' ' line includes a specific momentum transfer distribution as well as an important sampling around the B<sub>1</sub> mass range for the upper vertex.
