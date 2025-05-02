@@ -9,10 +9,10 @@ This session is directed at getting familiar with using a generator ( In this ca
 
 ## config file 
    The config file uses the same structure as a gen_amp config file. The most basic feature needed to simulate events are the reaction name: 
-   * EX: `reaction OmegaPiP Beam Proton Pi0 Omega`
+   * EX: `reaction OmegaPiProton Beam Proton Pi0 Omega`
 
 ## How to use
-   * In this example we generate 10k four-body phase phase events where the ⍵ π<sup>0</sup> are in the upper vertex and the proton is in the lower vertex.  
+   * In this example we generate 10k three-body phase phase events where the ⍵ π<sup>0</sup> are in the upper vertex and the proton is in the lower vertex.  
    * run `gen_amp_V2 -ac genPS.cfg -o b1_omegapi_ps.root -uv 23 -lv 1 -f`.  
  
   Things to note:
