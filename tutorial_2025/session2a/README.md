@@ -3,7 +3,7 @@ This session is directed at getting familiar with using a generator ( In this ca
 # Getting Started 
 
 ## Items needed
-  * The plots made in step 'Make Plots' uses the FSRoot package. Ypu can obtain and read the Documaentation on how to load this package in ROOT by going to the GitHub repository: https://github.com/remitche66/FSRoot
+  * The plots made in step 'Make Plots' uses the FSRoot package. You can obtain and read the Documaentation on how to load this package in ROOT by going to the GitHub repository: https://github.com/remitche66/FSRoot
   * halld_sim compiled ( No need if working on the farm).
   * config file (see `genPS.cfg`).  
 
