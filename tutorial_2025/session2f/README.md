@@ -1,25 +1,22 @@
 # Session Title / Description
 
+TODO: Need add how to load the container on the farm
+
 ## :dart: Goals
-- [Goal 1: Brief description of what participants will achieve in this session]
-- [Goal 2: Another key learning outcome or skill to be developed]
-- [Goal 3: Optional additional goal]
+- Goal 1: Learn about Regularization in PWA
+- Goal 2: Connect to Maximum likelihood, Markov Chain Monte Carlo, and Information Field Theory
+- Goal 3: Learn about a streamlined framework to do this
 
 ## :clipboard: Prerequisites
-- [List any prior knowledge, tools, or setup required for this session]
-- [Include links to any resources or instructions for setup]
+- General understanding of PWA, ability to connect to the jlab farm
+- analysis_chain.ipynb is a tutorial as of this writing, see **Analysis Tutorial** below for updated version
+- Useful links:
+  - [Analysis Tutorial](https://lan13005.github.io/PyAmpTools/demos/analysis_chain.html)
+  - [Regularization Documentation](https://halldweb.jlab.org/doc-private/DocDB/ShowDocument?docid=6826)
 
 ## :file_folder: Materials Provided
-- [List of files, scripts, or datasets provided for this session. Large datasets should be located in `/work/halld/gluex_workshop_data/tutorial_2025` and referenced]
-- [Links to any additional resources or documentation]
+- Nothing, just connect to the container on the farm, everything is self contained as it is an input output test -> drawing simulations then fitting
 
 ## :memo: Session Outline
-1. **Introduction**: [Brief overview of the session and its importance]
-2. **Step 1**: [Description of the first step or activity]
-3. **Step 2**: [Description of the second step or activity]
-4. **Step 3**: [Continue as needed for additional steps]
-5. **Wrap-Up**: [Summary of what was covered and next steps]
-
-## :link: Additional Resources
-- [Links to further reading, documentation, or related sessions]
-- [Optional: FAQs or troubleshooting tips]
+1. **Introduction**: Presentation on Regularization and the pyamptools framework
+2. **Wrap-Up**: Run the tutorial
