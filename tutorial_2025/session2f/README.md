@@ -6,6 +6,7 @@
 - Goal 3: Learn about a streamlined framework to do this
 
 ```bash
+# On the JLab farm
 # --bind whatever directories you need access to
 apptainer exec --contain --writable-tmpfs \
     --bind /my/working/directory \
@@ -26,8 +27,8 @@ source /etc/bash.bashrc
 - Useful links:
   - [Analysis Tutorial](https://lan13005.github.io/PyAmpTools/demos/analysis_chain.html)
     - jupyter through ssh
-      - [vscode:](https://lan13005.github.io/PyAmpTools/intro.html#for-vscode-remote-containter-development:~:text=For%20VSCode%20Remote%20Containter%20Development)
-      - [terminal:](https://lan13005.github.io/PyAmpTools/intro.html#for-vscode-remote-containter-development:~:text=Additional%20Information-,Jupyter%20notebooks%20in%20VSCode,-%23)
+      - [using vscode](https://lan13005.github.io/PyAmpTools/intro.html#for-vscode-remote-containter-development:~:text=For%20VSCode%20Remote%20Containter%20Development)
+      - [from terminal](https://lan13005.github.io/PyAmpTools/intro.html#for-vscode-remote-containter-development:~:text=Additional%20Information-,Jupyter%20notebooks%20in%20VSCode,-%23)
   - [Regularization Documentation](https://halldweb.jlab.org/doc-private/DocDB/ShowDocument?docid=6826)
 
 ## :file_folder: Materials Provided
