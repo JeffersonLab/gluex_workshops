@@ -1,0 +1,6 @@
+# 100% omega->pi+ pi- pi0 
+Decay omega
+1.00          pi+      pi-     pi0          PHSP;
+Enddecay
+
+End
