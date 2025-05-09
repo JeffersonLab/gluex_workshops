@@ -1,4 +1,4 @@
-# Session Title / Description
+# Session 1a / Scientific Computing at Jefferson Lab
 
 ## :dart: Goals
 - [Goal 1: Learn about the shared computing resources at Jefferson Lab]
