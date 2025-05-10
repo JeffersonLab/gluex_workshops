@@ -7,24 +7,57 @@
 - Utilize Python to quickly plot fit results across $\omega\pi^0$ mass, and access other information.
 
 ## :file_folder: Materials Provided
+- A python virtual environment containing all the necessary packages
+- 
 - [List of files, scripts, or datasets provided for this session. Large datasets should be located in `/work/halld/gluex_workshop_data/tutorial_2025` and referenced]
 
 ## :memo: Session Instructions
-If you are already familiar with amplitude analysis, then after you perform sections 1-3, you can skip to [section 5](#5-multi-bin-analysis-with-python) for using python.
+If you are already familiar with amplitude analysis, then after you perform sections 1-3, you can skip to [section 5](#5-multi-bin-analysis-with-python) for how to use python, but note that if you want to run the scripts within this repo you will need to perform the fits detailed in [section 4](#4-analysis-of-one-bin-using-vecps_plotter) to obtain `.fit` files.
 ### 1. Environment
-#### AmpTools
-Before we do anything, let's set up our environment. To run anything we'll need up-to-date versions of `halld_sim` and `AmpTools`, which can be sourced running the following line:
+#### $\color{Turquoise}\sqrt{~}$ AmpTools and ROOT
+Before we do anything, let's set up our environment. If you followed the main [README](../README.md), you have already setup `halld_sim` and `AmpTools` by running (from this directory):
 ```
-source setup_gluex.csh
+source ../setup_gluex.csh
 ```
-In the terminal, execute `echo $AMPTOOLS_HOME`, `which root` and `which fit` to check that you get the following outputs (ignoring version numbers), respectively:
+and ensuring that the setup is verified via:
 ```
-/group/halld/Software/builds/Linux_Alma9-x86_64-gcc11.4.1/amptools/AmpTools-0.15.3
-/group/halld/Software/builds/Linux_Alma9-x86_64-gcc11.4.1/root/root-6.24.04/bin/root
-/group/halld/Software/builds/Linux_Alma9-x86_64-gcc11.4.1/halld_sim/halld_sim-4.53.0/Linux_Alma9-x86_64-gcc11.4.1/bin/fit
+bash verify_setup.sh
 ```
-#### Python
-[Describe python venv here]
+
+To run the python scripts, we'll need access to the AmpTools libraries from ROOT. To do this, copy the `.rootrc` file to your home directory with
+```bash
+cp .rootrc ~/
+```
+This file simply adds a path that will allow us to utilize the AmpTools `FitResults` class. Execute `root` in a terminal window, then run `.x loadAmpTools.C` in the ROOT session. If this is successful, you should see the following output:
+```
+--------------------------------------------------
+------      Loading AmpTools Modules        ------
+--------------------------------------------------
+Loading IUAmpTools/report.cc..
+Loading IUAmpTools/Kinematics.cc..
+Loading IUAmpTools/ConfigurationInfo.cc..
+Loading IUAmpTools/ConfigFileParser.cc..
+Loading IUAmpTools/NormIntInterface.cc..
+Loading IUAmpTools/FitResults.cc..
+--------------------------------------------------
+------  Finished Loading AmpTools Modules   ------
+--------------------------------------------------
+```
+
+#### :snake: Python
+We will be using very basic python virtual environments (venv) to keep our python versions and packages consistent. Starting in the parent `PyAmpPlots` folder, execute
+```
+python -m venv .venv
+``` 
+to create a virtual environment with the same python version as the ifarm default. Activate the environment by running 
+```
+source .venv/bin/activate
+``` 
+(use `activate.csh` for csh/tcsh shells). With our new virtual environment, we can now download the required python packages to perform our analysis. Run
+```
+python -m pip install -r requirements.txt
+```
+to download these packages to the virtual environment.
 
 #### Halld_sim
 AmpTools is written to be fairly generic for anyone interested in doing binned maximum likelihood analysis, so the collaboration has built up a set of libraries and programs over the years in the [halld_sim github](https://github.com/JeffersonLab/halld_sim/tree/master). The two main directories you'll most often consult will likely be [the amplitude analysis programs](https://github.com/JeffersonLab/halld_sim/tree/master/src/programs/AmplitudeAnalysis) and [the corresponding libraries](https://github.com/JeffersonLab/halld_sim/tree/master/src/libraries). As you just saw above, this is where our `fit` program comes from. Halld_sim is of course not limited to just Amplitude Analysis, and you'll find a whole host of other useful tools there. There's no need to deep dive into this repo yet, but it and [AmpTools](https://github.com/mashephe/AmpTools) are good ones to keep bookmarked.
