@@ -17,11 +17,11 @@ To demonstrate this, we'll be using a fictitious analysis of the reaction $\gamm
 | Session 2a                             | *MC Signal Generator gen_amp_V2*               | Kevin Saldana     |
 | Session 2b                             | *MC Background Generator bggen_upd*            | Eugene Chudakov   |
 | Session 2c                             | *Event Selection with DSelector*               | Edmundo Barriga   |
-| Session 2c                             | *Event Selection with FSRoot*                  | Amy Schertz       |
+| Session 2d                             | *Event Selection with FSRoot*                  | Amy Schertz       |
 | **Advanced Methods**                   |                                                |                   |
-| Session 2d                             | *Event Selection with AI/ML*                   | Igal Jaegle       |
-| Session 2e                             | *AmpTools: Fitting and Plotting with python*   | Kevin Scheuer     |
-| Session 2f                             | *Beyond AmpTools*                              | Lawrence Ng       |
+| Session 2e                             | *Event Selection with AI/ML*                   | Igal Jaegle       |
+| Session 2f                             | *AmpTools: Fitting and Plotting with python*   | Kevin Scheuer     |
+| Session 2g                             | *Beyond AmpTools*                              | Lawrence Ng       |
 
 ## 🛠️ Setup & Environment
 
