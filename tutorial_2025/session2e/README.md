@@ -1,15 +1,11 @@
 # How to Fit With Amptools and Plot the Results Using Python
+:warning: This repo must be cloned to an `ifarm` node to ensure access to software and data files :warning:
 
 ## :dart: Goals
 - Use a simple `.cfg` file to perform mass-independent fits
 - Gain intuition of the intensity model by using the `vecps_plotter` for a fit result in one bin
 - Aggregate fit results across multiple bins with AmpTools + Python
 - Utilize Python to quickly plot fit results across $\omega\pi^0$ mass, and access other information.
-
-## :file_folder: Materials Provided
-- A python virtual environment containing all the necessary packages
-- 
-- [List of files, scripts, or datasets provided for this session. Large datasets should be located in `/work/halld/gluex_workshop_data/tutorial_2025` and referenced]
 
 ## :memo: Session Instructions
 If you are already familiar with amplitude analysis, then after you perform sections 1-3, you can skip to [section 5](#5-multi-bin-analysis-with-python) for how to use python, but note that if you want to run the scripts within this repo you will need to perform the fits detailed in [section 4](#4-analysis-of-one-bin-using-vecps_plotter) to obtain `.fit` files.
@@ -45,7 +41,7 @@ Loading IUAmpTools/FitResults.cc..
 ```
 
 #### :snake: Python
-We will be using very basic python virtual environments (venv) to keep our python versions and packages consistent. Starting in the parent `PyAmpPlots` folder, execute
+We will be using very basic python virtual environments (venv) to keep our package versions consistent. At the time of writing this, the default version of python on the ifarm `3.9.21`. Starting in the parent `PyAmpPlots` folder, execute
 ```
 python -m venv .venv
 ``` 
@@ -62,21 +58,18 @@ to download these packages to the virtual environment.
 #### Halld_sim
 AmpTools is written to be fairly generic for anyone interested in doing binned maximum likelihood analysis, so the collaboration has built up a set of libraries and programs over the years in the [halld_sim github](https://github.com/JeffersonLab/halld_sim/tree/master). The two main directories you'll most often consult will likely be [the amplitude analysis programs](https://github.com/JeffersonLab/halld_sim/tree/master/src/programs/AmplitudeAnalysis) and [the corresponding libraries](https://github.com/JeffersonLab/halld_sim/tree/master/src/libraries). As you just saw above, this is where our `fit` program comes from. Halld_sim is of course not limited to just Amplitude Analysis, and you'll find a whole host of other useful tools there. There's no need to deep dive into this repo yet, but it and [AmpTools](https://github.com/mashephe/AmpTools) are good ones to keep bookmarked.
 
-### 2. Handling data
-
-#### Description
-[Brief summary of what data files we'll be using and their characteristics]
-
-#### Binning
-With our event selected data files from the previous sessions in [LINK TO DIR HERE], we can now split our data into independent bins of beam energy $(E_\gamma)$, four-momentum transfer $(-t)$, and  mass $(M_{\omega\pi^0})$ to perform independent fits in. [DESCRIPTION HERE of t-range and mass bins we want to do].
+### 2. Binning Data
+We'll be using the data file produced by the DSelector from the previous session, which is stored in `/work/halld/gluex_workshop_data/tutorial_2025/session2e`, along with the corresponding phasespace files labelled as `anglesOmegaPiPhaseSpace.root` and `anglesOmegaPiPhaseSpaceAcc.root` for the generated and accepted phasespace, respectively. For faster fits and compatability with our python scripts later, we'll split our files into bins of 
+beam energy $(E_\gamma)$, four-momentum transfer $(-t)$, and  mass $(M_{\omega\pi^0})$ to perform independent fits in. 
+- $8.2 < E_\gamma < 8.8$: coherent peak region
+- $0.1 < -t < 0.2$: Nothing special about this region, just done to demonstrate binning in $-t$
+- 10 bins from $1.1 < M_{\omega\pi^0} < 1.3$: we'll perform 10 independent fits in these 10 mass bins
 
 This selection was done using the [copy_tree_with_cuts.cc script](./scripts/copy_tree_with_cuts.C). The data file has been renamed to `anglesOmegaPiAmplitude.root` and the phasespace files to `anglesOmegaPiPhaseSpace.root` and `anglesOmegaPiPhaseSpaceAcc.root`. This is mainly convention, we could name these files whatever so long as they match what's in our .cfg files.
 
-[mention TEM reader and that we want to use this instead to prep for python analysis]
-
 ### 3. Fits
 #### The config file
-The configuration file [`fit.cfg`](./fit.cfg) is the main file we'll use to actually run the fit. Whenever you want to change the waveset (the amplitudes you're fitting with) this is the file to edit. In addition to the big standard block comment at the start of the file, I've added some comments throughout to try and explain a bit more about what each line is doing. Conveniently the [halld_sim AmpTools libraries](https://github.com/JeffersonLab/halld_sim/tree/master/src/libraries/AMPTOOLS_AMPS) have plenty of amplitudes that others have written. This is why we can specify the `Vecp_ps_refl` amplitude in the config file and it will already know what to do.
+The configuration file [`fit.cfg`](./fit.cfg) is the main file we'll use to actually run the fit. Whenever you want to change the waveset (the amplitudes you're fitting with) this is the file to edit. Conveniently the [halld_sim AmpTools libraries](https://github.com/JeffersonLab/halld_sim/tree/master/src/libraries/AMPTOOLS_AMPS) have plenty of amplitudes that others have written. This is why we can specify the `Vecp_ps_refl` amplitude in the config file and it will already know what to do.
 
 #### Running the fit
 Now we're finally at the point where we can start running some actual fits! `cd` into MASS BIN and run the following from the terminal:
