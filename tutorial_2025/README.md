@@ -8,20 +8,20 @@ To demonstrate this, we'll be using a fictitious analysis of the reaction $\gamm
 | Session/Topic                          | Details                                        | Presenter(s)      |
 |:---------------------------------------|:-----------------------------------------------|:------------------|
 | **Introduction & Overview of Methods** |                                                |                   |
-| Session 1a                             | *Event Reconstruction in GlueX*                | Simon Taylor      |
-| Session 1b                             | *Introduction to Amplitude Analysis*           | Boris Grube       |
+| Session 1a                             | *Scientific Computing at JLab*                 | Alex Austregesilo |
+| Session 1b                             | *Event Reconstruction in GlueX*                | Simon Taylor      |
 | **Computing & Tools**                  |                                                |                   |
-| Session 1c                             | *Scientific Computing at JLab*                 | Alex Austregesilo |
+| Session 1c                             | *Introduction to Amplitude Analysis*           | Boris Grube       |
 | Session 1d                             | *GlueX MC Generation*                          | Peter Hurck       |
 | **MC Generation and Event Selection**  |                                                |                   |
 | Session 2a                             | *MC Signal Generator gen_amp_V2*               | Kevin Saldana     |
 | Session 2b                             | *MC Background Generator bggen_upd*            | Eugene Chudakov   |
 | Session 2c                             | *Event Selection with DSelector*               | Edmundo Barriga   |
-| Session 2c                             | *Event Selection with FSRoot*                  | Amy Schertz       |
+| Session 2d                             | *Event Selection with FSRoot*                  | Amy Schertz       |
 | **Advanced Methods**                   |                                                |                   |
-| Session 2d                             | *Event Selection with AI/ML*                   | Igal Jaegle       |
-| Session 2e                             | *AmpTools: Fitting and Plotting with python*   | Kevin Scheuer     |
-| Session 2f                             | *Beyond AmpTools*                              | Lawrence Ng       |
+| Session 2e                             | *Event Selection with AI/ML*                   | Igal Jaegle       |
+| Session 2f                             | *AmpTools: Fitting and Plotting with python*   | Kevin Scheuer     |
+| Session 2g                             | *Beyond AmpTools*                              | Lawrence Ng       |
 
 ## 🛠️ Setup & Environment
 

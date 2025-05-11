@@ -1,25 +1,22 @@
-# Session Title / Description
+# Session 1a / Scientific Computing at Jefferson Lab
 
 ## :dart: Goals
-- [Goal 1: Brief description of what participants will achieve in this session]
-- [Goal 2: Another key learning outcome or skill to be developed]
-- [Goal 3: Optional additional goal]
+- [Goal 1: Learn about the shared computing resources at Jefferson Lab]
+- [Goal 2: Understand how to set up the GlueX environment]
+- [Goal 3: Submit jobs to the batch farm via swif2]
 
 ## :clipboard: Prerequisites
-- [List any prior knowledge, tools, or setup required for this session]
-- [Include links to any resources or instructions for setup]
+- [Access to ifarm]
 
 ## :file_folder: Materials Provided
-- [List of files, scripts, or datasets provided for this session. Large datasets should be located in `/work/halld/gluex_workshop_data/tutorial_2025` and referenced]
-- [Links to any additional resources or documentation]
+- [Scripts]
 
 ## :memo: Session Outline
-1. **Introduction**: [Brief overview of the session and its importance]
-2. **Step 1**: [Description of the first step or activity]
-3. **Step 2**: [Description of the second step or activity]
-4. **Step 3**: [Continue as needed for additional steps]
-5. **Wrap-Up**: [Summary of what was covered and next steps]
+1. **Welcome**: [Brief overview of the GlueX Analysis Tutorial]
+2. **Step 1**: [Scientific Computing at Jefferson Lab]
+3. **Step 2**: [The GlueX Software Stack]
+4. **Step 3**: [Batch Workflow Management]
+5. **Wrap-Up**: [How to Ask for Help]
 
 ## :link: Additional Resources
-- [Links to further reading, documentation, or related sessions]
-- [Optional: FAQs or troubleshooting tips]
+- [Linked in the slides]
