@@ -94,9 +94,9 @@ void DSelector_OmegaPi0::Init(TTree *locTree)
 	// exit the directory
         gDirectory->cd( ".." );
 
-	gDirectory->mkdir( "CL/chiSq" )->cd();
-	dHist_ChiSq = new TH1D( "ChiSq", ";#chi^{2}; Combos / 10", 100, 0, 1000 );
-	dHist_ChiSq_z = new TH1D( "ChiSq_z", ";#chi^{2}; Combos / 1", 100, 0, 100 );		
+	gDirectory->mkdir( "CL_chiSq" )->cd();
+	dHist_ChiSq = new TH1D( "ChiSq", ";#chi^{2}/ndfd; Combos / 10", 100, 0, 1000 );
+	dHist_ChiSq_z = new TH1D( "ChiSq_z", ";#chi^{2}/ndf; Combos / 1", 100, 0, 100 );		
        	int locNumBins = 0;
 	double* locConLevLogBinning = dAnalysisUtilities.Generate_LogBinning(-50, 0, 5, locNumBins); 
 	if(locConLevLogBinning != NULL){
@@ -969,8 +969,8 @@ Bool_t DSelector_OmegaPi0::Process(Long64_t locEntry)
 
 			// CL and ChiSq
 			dHist_ConfidenceLevel_logX->Fill( dComboWrapper->Get_ConfidenceLevel_KinFit( "" ) );
-			dHist_ChiSq->Fill( dComboWrapper->Get_ChiSq_KinFit( "" ) );
-			dHist_ChiSq_z->Fill( dComboWrapper->Get_ChiSq_KinFit( "" ) );
+			dHist_ChiSq->Fill(  dComboWrapper->Get_ChiSq_KinFit("") / dComboWrapper->Get_NDF_KinFit("") );
+			dHist_ChiSq_z->Fill(  dComboWrapper->Get_ChiSq_KinFit("") / dComboWrapper->Get_NDF_KinFit("") );
 			dHist_ChiSqVsConfidenceLevel_logX->Fill( dComboWrapper->Get_ConfidenceLevel_KinFit( "" ) , dComboWrapper->Get_ChiSq_KinFit( "" ) );
 
 			//Unused Shower Energy
