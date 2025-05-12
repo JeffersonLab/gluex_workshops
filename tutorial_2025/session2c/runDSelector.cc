@@ -24,25 +24,13 @@ void runDSelector(){
   // If the trees are not in '/cache' use the following command to load
   // them from tape ('/mss'):
   // jache -get "path_to_the_tree/files*" -e email
-  // Set of trees for Data
-  //chain->Add( "/cache/halld/RunPeriod-2018-08/analysis/ver16/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_05163*");
+  // Set of trees for Data (9 files)
+  chain->Add( "/cache/halld/RunPeriod-2018-08/analysis/ver16/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_05163*");
   // Set of trees for MC accpeted
   // chain->Add("/cache/halld/home/jrsteven/REQUESTED_MC/omegapi_phasespace_2018_08_ver03/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_0516*");
   // Set of trees for MC thrown
   //chain->Add("/cache/halld/home/jrsteven/REQUESTED_MC/omegapi_phasespace_2018_08_ver03/tree_thrown/merged/tree_thrown_0516*");
 
-  chain->Add( "/cache/halld/RunPeriod-2018-08/analysis/ver16/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_050697*");
-  chain->Add( "/cache/halld/RunPeriod-2018-08/analysis/ver16/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_050698*");
-  chain->Add( "/cache/halld/RunPeriod-2018-08/analysis/ver16/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_050701*");
-  chain->Add( "/cache/halld/RunPeriod-2018-08/analysis/ver16/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_050702*");
-  chain->Add( "/cache/halld/RunPeriod-2018-08/analysis/ver16/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_050707*");
-  chain->Add( "/cache/halld/RunPeriod-2018-08/analysis/ver16/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_050712*");
-  chain->Add( "/cache/halld/RunPeriod-2018-08/analysis/ver16/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_050715*");
-  chain->Add( "/cache/halld/RunPeriod-2018-08/analysis/ver16/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_050726*");
-  chain->Add( "/cache/halld/RunPeriod-2018-08/analysis/ver16/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_050740*");
-  chain->Add( "/cache/halld/RunPeriod-2018-08/analysis/ver16/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_050752*");
-  chain->Add( "/cache/halld/RunPeriod-2018-08/analysis/ver16/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_050753*");
-  chain->Add( "/cache/halld/RunPeriod-2018-08/analysis/ver16/tree_pi0pi0pippim__B4/merged/tree_pi0pi0pippim__B4_050754*");
  
   string options = "";
   string outputHistFileName="OmegaPi_hists.root"; // name of the root file with the histograms
