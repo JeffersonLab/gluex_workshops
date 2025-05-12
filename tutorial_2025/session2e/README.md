@@ -13,7 +13,7 @@ If you are already familiar with amplitude analysis, then after you perform sect
 #### 1.1 $\color{Turquoise}\sqrt{~}$ AmpTools and ROOT
 Before we do anything, let's set up our environment. If you followed the main [README](../README.md), you have already setup `halld_sim` and `AmpTools` by running (from this directory):
 ```
-source ../setup_gluex.csh
+source ../setup_gluex.sh
 ```
 
 To run the python scripts, we'll need access to the AmpTools libraries in ROOT. To do this, copy the `.rootrc` file to your home directory with
@@ -37,7 +37,7 @@ Loading IUAmpTools/FitResults.cc..
 ```
 
 #### 1.2 :snake: Python
-We will be using very basic python virtual environments (venv) to keep our package versions consistent. At the time of writing this, the default version of python on the ifarm is `3.9.21`. Starting in the parent `PyAmpPlots` folder, execute
+We will be using very basic python virtual environments (venv) to keep our package versions consistent. At the time of writing this, the default version of python on the ifarm is `3.9.21`. Execute
 ```
 python -m venv .venv
 ``` 
@@ -52,10 +52,10 @@ python -m pip install -r requirements.txt
 to download these packages to your virtual environment.
 
 #### 1.3 Halld_sim info
-AmpTools is written to be fairly generic for anyone interested in doing binned maximum likelihood analysis, so the collaboration has built up a set of libraries and programs over the years in the [halld_sim github](https://github.com/JeffersonLab/halld_sim/tree/master). The two main directories you'll most often consult will likely be [the amplitude analysis programs](https://github.com/JeffersonLab/halld_sim/tree/master/src/programs/AmplitudeAnalysis) and [the corresponding libraries](https://github.com/JeffersonLab/halld_sim/tree/master/src/libraries). As you just saw above, this is where our `fit` program comes from. Halld_sim is of course not limited to just Amplitude Analysis, and you'll find a whole host of other useful tools there. There's no need to deep dive into this repo yet, but it and [AmpTools](https://github.com/mashephe/AmpTools) are good ones to keep bookmarked.
+AmpTools is written to be fairly generic for anyone interested in doing binned maximum likelihood analysis, so the collaboration has built up a set of libraries and programs over the years in the [halld_sim github](https://github.com/JeffersonLab/halld_sim/tree/master). The two main directories you'll most often consult will likely be [the amplitude analysis programs](https://github.com/JeffersonLab/halld_sim/tree/master/src/programs/AmplitudeAnalysis) and [the corresponding libraries](https://github.com/JeffersonLab/halld_sim/tree/master/src/libraries). Halld_sim is of course not limited to just Amplitude Analysis, and you'll find a whole host of other useful tools there. There's no need to deep dive into this repo yet, but it and [AmpTools](https://github.com/mashephe/AmpTools) are good ones to keep bookmarked.
 
 ### 2. Binning Data
-We'll be using the data file `anglesOmegaPiAmplitude.root` produced by the DSelector from an earlier session, which is stored in `/work/halld/gluex_workshop_data/tutorial_2025/session2e`, along with the corresponding phasespace files labelled as `anglesOmegaPiPhaseSpace.root` and `anglesOmegaPiPhaseSpaceAcc.root` for the generated and accepted phasespace, respectively. For faster fits and compatability with our python scripts later, we'll split our files into bins of beam energy $(E_\gamma)$, four-momentum transfer $(-t)$, and  mass $(M_{\omega\pi^0})$:
+We'll be using the data file `anglesOmegaPiAmplitude.root` produced by the DSelector from an earlier session, which is stored in `/work/halld/gluex_workshop_data/tutorial_2025/session2e`, along with the corresponding phasespace files labelled as `anglesOmegaPiPhaseSpace.root` and `anglesOmegaPiPhaseSpaceAcc.root` for the generated and accepted phasespace, respectively. For faster fits and compatibility with our python scripts later, we'll split our files into bins of beam energy $(E_\gamma)$, four-momentum transfer $(-t)$, and  mass $(M_{\omega\pi^0})$:
 - $8.2 < E_\gamma < 8.8$: coherent peak region
 - $0.1 < -t < 0.6$: Nothing particularly special about this region, just done to demonstrate binning in $-t$
 - 8 bins from $1.1 < M_{\omega\pi^0} < 1.3$: these are the bins we'll perform independent fits in
@@ -110,8 +110,10 @@ So we've seen the total fit result to the $\cos\theta$ distribution, but we can 
 4. While keeping all the amplitudes selected, under **Coherent Sums** make sure only `ImagPosSign` and `RealNegSign` are selected. Plot it. What we are looking at now is only positive reflectivity $\varepsilon=+1$ contribution to $\cos\theta$. 
 5. Now do the inverse, only selecting the $\varepsilon=-1$ coherent sums. What did you notice? You likely saw that the positive reflectivity contribution completely dominates, while the negative reflectivity is very small.
 
-If you can't remember which is which it helps to look at the model 
+If you can't remember which is which it helps to look at the model
+
 I = 2∑ₖ { (1-Pₐ)[|∑ₘₖ c⁻ Im(Zₘ)|² + |∑ₘₖ c⁺ Re(Zₘ)|²] + (1+Pₐ)[|∑ₘₖ c⁺ Im(Zₘ)|² + |∑ₘₖ c⁻ Re(Zₘ)|²] }
+
 and remember that a sum like `ImagPosSign` refers to the sum containing Im(Z) and the positive sign of the polarization fraction (1+Pₐ), which we see carries the positive reflectivity (denoted by the $+$ sign in the exponent of the production parameter c⁺). It's very important to remember that because the reflectivities live in different coherent sums, that **destructive interferences and phase differences don't occur across reflectivities**.  
 
 ##### 4.1.2 Amplitudes
@@ -119,7 +121,7 @@ Now let's try looking at the coherent sum of some of the amplitudes.
 
 6. With only the positive reflectivity coherent sums selected, select all the $S$-wave amplitudes i.e. those end with `s`. 
    * If you can't remember the meaning of the notation, reference the block comment in [fit.cfg](./fit.cfg). 
-7. Now try plotting the sum of the $D$-waves seperately. You'll likely notice that they don't both constructively add to the total. This is not a failure of the fit, but rather we are witnessing the built-in interference effects of the model! As we saw earlier, the total fit result performs quite well, but that total fit is the constructive/destructive interference of all the waves in the model. 
+7. Now try plotting the sum of the $D$-waves separately. You'll likely notice that they don't both constructively add to the total. This is not a failure of the fit, but rather we are witnessing the built-in interference effects of the model! As we saw earlier, the total fit result performs quite well, but that total fit is the constructive/destructive interference of all the waves in the model. 
 
 #### 4.2 Other Plots
 When viewing results, the mass distribution is what's most often shown, as that's where we are primarily looking for signatures of resonances. That's not to say the other plots are useless though. Below I've summarized some of the ones you'll find in the plotter and what they're useful for
@@ -150,9 +152,8 @@ Take a look at the output `fit.pdf` and you can see we've quickly obtained some 
 
 
 ### 5. Multi-bin analysis with python
+Rather than follow a separate set of instructions here, its much easier to follow along [with the jupyter notebook in the analysis section](./analysis/tutorial.ipynb).
 
-
-### Summary 
 ---
 ## :link: Additional Resources
 - [Tired of emacs/vim? Check out this guide for using Visual Studio Code on the ifarm](https://halldweb.jlab.org/wiki/index.php/How_to_Setup_Visual_Studio_Code_for_the_ifarm)
@@ -160,13 +161,12 @@ Take a look at the output `fit.pdf` and you can see we've quickly obtained some 
   - Post questions on the `halld_amplitude_analysis` slack channel (in the Jefferson Lab slack group).
   - Attend and present at the [Amplitude Analysis working group meetings](https://halldweb.jlab.org/wiki-private/index.php/Amplitude_Analysis_Working_Group_Meetings)
     - There's also a subgroup of us that attend those meetings who also meet in a [vector-pseudoscalar specific working group meeting](https://halldweb.jlab.org/wiki-private/index.php/Vector_Pseudoscalar_Working_Group_Meetings).
-  - 
 - [The AmpTools user guide](https://github.com/mashephe/AmpTools/blob/master/AmpTools_User_Guide.pdf)
 - [Previous analysis tutorial, with great AmpTools examples by Matt](https://halldweb.jlab.org/wiki/index.php/GlueX_Tutorial_2022)
 - Examples of presentations containing plots that use this framework
   - [Viewing bootstrap distributions](https://halldweb.jlab.org/doc-private/DocDB/ShowDocument?docid=6688)
   - [Parameter initialization and mass dependent studies](https://halldweb.jlab.org/doc-private/DocDB/ShowDocument?docid=6763)
-- [My repository where I put this to use](https://github.com/kevScheuer/neutralb1)
+- [My repository where I put this code to use](https://github.com/kevScheuer/neutralb1)
   - Most plotting scripts will be found in the `analysis` folder
 
 ## :question: FAQ
