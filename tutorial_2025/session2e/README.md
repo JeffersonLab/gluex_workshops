@@ -92,8 +92,6 @@ When the fit completes you should have the following:
 
 The `.fit` files for all 10 bins have already been done for you, and you can find these in the same directory bins as before `/work/halld/gluex_workshop_data/tutorial_2025/session2e/mass_X-Y/`.
 
-TODO: Mention random fits in new section here
-
 ### 4. Analysis of one bin using vecps_plotter
 1. Lets take a look at the fit you just did above, using the below command to bring up the interactive plotter view. You'll see two windows. The blank one will contain the plots we wish to see, and the other is a GUI for selecting the plots and amplitudes we wish to view. 
   ```
@@ -165,7 +163,11 @@ Take a look at the output `fit.pdf` and you can see we've quickly obtained some 
   - 
 - [The AmpTools user guide](https://github.com/mashephe/AmpTools/blob/master/AmpTools_User_Guide.pdf)
 - [Previous analysis tutorial, with great AmpTools examples by Matt](https://halldweb.jlab.org/wiki/index.php/GlueX_Tutorial_2022)
-- [TODO: add link here to my analysis, and maybe some presentations to show what can be done with it. Hao also has some really nice studies.]
+- Examples of presentations containing plots that use this framework
+  - [Viewing bootstrap distributions](https://halldweb.jlab.org/doc-private/DocDB/ShowDocument?docid=6688)
+  - [Parameter initialization and mass dependent studies](https://halldweb.jlab.org/doc-private/DocDB/ShowDocument?docid=6763)
+- [My repository where I put this to use](https://github.com/kevScheuer/neutralb1)
+  - Most plotting scripts will be found in the `analysis` folder
 
 ## :question: FAQ
 ### How can I adopt the python tools for my own analysis?

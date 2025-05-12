@@ -12,7 +12,7 @@ import subprocess
 import sys
 import tempfile
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 
 import utils
 
