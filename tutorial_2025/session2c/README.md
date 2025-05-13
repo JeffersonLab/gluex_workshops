@@ -71,13 +71,13 @@
         hypothesis. This is why the bachelor pion is `locPi0P4[abs(i - 1)]`. This type of structure is different for simpler cases.
       - Once the vector is ready, we will fill the branches
         ```
-         // Set weight from the 2D sidebands and accidentals
-	 dFlatTreeInterface->Fill_Fundamental<Float_t>("Weight", loc2Dweight * locHistAccidWeightFactor);
-         // Fill the beam and the vector of TLorentz vectors from earlier
-         FillAmpTools_FlatTree(locBeamP4, locFinalStateP4);
-         // FILL FLAT TREE
-         // This line is by default commented in the DSelector
-         Fill_FlatTree(); //for the active combo
+        // Set weight from the 2D sidebands and accidentals
+        dFlatTreeInterface->Fill_Fundamental<Float_t>("Weight", loc2Dweight * locHistAccidWeightFactor);
+        // Fill the beam and the vector of TLorentz vectors from earlier
+        FillAmpTools_FlatTree(locBeamP4, locFinalStateP4);
+        // FILL FLAT TREE
+        // This line is by default commented in the DSelector
+        Fill_FlatTree(); //for the active combo
         ```
  5. **Step 4**: Run the DSelector
        - Make sure that the paths are properly set in the ROOT macro `runDSelector.cc`
