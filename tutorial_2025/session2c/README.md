@@ -12,11 +12,11 @@
 
 ## :file_folder: Materials Provided
 - The DSelector examples to run on data (OmegaPi0) and thrown (thrown).
-- Macro to run DSelector (runDSelector.cc) and shell script to re-direct output (runDSelector.csh)
+- Macro to run DSelector (runDSelector.cc) and shell script to redirect output (runDSelector.csh)
 - [Links to any additional resources or documentation]
 
 ## :memo: Session Outline
-0. **Introduction**: DSelectors are a tool designed for Hall D data analysis that allows acess to all the information that is stored inside the output ROOT file of the ReactionFilter plugin. This session navigates some of the basics such as plotting histograms, applying data selection, and outputing histogram and flat tree ROOT files.
+0. **Introduction**: DSelectors are a tool designed for Hall D data analysis that allows access to all the information that is stored inside the output ROOT file of the ReactionFilter plugin. This session navigates some of the basics, such as plotting histograms, applying data selection, and outputting histogram and flat tree ROOT files.
 1. **Step 1**: Create your DSelector using the command 'MakeDSelector'
       - MakeDSelector  tree_pi0pi0pippim__B4_051636.root  pi0pi0pippim__B4_Tree OmegaPi0
 2. **Step 2**: Let's fill a histogram to see the FCAL shower quality factor
@@ -72,10 +72,10 @@
       - Once the vector is ready, we will fill the branches
         ```
          // Set weight from the 2D sidebands and accidentals
-		     dFlatTreeInterface->Fill_Fundamental<Float_t>("Weight", loc2Dweight * locHistAccidWeightFactor);
-		     // Fill the beam and the vector of TLorentz vectors from earlier
+	 dFlatTreeInterface->Fill_Fundamental<Float_t>("Weight", loc2Dweight * locHistAccidWeightFactor);
+         // Fill the beam and the vector of TLorentz vectors from earlier
          FillAmpTools_FlatTree(locBeamP4, locFinalStateP4);
-		     // FILL FLAT TREE
+         // FILL FLAT TREE
          // This line is by default commented in the DSelector
          Fill_FlatTree(); //for the active combo
         ```
