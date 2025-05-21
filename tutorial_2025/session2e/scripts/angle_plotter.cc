@@ -28,8 +28,8 @@ void plot1D(TFile *f, TString dir, TString data_title, TString reac);
 std::vector<TColor *> create_custom_colors();
 const std::map<TString, JP_props> create_jp_map();
 
-void angle_plotter(TString file_name = "vecps_plot.root",
-                   TString dir = "./", TString data_title = "GlueX Data",
+void angle_plotter(TString dir = "./", TString file_name = "vecps_plot.root",
+                   TString data_title = "GlueX Data",
                    TString reac = "")
 {
     gluex_style(); // semi-standard style for GlueX root plots
