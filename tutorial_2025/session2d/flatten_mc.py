@@ -51,12 +51,14 @@ def main(argv):
     os.chdir(DIR)
     FOUND_TREE_FILES = find_files( PREFIX + "*.root" )
 
-    if ISTHROWN:
-        totalScriptName = "/work/halld2/home/aschertz/gluex_workshops/tutorial_2025/session2d/scripts/mcSubmitJobs_flatten_trees_thrown_%s.sh" % RUN_PERIOD
-    else:
-        totalScriptName = "/work/halld2/home/aschertz/gluex_workshops/tutorial_2025/session2d/scripts/mcSubmitJobs_flatten_trees_%s.sh" % RUN_PERIOD
+    outputPath = "/work/halld2/home/aschertz/gluex_workshops/tutorial_2025/session2d/" # CHANGE THIS PATH TO YOUR OWN
 
-    outBaseDir = "/work/halld2/home/aschertz/gluex_workshops/tutorial_2025/session2d/mcTrees/RunPeriod-%s/" % RUN_PERIOD
+    if ISTHROWN:
+        totalScriptName = "%s/scripts/mcSubmitJobs_flatten_trees_thrown_%s.sh" % (outputPath,RUN_PERIOD)
+    else:
+        totalScriptName = "%s/scripts/mcSubmitJobs_flatten_trees_%s.sh" % (outputPath,RUN_PERIOD)
+
+    outBaseDir = "%s/mcTrees/RunPeriod-%s/" % (outputPath,RUN_PERIOD)
 
     if not os.path.exists(outBaseDir):
         os.makedirs(outBaseDir)
@@ -79,16 +81,16 @@ def main(argv):
         # Write script to submit all jobs
         f = open(totalScriptName,'a')
         if ISTHROWN:
-            f.write("sbatch /work/halld2/home/aschertz/gluex_workshops/tutorial_2025/session2d/scripts/subScripts/job_trees_thrown_flatten_%s.sh\n" % FILE_INDEX)
+            f.write("sbatch %s/scripts/subScripts/job_trees_thrown_flatten_%s.sh\n" % (outputPath,FILE_INDEX) )
         else:
-            f.write("sbatch /work/halld2/home/aschertz/gluex_workshops/tutorial_2025/session2d/scripts/subScripts/job_trees_flatten_%s.sh\n" % FILE_INDEX)
+            f.write("sbatch %s/scripts/subScripts/job_trees_flatten_%s.sh\n" % (outputPath,FILE_INDEX) )
         f.close() 
 
         # Write individual scripts for each job
         if ISTHROWN:
-            f2 = open( "/work/halld2/home/aschertz/gluex_workshops/tutorial_2025/session2d/scripts/subScripts/job_trees_thrown_flatten_%s.sh" % FILE_INDEX, "w")
+            f2 = open( "%s/scripts/subScripts/job_trees_thrown_flatten_%s.sh" % (outputPath,FILE_INDEX), "w")
         else:
-            f2 = open( "/work/halld2/home/aschertz/gluex_workshops/tutorial_2025/session2d/scripts/subScripts/job_trees_flatten_%s.sh" % FILE_INDEX, "w")
+            f2 = open( "%s/scripts/subScripts/job_trees_flatten_%s.sh" % (outputPath,FILE_INDEX), "w")
         f2.write( "#!/bin/sh\n" )
         f2.write( "#SBATCH -q phi\n" )
         f2.write( "#SBATCH -t 00:50:00\n" )
