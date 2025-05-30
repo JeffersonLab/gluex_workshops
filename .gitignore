@@ -1,0 +1,6 @@
+# TUTORIAL 2025
+
+## session 2e
+tutorial_2025/session2e/.venv/*
+tutorial_2025/session2e/__pycache__/*
+tutorial_2025/session2e/**/*.csv
