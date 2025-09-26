@@ -46,12 +46,16 @@ def plot_training_curves(
     if n_metrics == 1:
         axes = [axes]
     
-    epochs = range(1, len(train_losses) + 1)
+    epochs = np.arange(1, len(train_losses) + 1)
+    val_losses = np.array(val_losses, dtype=float)
+    not_nan_mask = ~np.isnan(val_losses)
+    val_epochs = epochs[not_nan_mask]
+    val_losses = val_losses[not_nan_mask]
     
     # Plot loss
     ax_idx = 0
     axes[ax_idx].plot(epochs, train_losses, 'b-', label='Training Loss', linewidth=2)
-    axes[ax_idx].plot(epochs, val_losses, 'r-', label='Validation Loss', linewidth=2)
+    axes[ax_idx].plot(val_epochs, val_losses, 'r-', label='Validation Loss', linewidth=2)
     axes[ax_idx].set_xlabel('Epoch')
     axes[ax_idx].set_ylabel('Loss')
     axes[ax_idx].set_title('Training and Validation Loss')
@@ -62,7 +66,7 @@ def plot_training_curves(
     if train_aucs is not None:
         ax_idx += 1
         axes[ax_idx].plot(epochs, train_aucs, 'b-', label='Training AUC', linewidth=2)
-        axes[ax_idx].plot(epochs, val_aucs, 'r-', label='Validation AUC', linewidth=2)
+        axes[ax_idx].plot(val_epochs, val_aucs, 'r-', label='Validation AUC', linewidth=2)
         axes[ax_idx].set_xlabel('Epoch')
         axes[ax_idx].set_ylabel('AUC')
         axes[ax_idx].set_title('Training and Validation AUC')
@@ -74,7 +78,7 @@ def plot_training_curves(
     if train_accs is not None:
         ax_idx += 1
         axes[ax_idx].plot(epochs, train_accs, 'b-', label='Training Accuracy', linewidth=2)
-        axes[ax_idx].plot(epochs, val_accs, 'r-', label='Validation Accuracy', linewidth=2)
+        axes[ax_idx].plot(val_epochs, val_accs, 'r-', label='Validation Accuracy', linewidth=2)
         axes[ax_idx].set_xlabel('Epoch')
         axes[ax_idx].set_ylabel('Accuracy')
         axes[ax_idx].set_title('Training and Validation Accuracy')
