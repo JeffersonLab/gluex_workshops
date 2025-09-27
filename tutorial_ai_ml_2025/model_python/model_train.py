@@ -51,7 +51,7 @@ USE_STANDARD_SCALER = True
 # Fixed hyperparameters
 TEST_SIZE = 0.3
 RANDOM_STATE = 42
-EPOCHS = 200
+EPOCHS = 1000
 VALIDATE_EVERY = 10
 FEATURE_COLS = [
     "Positive_Energy_FCAL",
@@ -92,19 +92,18 @@ def suggest_hyperparameters(trial: optuna.Trial, num_inputs: int) -> Dict[str, A
         'weight_decay': trial.suggest_float('weight_decay', 1e-6, 1e-2, log=True),
         'hidden_layers': trial.suggest_int('hidden_layers', 1, 3),
         'hidden_size_multiplier': trial.suggest_float('hidden_size_multiplier', 0.5, 3.0),
-        'extra_hidden_size': trial.suggest_int('extra_hidden_size', 0, 20),
     }
 
 def create_model_architecture(params: Dict[str, Any], num_inputs: int) -> MLP:
     """Create MLP model based on suggested hyperparameters."""
     # Calculate hidden layer sizes
-    base_size = num_inputs + params['extra_hidden_size']
     hidden_sizes = []
+    current_size = num_inputs
     
     for _ in range(params['hidden_layers']):
-        layer_size = int(base_size * params['hidden_size_multiplier'])
+        layer_size = int(current_size * params['hidden_size_multiplier'])
         hidden_sizes.append(layer_size)
-        base_size = layer_size  # For next layer
+        current_size = layer_size  # For next layer
     
     return MLP(
         num_inputs=num_inputs,
@@ -209,7 +208,7 @@ def train_single_trial(trial: optuna.Trial, X_train: np.ndarray, y_train: np.nda
     params = suggest_hyperparameters(trial, X_train.shape[1])
     
     # Track model architecture
-    trial.set_user_attr("model_architecture", f"hidden_layers={params['hidden_layers']}, base_size={X_train.shape[1] + params['extra_hidden_size']}")
+    trial.set_user_attr("model_architecture", f"hidden_layers={params['hidden_layers']}, multiplier={params['hidden_size_multiplier']:.2f}")
     
     # Create model and track parameters
     model = create_model_architecture(params, X_train.shape[1]).to(device)
@@ -243,28 +242,6 @@ def train_single_trial(trial: optuna.Trial, X_train: np.ndarray, y_train: np.nda
     trial.set_user_attr("best_val_auc", best_val_auc)
     trial.set_user_attr("best_val_acc", best_val_acc)
     return best_val_auc, best_val_acc
-
-def create_or_load_study() -> optuna.Study:
-    """Create a new study or load existing one from database."""
-    storage = RDBStorage(OPTUNA_DB_URL)
-    
-    try:
-        study = optuna.load_study(
-            study_name=STUDY_NAME,
-            storage=storage,
-            sampler=TPESampler(seed=RANDOM_STATE)
-        )
-        print(f"Loaded existing study: {STUDY_NAME} ({len(study.trials)} trials)")
-    except KeyError:
-        study = optuna.create_study(
-            study_name=STUDY_NAME,
-            storage=storage,
-            directions=['maximize', 'maximize'],  # Multi-objective: AUC and accuracy
-            sampler=TPESampler(seed=RANDOM_STATE)
-        )
-        print(f"Created new study: {STUDY_NAME}")
-    
-    return study
 
 def optimize_hyperparameters(n_trials: int = 100) -> Tuple[optuna.Study, np.ndarray, np.ndarray, np.ndarray, np.ndarray, StandardScaler]:
     """Run hyperparameter optimization using Optuna."""
@@ -300,8 +277,23 @@ def optimize_hyperparameters(n_trials: int = 100) -> Tuple[optuna.Study, np.ndar
         X = scaler.transform(X)
     
     # Create study and run optimization
-    study = create_or_load_study()
-    
+    storage = RDBStorage(OPTUNA_DB_URL)
+    try:
+        study = optuna.load_study(
+            study_name=STUDY_NAME,
+            storage=storage,
+            sampler=TPESampler(seed=RANDOM_STATE)
+        )
+        print(f"Loaded existing study: {STUDY_NAME} ({len(study.trials)} trials)")
+    except KeyError:
+        study = optuna.create_study(
+            study_name=STUDY_NAME,
+            storage=storage,
+            directions=['maximize', 'maximize'],  # Multi-objective: AUC and accuracy
+            sampler=TPESampler(seed=RANDOM_STATE)
+        )
+        print(f"Created new study: {STUDY_NAME}")
+
     def objective(trial):
         try:
             return train_single_trial(trial, X_train, y_train, X_val, y_val, device)
@@ -331,13 +323,6 @@ def train_best_model(study: optuna.Study, X: np.ndarray, y: np.ndarray,
     
     # Create and train best model
     model = create_model_architecture(best_params, X.shape[1]).to(device)
-    
-    # Set optimizer with best parameters
-    optimizer = torch.optim.Adam(
-        model.parameters(), 
-        lr=best_params['learning_rate'], 
-        weight_decay=best_params['weight_decay']
-    )
     
     # Create data loaders
     train_loader = DataLoader(
@@ -405,7 +390,7 @@ def main():
     
     parser = argparse.ArgumentParser(description="MLP Hyperparameter Optimization with Optuna")
     parser.add_argument("--trials", type=int, default=50, help="Number of optimization trials")
-    parser.add_argument("--dashboard", action="store_true", help="Start Optuna dashboard")
+    parser.add_argument("--dashboard", action="store_true", help="Start Optuna dashboard (run after optimization)")
     
     args = parser.parse_args()
     
@@ -439,8 +424,7 @@ def main():
     train_best_model(study, X, y, X_test, y_test, scaler)
     
     print("Training completed!")
-    print(f"\nTo view the interactive dashboard, run:")
-    print(f"python {__file__} --dashboard")
+    print(f"\nTo view the interactive dashboard, run with --dashboard flag")
 
 if __name__ == "__main__":
     main()
