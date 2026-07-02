@@ -1,8 +1,8 @@
 // Basic pLots for flattened DATA trees:
-TString FN("/work/halld2/home/aschertz/gluex_workshops/tutorial_2025/session2d/dataTrees/RunPeriod-2018-08/tree_pi0pip0pippim__B4_flat_*.root");
+TString FN("/sciclone/gluex10/gluex_workshop_data/tutorial_2025/session2d/flattenedTrees/data/tree_pi0pi0pippim__B4_FSROOT_*.root");
 
 // Basic plots for flattened MC trees:
-TString FNMC("/work/halld2/home/aschertz/gluex_workshops/tutorial_2025/session2d/mcTrees/RunPeriod-2018-08/tree_pi0pip0pippim__B4_flat_*.root");
+TString FNMC("/sciclone/gluex10/gluex_workshop_data/tutorial_2025/session2d/flattenedTrees/monteCarlo/tree_pi0pi0pippim__B4_FSROOT_*.root");
 
 TString NT("ntFSGlueX_100_112");
 
